@@ -3,6 +3,7 @@ import sys
 from datetime import datetime, timedelta
 
 import pendulum
+from airflow.operators.bash import BashOperator
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from airflow_kubernetes_job_operator.kubernetes_job_operator import \
     KubernetesJobOperator
@@ -57,20 +58,11 @@ with DAG(
         },
     )
 
-    t2 = KubernetesJobOperator(
-        task_id="te",
-        body_filepath=POD_TEMPALTE,
-        command=["/bin/bash", "echo"],
-        arguments=[
-            "{{ ti.xcom_pull(task_ids='get_games_list') }}",
-
-        ],
-        jinja_job_args={
-            "image": "google/cloud-sdk",
-            "name": "get-games-list22",
-            "gitsync": True,
-        },
+    t2 = BashOperator(
+        task_id=mytask,
+        bash_command="echo ${MYVAR}",
+        env={"MYVAR": '{{ ti.xcom_pull(key=\'game_list\') }}'},
     )
-    
+
     
     t1>>t2
