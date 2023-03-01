@@ -43,6 +43,23 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
+    t0 = KubernetesJobOperator(
+            task_id=f"scrape-vgchartz-hw-sales",
+            body_filepath=POD_TEMPALTE,
+            command=["python", f"{BASE}/vgchartz/hardware_sales.py"],
+            jinja_job_args={
+                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                "name": f"scrape-vg-hw-sales",
+                "gitsync": True,
+                "volumes": [
+                    {
+                        "name": "persistent-volume",
+                        "type": "persistentVolumeClaim",
+                        "reference": "data-pv-claim",
+                        "mountPath": "/etc/scraped_data/",
+                    }]
+            },
+        )
 # "xbox-series-x", "xbox-one","xbox"
     consoles = [  "xbox360", ]
     for console in consoles:
@@ -145,4 +162,4 @@ with DAG(
         )
 
         t1>>[t2, t3, t4]
-        
+    t0
