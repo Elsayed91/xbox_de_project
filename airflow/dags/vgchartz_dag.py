@@ -69,11 +69,18 @@ with DAG(
             t2 = KubernetesJobOperator(
             task_id=f"scrape-{genre.lower().replace(' ', '-')}",
             body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_game_genres.py"],
+            command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
             jinja_job_args={
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": f"scrape-vg-genres",
                 "gitsync": True,
+                "volumes": [
+                    {
+                        "name": "persistent-volume",
+                        "type": "persistentVolumeClaim",
+                        "reference": "data-pv-claim",
+                        "mountPath": "/etc/scraped_data/",
+                    }]
             },
             envs = {
                 "genre": genre

@@ -49,7 +49,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 #        --machine-type=e2-medium  \
 #        --enable-autoscaling \
 #        --min-nodes=0 \
-#        --max-nodes=7 \
+#        --max-nodes=20 \
 #        --workload-metadata=GKE_METADATA \
 #        --spot \
 #        --disk-size=10 \

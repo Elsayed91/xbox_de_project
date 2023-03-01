@@ -168,4 +168,4 @@ def main():
     end = timer()
     print("It took " + str(end - start) + " seconds to retrieve the data.")
     df = clean_data(df)
-    df.to_csv('vgc_game_sales.csv', index=False)
+    df.to_csv(f'/etc/scraped_data/vgc_game_sales_{genre}.csv', index=False)
