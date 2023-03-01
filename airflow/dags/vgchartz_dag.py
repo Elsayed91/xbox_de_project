@@ -67,7 +67,7 @@ with DAG(
                    'Racing', 'Role-Playing', 'Sandbox', 'Shooter', 'Simulation', 
                    'Sports', 'Strategy', 'Visual Novel']:
             t2 = KubernetesJobOperator(
-            task_id=f"scrape-{genre}",
+            task_id=f"scrape-{genre.lower().replace(' ', '-')}",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/vgchartz/scrape_game_genres.py"],
             jinja_job_args={
