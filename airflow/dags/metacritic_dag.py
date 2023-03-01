@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from datetime import datetime, timedelta
@@ -72,7 +73,7 @@ with DAG(
             "gitsync": True,
         },
         envs={
-            "game_list": '{{ ti.xcom_pull(key=\'game_list\') }}'
+            "game_list": json.loads('{{ ti.xcom_pull(key=\'game_list\') }}')
         }
     )
 
