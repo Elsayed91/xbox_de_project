@@ -82,8 +82,14 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 #     --clusterrole=cluster-admin --serviceaccount=default:default
 
 
-gcloud builds submit
+# gcloud builds submit
 
 # kubectl apply -f airflow/manifests/rbac.yaml
 # cat airflow/manifests/postgres.yaml | envsubst | kubectl apply -f - 
 # cat airflow/manifests/airflow.yaml | envsubst | kubectl apply -f - 
+
+
+pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+if [ -n "$pods" ]; then
+    kubectl delete pod $pods
+fi

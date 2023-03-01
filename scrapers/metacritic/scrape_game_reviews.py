@@ -122,6 +122,5 @@ def main(game_list: list, console: str, review_type: str) -> None:
         
 if __name__ == '__main__':
     game_list = textToList(os.getenv("game_list"))
-    game_list = game_list[:10]
     main(game_list, os.getenv("console"), os.getenv("review_type"))
     

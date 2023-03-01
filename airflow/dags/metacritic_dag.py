@@ -42,13 +42,13 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-# "xbox-series-x", "xbox-one", "xbox360",
-    consoles = [ "xbox"]
+
+    consoles = [ "xbox-series-x", "xbox-one", "xbox360", "xbox"]
     for console in consoles:
         t1 = KubernetesJobOperator(
-            task_id=f"get_{console}_games_list",
+            task_id=f"scrape{console}_game_list",
             body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/metacritic/get_games.py"],
+            command=["python", f"{BASE}/metacritic/scrape_game_list.py"],
             arguments=[
                 "--console",
                 console
@@ -63,7 +63,7 @@ with DAG(
         t2 = KubernetesJobOperator(
             task_id=f"scrape-{console}-games-data",
             body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
+            command=["python", f"{BASE}/metacritic/scrape_game_data.py"],
             jinja_job_args={
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": f"get-{console}-games-data",
@@ -103,7 +103,6 @@ with DAG(
             },
             envs={
                 "game_list": f"{{{{ ti.xcom_pull(key=\'game_list_{console}\') }}}}",
-                # "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}',
                 "console": console,
                 "review_type": "user"
             }
@@ -127,7 +126,6 @@ with DAG(
             },
             envs={
                 "game_list": f"{{{{ ti.xcom_pull(key=\'game_list_{console}\') }}}}",
-                # "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}',
                 "console": console,
                 "review_type": "critic"
             }
