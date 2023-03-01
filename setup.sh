@@ -81,6 +81,9 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # kubectl create clusterrolebinding admin-role \
 #     --clusterrole=cluster-admin --serviceaccount=default:default
 
+
+gcloud builds submit
+
 # kubectl apply -f airflow/manifests/rbac.yaml
-cat airflow/manifests/postgres.yaml | envsubst | kubectl apply -f - 
-cat airflow/manifests/airflow.yaml | envsubst | kubectl apply -f - 
+# cat airflow/manifests/postgres.yaml | envsubst | kubectl apply -f - 
+# cat airflow/manifests/airflow.yaml | envsubst | kubectl apply -f - 

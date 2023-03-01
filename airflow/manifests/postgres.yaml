@@ -8,7 +8,7 @@ data:
   PGDATA: "/var/lib/postgresql/data/"
   POSTGRESQL_PORT_NUMBER: "5432"
   POSTGRESQL_VOLUME_DIR: "/data"
-  POSTGRES_USER: "postgres"
+  POSTGRES_USER: ${POSTGRES_USER}
   POSTGRESQL_ENABLE_LDAP: "no"
   POSTGRESQL_ENABLE_TLS: "no"
   POSTGRESQL_LOG_HOSTNAME: "false"
@@ -88,8 +88,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: postgres-db-config
-            - secretRef:
-                name: postgres-secret
           volumeMounts:
             - name: postgresql-db-disk
               mountPath: /data

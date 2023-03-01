@@ -1,0 +1,11 @@
+steps:
+  - id: build_postgres_image
+    waitFor: ['-']
+    name: "gcr.io/kaniko-project/executor:latest"
+    args:
+      [
+        "--context=dir://airflow/docker",
+        "--cache=true",
+        "--cache-ttl=6h",
+        "--destination=eu.gcr.io/$PROJECT_ID/airflow:$COMMIT_SHA",
+      ]
