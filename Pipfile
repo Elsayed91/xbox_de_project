@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+js2py = "*"
+beautifulsoup4 = "*"
+scrapy = {extras = ["vgchartz"], version = "*"}
+html5lib = "*"
+fuzzywuzzy = "*"
+snscrape = {extras = ["twitter"], version = "*"}
+textblob = {extras = ["twitter"], version = "*"}
+nltk = {extras = ["twitter"], version = "*"}
+vadersentiment = {extras = ["twitter"], version = "*"}
+better-profanity = {extras = ["twitter"], version = "*"}
+python-levenshtein = {extras = ["metacritic"], version = "*"}
+fake-useragent = {extras = ["metacritic"], version = "*"}
+
+
+[dev-packages]
+airflow-kubernetes-job-operator = "*"
+apache-airflow = "*"
+jupyter = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.10"

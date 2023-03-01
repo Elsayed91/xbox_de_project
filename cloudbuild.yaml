@@ -1,11 +1,21 @@
 steps:
-  - id: build_postgres_image
+  # - id: build_airflow_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://docker/airflow",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/airflow:$COMMIT_SHA",
+  #     ]
+  - id: build_python_image
     waitFor: ['-']
     name: "gcr.io/kaniko-project/executor:latest"
     args:
       [
-        "--context=dir://airflow/docker",
+        "--context=dir://docker/scraper",
         "--cache=true",
         "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/airflow:$COMMIT_SHA",
+        "--destination=eu.gcr.io/$PROJECT_ID/scraper:$COMMIT_SHA",
       ]

@@ -1,2 +1,3 @@
 .vscode
 .env
+scrapers/metacritic/__pycache__
