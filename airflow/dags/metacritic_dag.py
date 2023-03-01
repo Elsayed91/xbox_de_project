@@ -59,6 +59,10 @@ with DAG(
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": f"get-games-list-{console}",
                 "gitsync": True,
+            },
+            envs={
+
+                "console": console,
             }
         )
         
