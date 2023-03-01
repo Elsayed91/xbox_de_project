@@ -61,6 +61,9 @@ spec:
       {% elif volume.type == 'configMap' %}
       configMap:
         name: {{ volume.reference }}
+      {% elif volume.type == 'persistentVolumeClaim' %}
+      persistentVolumeClaim:
+        claimName: {{ volume.reference }}
       {% elif volume.type == 'emptyDir' %}
       emptyDir: {}
       {% endif %}

@@ -70,6 +70,14 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
             "name": "get-games-data",
             "gitsync": True,
+            "volumes": [
+                {
+                    "name": "persistent-volume",
+                    "type": "persistentVolumeClaim",
+                    "reference": "data-pv-claim",
+                    "mountPath": "/etc/scraped_data/",
+                }
+            ],
         },
         envs={
             "game_list": '{{ ti.xcom_pull(key=\'game_list\') }}'

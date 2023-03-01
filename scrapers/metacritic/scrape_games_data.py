@@ -6,7 +6,6 @@ import random as rand
 import re
 import time
 from datetime import datetime
-from timeit import default_timer as timer
 
 import pandas as pd
 import requests
@@ -128,7 +127,7 @@ def main(game_list: list, console: str) -> None:
     df1 = (pd.DataFrame.from_dict(data_list))
     print(df1.head())
     add_gamepass_status(df1)
-    with open(f"{console}-games.csv", 'w', newline='', encoding='utf-8') as file:
+    with open(f"/etc/scraped_data/{console}-games.csv", 'w', newline='', encoding='utf-8') as file:
         df1.to_csv(file, index=False)
 
 
@@ -136,7 +135,6 @@ def main(game_list: list, console: str) -> None:
 
 
 if __name__ == "__main__":
-    start = timer()
     import ast
     game_list = os.getenv('game_list')
     l = ast.literal_eval(game_list)
@@ -145,6 +143,5 @@ if __name__ == "__main__":
     print(game_list)
     for console in [ "xbox-series-x"]:
         main(game_list, console)
-    end = timer()
-    print("It took " + str(end - start) + " seconds to retrieve this data.")
+
 
