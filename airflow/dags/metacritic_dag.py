@@ -46,7 +46,7 @@ with DAG(
     consoles = ["xbox-series-x", "xbox-one", "xbox360", "xbox"]
     for console in consoles:
         t1 = KubernetesJobOperator(
-            task_id=f"get_games_list_{console}",
+            task_id=f"get_{console}_games_list",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/metacritic/get_games.py"],
             arguments=[
