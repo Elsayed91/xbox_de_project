@@ -42,8 +42,8 @@ spec:
               subPath: airflow.cfg
       containers:
         - name: scheduler
-          image: eu.gcr.io/${PROJECT}/airflow
-          imagePullPolicy: Always
+          image: eu.gcr.io/${PROJECT}/airflow:latest
+          imagePullPolicy: IfNotPresent
           args:
             - bash
             - -c
@@ -188,7 +188,7 @@ data:
 
     [core]
     colored_console_log = False
-    dags_folder = /git/repo/components/airflow/dags/
+    dags_folder = /git/repo/airflow/dags/
     executor = LocalExecutor
     load_examples = False
     remote_logging = False

@@ -62,7 +62,7 @@ with DAG(
         body_filepath=POD_TEMPALTE,
         command=["/bin/bash", "echo"],
         arguments=[
-            xcom_value_parser,
+            parse_xcom_event,
 
         ],
         jinja_job_args={
