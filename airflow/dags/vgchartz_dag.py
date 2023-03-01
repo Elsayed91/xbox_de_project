@@ -37,7 +37,7 @@ with DAG(
     schedule_interval=None,
     default_args=default_args,
     catchup=False,
-    tags=["full-refresh"],
+    tags=["vgchartz"],
     description="initial load/full refresh data pipeline",
 ) as dag:
 
