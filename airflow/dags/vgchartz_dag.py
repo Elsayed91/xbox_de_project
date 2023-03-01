@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import pendulum
 from airflow.decorators import task_group
 from airflow.operators.bash import BashOperator
+from airflow.utils.task_group import TaskGroup
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from airflow_kubernetes_job_operator.kubernetes_job_operator import \
     KubernetesJobOperator
@@ -61,32 +62,31 @@ with DAG(
             },
         )
     
-
-    for genre in  ['Action', 'Action-Adventure', 'Adventure', 'Board Game', 'Education',
-                   'Fighting', 'Misc', 'MMO', 'Music', 'Party', 'Platform', 'Puzzle', 
-                   'Racing', 'Role-Playing', 'Sandbox', 'Shooter', 'Simulation', 
-                   'Sports', 'Strategy', 'Visual Novel']:
-            t2 = KubernetesJobOperator(
-            task_id=f"scrape-{genre.lower().replace(' ', '-')}",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"scrape-vg-genres",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }]
-            },
-            envs = {
-                "genre": genre
-            }
-        )
-            t2
+    with TaskGroup(group_id='group1') as tg1:
+        for genre in  ['Action', 'Action-Adventure', 'Adventure', 'Board Game', 'Education',
+                    'Fighting', 'Misc', 'MMO', 'Music', 'Party', 'Platform', 'Puzzle', 
+                    'Racing', 'Role-Playing', 'Sandbox', 'Shooter', 'Simulation', 
+                    'Sports', 'Strategy', 'Visual Novel']:
+                t2 = KubernetesJobOperator(
+                task_id=f"scrape-{genre.lower().replace(' ', '-')}",
+                body_filepath=POD_TEMPALTE,
+                command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
+                jinja_job_args={
+                    "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                    "name": f"scrape-vg-genres",
+                    "gitsync": True,
+                    "volumes": [
+                        {
+                            "name": "persistent-volume",
+                            "type": "persistentVolumeClaim",
+                            "reference": "data-pv-claim",
+                            "mountPath": "/etc/scraped_data/",
+                        }]
+                },
+                envs = {
+                    "genre": genre
+                }
+            )
+                t2
             
-    t0
-    [t2]
+    [t0,tg1]
