@@ -42,8 +42,8 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-#"xbox-series-x", "xbox-one", "xbox360",
-    consoles = [ "xbox"]
+
+    consoles = ["xbox-series-x", "xbox-one", "xbox360", "xbox"]
     for console in consoles:
         t1 = KubernetesJobOperator(
             task_id=f"get_{console}_games_list",
@@ -67,8 +67,6 @@ with DAG(
             arguments=[
                 "--console",
                 console,
-                "--game_list",
-                f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}'
             ],
             jinja_job_args={
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
@@ -83,6 +81,9 @@ with DAG(
                     }
                 ],
             },
+            envs={
+                "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}'
+            }
         )
 
         t1>>t2

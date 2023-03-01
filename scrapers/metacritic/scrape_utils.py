@@ -60,3 +60,7 @@ def get_games_per_page(link: str) -> list[str]:
     title_elements = soup.find_all('a', class_='title')
     href_list = [elem.get('href') for elem in title_elements]
     return href_list
+
+
+def textToList(hashtags):
+    return hashtags.strip('[]').replace('\'', '').replace(' ', '').split(',')
