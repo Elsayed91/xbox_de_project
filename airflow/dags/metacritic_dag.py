@@ -42,8 +42,8 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-
-    consoles = ["xbox-series-x", "xbox-one", "xbox360", "xbox"]
+# "xbox-series-x", "xbox-one", "xbox360",
+    consoles = [ "xbox"]
     for console in consoles:
         t1 = KubernetesJobOperator(
             task_id=f"get_{console}_games_list",
