@@ -62,7 +62,7 @@ with DAG(
         body_filepath=POD_TEMPALTE,
         command=["/bin/bash", "echo"],
         arguments=[
-            parse_xcom_event,
+            "{{ ti.xcom_pull(task_ids='get_games_list') }}",
 
         ],
         jinja_job_args={
