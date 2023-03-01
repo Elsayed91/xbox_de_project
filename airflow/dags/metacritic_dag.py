@@ -78,7 +78,7 @@ with DAG(
                 ],
             },
             envs={
-                "game_list": f'{{{{ ti.xcom_pull(key=\'game_list_{console}\') }} }}',
+                "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}',
                 "console": console
             }
         )
