@@ -142,9 +142,9 @@ if __name__ == "__main__":
     parser.add_argument('--game_list', required=True, help='List of games')
     args = parser.parse_args()
     game_list = args.game_list
-    print(game_list)
-    l = ast.literal_eval(game_list)
-    l = [i.strip() for i in l]
+    print(type(game_list))
+    # l = ast.literal_eval(game_list)
+    # l = [i.strip() for i in l]
     game_list = l[:10]
     print(game_list)
     main(game_list, args.console)
