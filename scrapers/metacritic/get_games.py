@@ -26,6 +26,7 @@ def game_urls(link: str, pages: int) -> Generator[str, None, None]:
             yield f"https://www.metacritic.com{elem.get('href')}"
 
 if __name__=='__main__':
+    url = "https://www.metacritic.com/browse/games/release-date/available/xbox-series-x/name?&view=detailed"
     pages = get_last_page_num(url)
     url_list = [u for u in game_urls(url, pages)]
     import json
