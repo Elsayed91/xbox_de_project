@@ -32,7 +32,7 @@ if __name__=='__main__':
            f"available/{console}/name?&view=detailed")
     pages = get_last_page_num(url)
     url_list = [u for u in game_urls(url, pages)]
-    with open(f"/etc/scraped_data/{console}-urls.txt", "a") as f:
+    with open(f"/etc/scraped_data/{console}-urls.txt", "w") as f:
         for url in url_list:
             f.write(url + "\n")
     # import json
