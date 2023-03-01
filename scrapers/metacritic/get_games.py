@@ -36,5 +36,4 @@ if __name__=='__main__':
     url_list = [u for u in game_urls(url, pages)]
     import json
     game_list_json = json.dumps(url_list)
-    print(f"got game list for {args.console}")
-    print(f"::kube_api:xcom={{\"game_list_{console}\":{game_list_json}}}")
+    print(f"::kube_api:xcom={{\"game_list_{args.console}\":{game_list_json}}}")
