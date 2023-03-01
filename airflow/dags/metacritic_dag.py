@@ -22,7 +22,7 @@ default_args = {
     "concurrency": 5,
     "max_active_runs": 3,
     "in_cluster": True,
-    "random_name_postfix_length": 2,
+    "random_name_postfix_length": 3,
     "name_prefix": "",
 }
 
