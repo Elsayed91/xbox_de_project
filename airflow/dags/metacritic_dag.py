@@ -61,7 +61,7 @@ with DAG(
         )
         
         t2 = KubernetesJobOperator(
-            task_id="scrape-games-data",
+            task_id=f"scrape-{console}-games-data",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
             # arguments=[
@@ -70,7 +70,7 @@ with DAG(
             # ],
             jinja_job_args={
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": "get-games-data",
+                "name": f"get-{console}-games-data",
                 "gitsync": True,
                 "volumes": [
                     {
