@@ -123,10 +123,10 @@ def main(game_list: list, console: str) -> None:
     exception_list = []
     for game in game_list:
         print(f"processing {game} data.")
-        game_url = f"https://www.metacritic.com{game}"
-        scrape_game_data(game_url, data_list, exception_list)
+        scrape_game_data(game, data_list, exception_list)
     
     df1 = (pd.DataFrame.from_dict(data_list))
+    print(df1.head())
     add_gamepass_status(df1)
     with open(f"{console}-games.csv", 'w', newline='', encoding='utf-8') as file:
         df1.to_csv(file, index=False)
@@ -138,6 +138,7 @@ def main(game_list: list, console: str) -> None:
 if __name__ == "__main__":
     start = timer()
     game_list = os.getenv('game_list')
+    print(game_list)
     for console in [ "xbox-series-x"]:
         url = ('https://www.metacritic.com/browse/games/release-date/'
                 + f'available/{console}/name?&view=detailed')

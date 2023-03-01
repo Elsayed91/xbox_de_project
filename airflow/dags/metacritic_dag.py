@@ -57,11 +57,23 @@ with DAG(
             "gitsync": True,
         },
     )
+    
+    t2 = KubernetesJobOperator(
+        task_id="scrape-games-data",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
+        # arguments=[
+        #     "--data-source",
 
-    t2 = BashOperator(
-        task_id="xd",
-        bash_command="echo ${MYVAR}",
-        env={"MYVAR": '{{ ti.xcom_pull(key=\'game_list\') }}'},
+        # ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+            "name": "get-games-data",
+            "gitsync": True,
+        },
+        envs={
+            "game_list": '{{ ti.xcom_pull(key=\'game_list\') }}'
+        }
     )
 
     
