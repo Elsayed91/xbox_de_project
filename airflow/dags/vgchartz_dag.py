@@ -38,7 +38,7 @@ with DAG(
     default_args=default_args,
     catchup=False,
     tags=["vgchartz"],
-    description="initial load/full refresh data pipeline",
+    # description="initial load/full refresh data pipeline",
 ) as dag:
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
