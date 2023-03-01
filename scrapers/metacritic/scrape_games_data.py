@@ -140,8 +140,6 @@ if __name__ == "__main__":
     game_list = os.getenv('game_list')
     print(game_list)
     for console in [ "xbox-series-x"]:
-        url = ('https://www.metacritic.com/browse/games/release-date/'
-                + f'available/{console}/name?&view=detailed')
         main(game_list, console)
     end = timer()
     print("It took " + str(end - start) + " seconds to retrieve this data.")
