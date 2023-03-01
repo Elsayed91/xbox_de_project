@@ -33,7 +33,7 @@ POD_TEMPALTE = os.path.join(os.path.dirname(__file__), "templates", "pod_templat
 BASE = "/git/repo/scrapers"
 
 with DAG(
-    dag_id="full-refresh",
+    dag_id="vgchartz",
     schedule_interval=None,
     default_args=default_args,
     catchup=False,
