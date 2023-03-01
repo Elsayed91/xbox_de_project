@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: airflow-secret
+stringData:
+  AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: "postgresql://${POSTGRES_USER}:${AIRFLOW_DB_PASSWORD}@${POSTGRES_HOST}:5432/${AIRFLOW_DB}"
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql://${POSTGRES_USER}:${AIRFLOW_DB_PASSWORD}@${POSTGRES_HOST}:5432/${AIRFLOW_DB}"
+  AIRFLOW_CONN_AIRFLOW_DB: "postgresql://${POSTGRES_USER}:${AIRFLOW_DB_PASSWORD}@${POSTGRES_HOST}:5432/${AIRFLOW_DB}"
+  AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
+  AIRFLOW_ADMIN_USER: ${AIRFLOW_ADMIN_USER}
+  AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD}
+  AIRFLOW_VIEWER_USER: ${AIRFLOW_VIEWER_USER}
+  AIRFLOW_VIEWER_PASSWORD: ${AIRFLOW_VIEWER_PASSWORD}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: airflow
+spec:
+  selector:
+    matchLabels:
+      app: airflow
+  template:
+    metadata:
+      labels:
+        app: airflow
+    spec:
+      securityContext:
+        runAsUser: 50000
+        fsGroup: 0
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - airflow
+            topologyKey: kubernetes.io/hostname
+      initContainers:
+        - name: run-airflow-migrations
+          image: eu.gcr.io/${PROJECT}/airflow
+          imagePullPolicy: Always
+          command: ["/bin/bash", "/opt/airflow/init.sh"]
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+            - configMapRef:
+                name: pipeline-env
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: "/opt/airflow/airflow.cfg"
+              subPath: airflow.cfg
+      containers:
+        - name: scheduler
+          image: eu.gcr.io/${PROJECT}/airflow
+          imagePullPolicy: Always
+          args:
+            - bash
+            - -c
+            - exec airflow scheduler
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+            - configMapRef:
+                name: pipeline-env
+          ports:
+            - name: worker-logs
+              containerPort: 8793
+          livenessProbe:
+            initialDelaySeconds: 10
+            timeoutSeconds: 20
+            failureThreshold: 5
+            periodSeconds: 60
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                  airflow jobs check --job-type SchedulerJob --hostname $(hostname)
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+              subPath: pod_template_file.yaml
+            - name: logs
+              mountPath: "/opt/airflow/logs"
+            - name: dags
+              mountPath: /git
+            - name: config
+              mountPath: "/opt/airflow/airflow.cfg"
+              subPath: airflow.cfg
+            - name: config
+              mountPath: "/opt/airflow/config/airflow_local_settings.py"
+              subPath: airflow_local_settings.py
+        - name: git-sync
+          image: k8s.gcr.io/git-sync/git-sync:v3.6.2
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 65533
+          envFrom:
+            - configMapRef:
+                name: git-env
+          resources: {}
+          volumeMounts:
+            - name: dags
+              mountPath: /git
+        - name: webserver
+          image: eu.gcr.io/${PROJECT}/airflow #apache/airflow:2.5.0
+          imagePullPolicy: Always
+          args:
+            - bash
+            - -c
+            - exec airflow webserver
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+          livenessProbe:
+            failureThreshold: 20
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+          ports:
+            - name: airflow-ui
+              containerPort: 8080
+          resources: {}
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: "true"
+      volumes:
+        - name: config
+          configMap:
+            name: airflow-config
+        - name: logs
+          emptyDir: {}
+        - name: dags
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-headless-service
+  labels:
+    app: airflow
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: airflow
+  ports:
+    - name: task-logs
+      port: 8793
+      targetPort: 8793
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: airflow-webserver
+  labels:
+    app: airflow
+spec:
+  type: NodePort
+  selector:
+    app: airflow
+  ports:
+    - name: airflow-ui
+      port: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: git-env
+data:
+  GIT_SYNC_REV: "HEAD"
+  GIT_SYNC_BRANCH: "main"
+  GIT_SYNC_REPO: ${GIT_SYNC_REPO}
+  GIT_SYNC_DEPTH: "1"
+  GIT_SYNC_ROOT: "/git"
+  GIT_SYNC_DEST: "repo"
+  GIT_SYNC_USERNAME: "Liftingthedata"
+  GIT_SYNC_WAIT: "5"
+  GIT_SYNC_MAX_SYNC_FAILURES: "0"
+  GIT_KNOWN_HOSTS: "false"
+  GIT_SYNC_PASSWORD: ${GIT_SYNC_PASSWORD}
+
+\

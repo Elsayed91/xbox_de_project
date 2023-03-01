@@ -1,0 +1,234 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: full-privilege
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods/logs
+    verbs:
+      - get
+      - watch
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - watch
+      - list
+      - create
+      - delete
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - configmaps
+      - secrets
+    verbs:
+      - create
+      - get
+      - delete
+      - watch
+      - list
+      - patch
+      - update
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - create
+      - get
+      - delete
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - listen
+      - watch
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - resourcequotas
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - create
+      - get
+      - update
+      - delete
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs:
+      - create
+      - get
+      - update
+      - list
+      - watch
+      - delete
+  - apiGroups:
+      - sparkoperator.k8s.io
+    resources:
+      - sparkapplications
+      - sparkapplications/status
+      - scheduledsparkapplications
+      - scheduledsparkapplications/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - get
+      - delete
+      - watch
+      - list
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - "*"
+  - apiGroups: ["extensions"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames: [prometheus-postgres-exporter]
+  - apiGroups: ["certificates.k8s.io"]
+    resources:
+      - certificatesigningrequests
+    verbs: ["list", "watch"]
+  - apiGroups: ["batch"]
+    resources:
+      - cronjobs
+    verbs: ["list", "watch"]
+  - apiGroups: ["extensions", "apps"]
+    resources:
+      - daemonsets
+    verbs: ["list", "watch"]
+  - apiGroups: ["extensions", "apps"]
+    resources:
+      - deployments
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - endpoints
+    verbs: ["list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["list", "watch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources:
+      - leases
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - limitranges
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - namespaces
+    verbs: ["list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - networkpolicies
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - persistentvolumes
+    verbs: ["list", "watch"]
+  - apiGroups: ["policy"]
+    resources:
+      - poddisruptionbudgets
+    verbs: ["list", "watch"]
+  - apiGroups: ["extensions", "apps"]
+    resources:
+      - replicasets
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - replicationcontrollers
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - resourcequotas
+    verbs: ["list", "watch"]
+
+  - apiGroups: ["apps"]
+    resources:
+      - statefulsets
+    verbs: ["list", "watch"]
+
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - storageclasses
+    verbs: ["list", "watch"]
+
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources:
+      - validatingwebhookconfigurations
+    verbs: ["list", "watch"]
+
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - volumeattachments
+    verbs: ["list", "watch"]
+---
+# Source: spark-operator/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: full-privilege-Binding
+roleRef:
+  kind: ClusterRole
+  name: full-privilege
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: full-privilege-Role-Binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  kind: Role
+  name: full-privilege
+  apiGroup: rbac.authorization.k8s.io
