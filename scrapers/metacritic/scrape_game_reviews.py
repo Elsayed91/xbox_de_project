@@ -6,10 +6,9 @@ import requests
 from bs4 import BeautifulSoup
 
 try: 
-    from common_scrape_utils import *
+    from scrape_utils import *
 except:
-    from scrapers.metacritic.common_scrape_utils import *
-
+    from scrapers.metacritic.scrape_utils import *
 
 def scrape_metacritic_reviews(game_link: str, critic_review_list: list, exception_list: list) -> None:
     """
