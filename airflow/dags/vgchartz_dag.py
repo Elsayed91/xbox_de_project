@@ -21,7 +21,7 @@ default_args = {
     "depends_on_past": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=60),
-    "concurrency": 6,
+    "concurrency": 5,
     "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
