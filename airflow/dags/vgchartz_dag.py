@@ -62,7 +62,7 @@ with DAG(
             },
         )
     
-    with TaskGroup(group_id='group1') as tg1:
+    with TaskGroup(group_id='scrape-genres') as tg1:
         for genre in  ['Action', 'Action-Adventure', 'Adventure', 'Board Game', 'Education',
                     'Fighting', 'Misc', 'MMO', 'Music', 'Party', 'Platform', 'Puzzle', 
                     'Racing', 'Role-Playing', 'Sandbox', 'Shooter', 'Simulation', 
