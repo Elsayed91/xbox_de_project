@@ -51,7 +51,7 @@ with DAG(
 
         # ],
         jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
             "name": "get-games-list",
             "gitsync": True,
         },
