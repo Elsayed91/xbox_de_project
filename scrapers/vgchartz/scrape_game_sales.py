@@ -146,13 +146,14 @@ def scrape_vgchartz(console_list: list[str]) -> pd.DataFrame:
     """
     # get genre and console list
     genre_list = scrape_genre_list()
-    
+    print(genre_list)
 
     # create empty dataframe to store game info
     game_df = pd.DataFrame()
 
     # loop through genres and consoles and scrape games for each combination
     for genre in genre_list:
+        print(f"processing {genre}.")
         for console_type in console_list:
             page_num = 1
             page_exist = True
@@ -164,6 +165,7 @@ def scrape_vgchartz(console_list: list[str]) -> pd.DataFrame:
                 page_exist, game_info_df = scrape_game_info(soup, genre)
                 if game_info_df is not None:
                     game_df = pd.concat([game_df, game_info_df], ignore_index=True)
+                    
                     print(f"Appended Dataframe with page {page_num} of {console_type} games in Genre {genre}")
 
                 # increment page number
@@ -186,8 +188,6 @@ def clean_data(df):
 
 def main():
     df = scrape_vgchartz(console_list = ['XS', 'XOne', 'X360', 'XB'])
-    end = timer()
-    print("It took " + str(end - start) + " seconds to retrieve the data.")
     df = clean_data(df)
     df.to_csv('vgc_game_sales.csv', index=False)
 
