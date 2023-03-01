@@ -79,3 +79,6 @@ with DAG(
                 "genre": genre
             }
         )
+            t2
+            
+    t1 >> t2
