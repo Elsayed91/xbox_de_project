@@ -143,8 +143,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     game_list = args.game_list
     print((game_list))
-    l = ast.literal_eval(game_list)
-    l = [i.strip() for i in l]
+    l = [i.strip() for i in game_list.replace('"',"").split(',')]
+    print((l))
     game_list = l[:10]
     print(game_list)
     main(game_list, args.console)
