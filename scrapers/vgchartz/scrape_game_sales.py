@@ -134,7 +134,7 @@ def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd
 
     return True, game_info_df
 
-def scrape_vgchartz(console_list: List[str]) -> pd.DataFrame:
+def scrape_vgchartz(console_list: list[str]) -> pd.DataFrame:
     """
     Scrapes game information from VGChartz for a list of game consoles.
 
