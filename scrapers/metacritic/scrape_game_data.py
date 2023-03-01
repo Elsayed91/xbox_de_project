@@ -108,7 +108,7 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
             
             
 
-def main(game_list: list, console: str) -> None:
+def main(console: str) -> None:
     """
     Given a URL, scrapes game data from all pages and writes the data to a CSV file.
 
@@ -138,4 +138,4 @@ def main(game_list: list, console: str) -> None:
 
 if __name__ == "__main__":
 
-    main(game_list, os.getenv("console"))
+    main(os.getenv("console"))

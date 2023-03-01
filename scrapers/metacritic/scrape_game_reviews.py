@@ -122,6 +122,5 @@ def main(console: str, review_type: str) -> None:
         df.to_csv(file, index=False)
         
 if __name__ == '__main__':
-    game_list = textToList(os.getenv("game_list"))
     main(os.getenv("console"), os.getenv("review_type"))
     
