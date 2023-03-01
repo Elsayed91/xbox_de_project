@@ -44,7 +44,7 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-    t0 = KubernetesJobOperator(
+    v1 = KubernetesJobOperator(
             task_id=f"scrape-vgchartz-hw-sales",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
@@ -62,31 +62,22 @@ with DAG(
             },
         )
     
-    with TaskGroup(group_id='scrape-genres') as tg1:
-        for genre in  ['Action', 'Action-Adventure', 'Adventure', 'Board Game', 'Education',
-                    'Fighting', 'Misc', 'MMO', 'Music', 'Party', 'Platform', 'Puzzle', 
-                    'Racing', 'Role-Playing', 'Sandbox', 'Shooter', 'Simulation', 
-                    'Sports', 'Strategy', 'Visual Novel']:
-                t2 = KubernetesJobOperator(
-                task_id=f"scrape-{genre.lower().replace(' ', '-')}",
-                body_filepath=POD_TEMPALTE,
-                command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
-                jinja_job_args={
-                    "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                    "name": f"scrape-vg-genres",
-                    "gitsync": True,
-                    "volumes": [
-                        {
-                            "name": "persistent-volume",
-                            "type": "persistentVolumeClaim",
-                            "reference": "data-pv-claim",
-                            "mountPath": "/etc/scraped_data/",
-                        }]
-                },
-                envs = {
-                    "genre": genre
-                }
-            )
-                t2
+    v2 = KubernetesJobOperator(
+            task_id=f"scrape-vgchartz-game-sales",
+            body_filepath=POD_TEMPALTE,
+            command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
+            jinja_job_args={
+                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                "name": f"scrape-vg-game-sales",
+                "gitsync": True,
+                "volumes": [
+                    {
+                        "name": "persistent-volume",
+                        "type": "persistentVolumeClaim",
+                        "reference": "data-pv-claim",
+                        "mountPath": "/etc/scraped_data/",
+                    }]
+            },
+        )
             
-    [t0,tg1]
+    v1>>v2
