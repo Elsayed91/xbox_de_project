@@ -1,4 +1,5 @@
 
+import argparse
 import datetime
 import json
 import os
@@ -136,10 +137,14 @@ def main(game_list: list, console: str) -> None:
 
 if __name__ == "__main__":
     import ast
-    game_list = os.getenv('game_list')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--console', required=True, help='URL of console')
+    parser.add_argument('--game_list', required=True, help='List of games')
+    args = parser.parse_args()
+    game_list = args.game_list
+    print(game_list)
     l = ast.literal_eval(game_list)
     l = [i.strip() for i in l]
     game_list = l[:10]
     print(game_list)
-    for console in [ "xbox-series-x"]:
-        main(game_list, console)
+    main(game_list, args.console)
