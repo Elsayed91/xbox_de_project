@@ -183,7 +183,7 @@ def clean_data(df):
             
     df['Console'] = df['Console'].str.replace('Series', 'XS')
 #     df['Console'] = df['Console'].str.replace('Xbox XS', 'XS')
-    df = df.drop(['Gamex','VGChartz Score', 'Critic Score', 'User Score'], axis=1)
+    df = df.drop(['Gamex'], axis=1)
     return df
 
 def main():
