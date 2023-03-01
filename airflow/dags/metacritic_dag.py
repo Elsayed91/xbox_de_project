@@ -48,7 +48,7 @@ with DAG(
     for console in consoles:
         
         t1 = KubernetesJobOperator(
-            task_id=f"scrape-{console}_game_list",
+            task_id=f"scrape-{console}-game-list",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/metacritic/scrape_game_list.py"],
             arguments=[
@@ -59,6 +59,13 @@ with DAG(
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": f"get-games-list-{console}",
                 "gitsync": True,
+                "volumes": [
+                    {
+                        "name": "persistent-volume",
+                        "type": "persistentVolumeClaim",
+                        "reference": "data-pv-claim",
+                        "mountPath": "/etc/scraped_data/",
+                    }
             },
             envs={
 
@@ -67,12 +74,12 @@ with DAG(
         )
         
         t2 = KubernetesJobOperator(
-            task_id=f"scrape-{console}-games-data",
+            task_id=f"scrape-{console}-game-data",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/metacritic/scrape_game_data.py"],
             jinja_job_args={
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"get-{console}-games-data",
+                "name": f"get-{console}-game-data",
                 "gitsync": True,
                 "volumes": [
                     {
