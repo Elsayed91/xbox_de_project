@@ -28,7 +28,7 @@ def scrape_metacritic_reviews(game_link: str, critic_review_list: list, exceptio
     try: 
         url =  game_link + "/critic-reviews?page="
         pages = get_last_page_num(url)
-        for page in range(pages+1):
+        for page in range(pages):
             print(page)
             game_url = url + str(page)
 
@@ -67,7 +67,7 @@ def scrape_user_reviews(game_link: str, review_list: list, exception_list: list)
     try:
         url =  game_link + "/user-reviews?page="
         pages = get_last_page_num(url)
-        for page in range(pages+1):
+        for page in range(pages):
             game_url = url + str(page)
 
             soup = soup_it(game_url)

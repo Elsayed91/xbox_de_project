@@ -91,17 +91,16 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         data_list.append({
         'Name' : data.get('name'),
         'Release Date' : datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
-
         'Maturity Rating': data.get('contentRating', "Unspecified").replace("ESRB ",""),
         'Genre' : ", ".join(data.get('genre', [])),
             'Developer' : soup.select_one('.developer a').text if soup.select_one('.developer a') else None,
         'Publisher' : ", ".join([x['name'] for x in data.get('publisher', [])]),
         'Meta Score' : data['aggregateRating']['ratingValue'] if 'aggregateRating' in data else 0,
-
         'Critic Reviews Count' : data['aggregateRating']['ratingCount'] if 'aggregateRating' in data else 0,
         'User Rating' : soup.find('div', class_="user").text if soup.find('div', class_="user") else None,
         'User Rating Count' : user_rating_count,
-            'Summary': data.get('description'),
+        'Summary': data.get('description'),
+        'Image': data.find("img", class_="product_image large_image")["src"]
         })
     except BaseException as e:
             exception_list.append(f"On game link {link}, Error : {e}")

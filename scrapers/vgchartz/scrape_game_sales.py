@@ -8,36 +8,12 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+try: 
+    from scrape_utils import *
+except:
+    from scrapers.vgchartz.scrape_utils import *
 
-def get_page_html(url: str) -> BeautifulSoup:
-    """
-    Sends an HTTP request to the given URL, and returns the response content as a
-    BeautifulSoup object.
 
-    Args:
-        url (str): The URL to scrape.
-
-    Returns:
-        BeautifulSoup: A BeautifulSoup object representing the parsed HTML content of the
-        page.
-    """
-    response = requests.get(url)
-    return  BeautifulSoup(response.content, 'html.parser')
-
-def scrape_genre_list() -> list[str]:
-    """
-    Scrapes the genre list from vgchartz.com.
-
-    Returns:
-        A list of genre names.
-    """
-    url = 'https://www.vgchartz.com/gamedb/'
-    soup = get_page_html(url)
-    result_select = soup.find('select', {'name': 'genre'})
-    result_options = result_select.find_all('option')
-    genre_list = []
-    genre_list = [result['value'] for result in result_options if result['value']]
-    return genre_list
 
 
 
@@ -134,7 +110,7 @@ def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd
 
     return True, game_info_df
 
-def scrape_vgchartz(console_list: List[str]) -> pd.DataFrame:
+def scrape_vgchartz(console_list: list[str], genre: str) -> pd.DataFrame:
     """
     Scrapes game information from VGChartz for a list of game consoles.
 
@@ -152,23 +128,23 @@ def scrape_vgchartz(console_list: List[str]) -> pd.DataFrame:
     game_df = pd.DataFrame()
 
     # loop through genres and consoles and scrape games for each combination
-    for genre in genre_list:
-        for console_type in console_list:
-            page_num = 1
-            page_exist = True
 
-            # loop through pages for each genre and console combination
-            while page_exist:
-                url = build_url(genre, console_type, page_num)
-                soup = get_page_html(url)
-                page_exist, game_info_df = scrape_game_info(soup, genre)
-                if game_info_df is not None:
-                    game_df = pd.concat([game_df, game_info_df], ignore_index=True)
-                    print(f"Appended Dataframe with page {page_num} of {console_type} games in Genre {genre}")
+    for console_type in console_list:
+        page_num = 1
+        page_exist = True
 
-                # increment page number
-                page_num += 1
-                time.sleep(1)
+        # loop through pages for each genre and console combination
+        while page_exist:
+            url = build_url(genre, console_type, page_num)
+            soup = get_page_html(url)
+            page_exist, game_info_df = scrape_game_info(soup, genre)
+            if game_info_df is not None:
+                game_df = pd.concat([game_df, game_info_df], ignore_index=True)
+                print(f"Appended Dataframe with page {page_num} of {console_type} games in Genre {genre}")
+
+            # increment page number
+            page_num += 1
+            time.sleep(1)
     return game_df
 
 
@@ -186,8 +162,9 @@ def clean_data(df):
 
 def main():
     start = timer()
+    genre = os.getenv("genre")
     # console_list = ['Xbox', 'Xbox One', 'Xbox 360', 'Xbox Series', 'Series']
-    df = scrape_vgchartz(console_list = ['XS', 'XOne', 'X360', 'XB', 'Series'])
+    df = scrape_vgchartz(console_list = ['XS', 'XOne', 'X360', 'XB', 'Series'], genre=genre)
     end = timer()
     print("It took " + str(end - start) + " seconds to retrieve the data.")
     df = clean_data(df)
