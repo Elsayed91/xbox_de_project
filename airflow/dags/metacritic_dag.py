@@ -59,7 +59,7 @@ with DAG(
     )
 
     t2 = BashOperator(
-        task_id=mytask,
+        task_id="xd",
         bash_command="echo ${MYVAR}",
         env={"MYVAR": '{{ ti.xcom_pull(key=\'game_list\') }}'},
     )
