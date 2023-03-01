@@ -43,46 +43,48 @@ with DAG(
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
 
-    t1 = KubernetesJobOperator(
-        task_id="get_games_list",
-        body_filepath=POD_TEMPALTE,
-        command=["python", f"{BASE}/metacritic/get_games.py"],
-        # arguments=[
-        #     "--data-source",
-
-        # ],
-        jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": "get-games-list",
-            "gitsync": True,
-        },
-    )
-    
-    t2 = KubernetesJobOperator(
-        task_id="scrape-games-data",
-        body_filepath=POD_TEMPALTE,
-        command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
-        # arguments=[
-        #     "--data-source",
-
-        # ],
-        jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": "get-games-data",
-            "gitsync": True,
-            "volumes": [
-                {
-                    "name": "persistent-volume",
-                    "type": "persistentVolumeClaim",
-                    "reference": "data-pv-claim",
-                    "mountPath": "/etc/scraped_data/",
-                }
+    consoles = ["xbox-series-x", "xbox-one", "xbox360", "xbox"]
+    for console in consoles:
+        t1 = KubernetesJobOperator(
+            task_id=f"get_games_list_{console}",
+            body_filepath=POD_TEMPALTE,
+            command=["python", f"{BASE}/metacritic/get_games.py"],
+            arguments=[
+                "--console",
+                console
             ],
-        },
-        envs={
-            "game_list": '{{ ti.xcom_pull(key=\'game_list\') }}'
-        }
-    )
+            jinja_job_args={
+                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                "name": f"get-games-list-{console}",
+                "gitsync": True,
+            }
+        )
+        
+        t2 = KubernetesJobOperator(
+            task_id="scrape-games-data",
+            body_filepath=POD_TEMPALTE,
+            command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
+            # arguments=[
+            #     "--data-source",
+
+            # ],
+            jinja_job_args={
+                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                "name": "get-games-data",
+                "gitsync": True,
+                "volumes": [
+                    {
+                        "name": "persistent-volume",
+                        "type": "persistentVolumeClaim",
+                        "reference": "data-pv-claim",
+                        "mountPath": "/etc/scraped_data/",
+                    }
+                ],
+            },
+            envs={
+                "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}'
+            }
+        )
 
     
     t1>>t2

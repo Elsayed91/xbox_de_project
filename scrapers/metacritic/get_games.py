@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 from typing import Generator
@@ -26,9 +27,14 @@ def game_urls(link: str, pages: int) -> Generator[str, None, None]:
             yield f"https://www.metacritic.com{elem.get('href')}"
 
 if __name__=='__main__':
-    url = "https://www.metacritic.com/browse/games/release-date/available/xbox-series-x/name?&view=detailed"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--console', required=True, help='URL of console')
+    args = parser.parse_args()
+    url = ("https://www.metacritic.com/browse/games/release-date/" + 
+           f"available/{args.console}/name?&view=detailed")
     pages = get_last_page_num(url)
     url_list = [u for u in game_urls(url, pages)]
     import json
     game_list_json = json.dumps(url_list)
-    print(f"::kube_api:xcom={{\"game_list\":{game_list_json}}}")
+    print(f"got game list for {args.console}")
+    print(f"::kube_api:xcom={{\"game_list_{console}\":{game_list_json}}}")

@@ -143,5 +143,3 @@ if __name__ == "__main__":
     print(game_list)
     for console in [ "xbox-series-x"]:
         main(game_list, console)
-
-
