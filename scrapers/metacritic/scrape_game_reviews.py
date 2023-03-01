@@ -88,7 +88,7 @@ def scrape_user_reviews(game_link: str, review_list: list, exception_list: list)
     except BaseException as e:
             exception_list.append(f"On game link {game_url}, Error : {e}")
             
-def main(game_list: list, console: str, review_type: str) -> None:
+def main(console: str, review_type: str) -> None:
     """
     Main function that scrapes either user reviews or critic reviews for the games in game_list.
     
@@ -112,6 +112,7 @@ def main(game_list: list, console: str, review_type: str) -> None:
 
     data_list = []
     exception_list = []
+    game_list = read_txt(console)
     for game in game_list:
         print(f"processing {review_type} reviews for {game}")
         scrape_reviews(game, data_list, exception_list)
@@ -122,5 +123,5 @@ def main(game_list: list, console: str, review_type: str) -> None:
         
 if __name__ == '__main__':
     game_list = textToList(os.getenv("game_list"))
-    main(game_list, os.getenv("console"), os.getenv("review_type"))
+    main(os.getenv("console"), os.getenv("review_type"))
     

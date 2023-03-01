@@ -64,3 +64,11 @@ def get_games_per_page(link: str) -> list[str]:
 
 def textToList(hashtags):
     return hashtags.strip('[]').replace('\'', '').replace(' ', '').split(',')
+
+def read_txt(console):
+    with open(f"/etc/scraped_data/{console}-urls.txt", "r") as f:  # open the file in "read" mode
+        url_list = f.readlines()
+
+    # remove any newline characters from the end of each URL
+    url_list = [url.strip() for url in url_list]
+    return url_list

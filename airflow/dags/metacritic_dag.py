@@ -3,6 +3,7 @@ import sys
 from datetime import datetime, timedelta
 
 import pendulum
+from airflow.decorators import task_group
 from airflow.operators.bash import BashOperator
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from airflow_kubernetes_job_operator.kubernetes_job_operator import \
@@ -19,8 +20,8 @@ default_args = {
     "depends_on_past": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=60),
-    "concurrency": 5,
-    "max_active_runs": 3,
+    "concurrency": 20,
+    "max_active_runs": 5,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
@@ -42,11 +43,12 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-
-    consoles = [ "xbox-series-x", "xbox-one", "xbox360", "xbox"]
+# "xbox-series-x", "xbox-one","xbox"
+    consoles = [  "xbox360", ]
     for console in consoles:
+        
         t1 = KubernetesJobOperator(
-            task_id=f"scrape{console}_game_list",
+            task_id=f"scrape-{console}_game_list",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/metacritic/scrape_game_list.py"],
             arguments=[
@@ -78,8 +80,8 @@ with DAG(
                 ],
             },
             envs={
-                "game_list": f"{{{{ ti.xcom_pull(key=\'game_list_{console}\') }}}}",
-                # "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}',
+                # "game_list": f"{{{{ ti.xcom_pull(key=\'game_list_{console}\') }}}}",
+
                 "console": console
             }
         )
@@ -102,7 +104,7 @@ with DAG(
                 ],
             },
             envs={
-                "game_list": f"{{{{ ti.xcom_pull(key=\'game_list_{console}\') }}}}",
+
                 "console": console,
                 "review_type": "user"
             }
@@ -125,7 +127,7 @@ with DAG(
                 ],
             },
             envs={
-                "game_list": f"{{{{ ti.xcom_pull(key=\'game_list_{console}\') }}}}",
+
                 "console": console,
                 "review_type": "critic"
             }

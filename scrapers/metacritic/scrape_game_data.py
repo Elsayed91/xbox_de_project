@@ -121,6 +121,7 @@ def main(game_list: list, console: str) -> None:
     """
     data_list = []
     exception_list = []
+    game_list = read_txt(console)
     for game in game_list:
         print(f"processing {game} data.")
         scrape_game_data(game, data_list, exception_list)
@@ -136,5 +137,5 @@ def main(game_list: list, console: str) -> None:
 
 
 if __name__ == "__main__":
-    game_list = textToList(os.getenv("game_list"))
+
     main(game_list, os.getenv("console"))
