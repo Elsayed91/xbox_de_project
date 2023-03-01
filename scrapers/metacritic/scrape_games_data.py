@@ -137,11 +137,9 @@ def main(game_list: list, console: str) -> None:
 
 if __name__ == "__main__":
     import ast
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--console', required=True, help='URL of console')
-    args = parser.parse_args()
+
     game_list = textToList(os.getenv("game_list"))
     print((game_list))
     game_list = game_list[:10]
     print(game_list)
-    main(game_list, args.console)
+    main(game_list, os.getenv("console"))

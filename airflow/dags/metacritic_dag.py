@@ -64,10 +64,6 @@ with DAG(
             task_id=f"scrape-{console}-games-data",
             body_filepath=POD_TEMPALTE,
             command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
-            arguments=[
-                "--console",
-                console,
-            ],
             jinja_job_args={
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": f"get-{console}-games-data",
@@ -82,7 +78,8 @@ with DAG(
                 ],
             },
             envs={
-                "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}'
+                "game_list": f'{{ ti.xcom_pull(key=\'game_list_{console}\') }}',
+                "console": console
             }
         )
 
