@@ -153,7 +153,7 @@ def clean_data(df):
     
     # convert sales columns to float format
     for col in df.columns:
-        if 'Sales' in col or 'Units' in col:
+        if df[col].dtype == 'object' and ('Sales' in col or 'Units' in col):
             df[col] = df[col].str.replace('m', '').astype(float)
             
     df['Console'] = df['Console'].str.replace('Series', 'XS')
