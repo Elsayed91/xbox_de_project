@@ -137,12 +137,11 @@ def main(game_list: list, console: str) -> None:
 
 if __name__ == "__main__":
     start = timer()
+    import ast
     game_list = os.getenv('game_list')
-    print(game_list)
-    print(type(game_list))
-    game_list = list(map(str.strip, game_list.strip('][').replace('"', '').split(',')))
-
-    game_list = game_list[:10]
+    l = ast.literal_eval(game_list)
+    l = [i.strip() for i in l]
+    game_list = l[:10]
     print(game_list)
     for console in [ "xbox-series-x"]:
         main(game_list, console)
