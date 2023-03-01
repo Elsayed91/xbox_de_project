@@ -43,20 +43,20 @@ with DAG(
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
 
-    # t1 = KubernetesJobOperator(
-    #     task_id="get_games_list",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["python", f"{BASE}/metacritic/get_games.py"],
-    #     # arguments=[
-    #     #     "--data-source",
+    t1 = KubernetesJobOperator(
+        task_id="get_games_list",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/metacritic/get_games.py"],
+        # arguments=[
+        #     "--data-source",
 
-    #     # ],
-    #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-    #         "name": "get-games-list",
-    #         "gitsync": True,
-    #     },
-    # )
+        # ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+            "name": "get-games-list",
+            "gitsync": True,
+        },
+    )
     
     t2 = KubernetesJobOperator(
         task_id="scrape-games-data",
@@ -77,4 +77,4 @@ with DAG(
     )
 
     
-    # t1>>t2
+    t1>>t2
