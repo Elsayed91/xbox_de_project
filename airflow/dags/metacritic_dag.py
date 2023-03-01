@@ -65,7 +65,7 @@ with DAG(
                         "type": "persistentVolumeClaim",
                         "reference": "data-pv-claim",
                         "mountPath": "/etc/scraped_data/",
-                    }
+                    }]
             },
             envs={
 
