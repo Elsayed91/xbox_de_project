@@ -138,6 +138,7 @@ def main(game_list: list, console: str) -> None:
 if __name__ == "__main__":
     start = timer()
     game_list = os.getenv('game_list')
+    game_list = json.loads(game_list)
     game_list = game_list[:10]
     print(game_list)
     for console in [ "xbox-series-x"]:
