@@ -68,16 +68,6 @@ spec:
       labels:
         app: postgresql
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - postgresql
-            topologyKey: kubernetes.io/hostname
       containers:
         - name: postgresql
           image: postgres:15.1-alpine3.16

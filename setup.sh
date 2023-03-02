@@ -38,22 +38,15 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud container clusters create ${GKE_CLUSTER_NAME}  \
 #     --zone=${GCP_ZONE} \
-#     --workload-pool=${PROJECT}.svc.id.goog
-
-# gcloud container node-pools delete default-pool \
-#     --cluster ${GKE_CLUSTER_NAME} -q
-
-# gcloud container node-pools create default \
-#        --cluster=${GKE_CLUSTER_NAME} \
-#        --zone=${GCP_ZONE} \
-#        --machine-type=e2-medium  \
-#        --enable-autoscaling \
-#        --min-nodes=0 \
-#        --max-nodes=20 \
-#        --workload-metadata=GKE_METADATA \
-#        --spot \
-#        --disk-size=10 \
-#        --num-nodes=0
+#     --workload-pool=${PROJECT}.svc.id.goog \
+#     --machine-type=e2-standard-2  \
+#     --enable-autoscaling \
+#     --min-nodes=0 \
+#     --max-nodes=20 \
+#     --workload-metadata=GKE_METADATA \
+#     --spot \
+#     --disk-size=10 \
+#     --num-nodes=1
 
 # gcloud iam service-accounts create gke-sa \
 #     --project=${PROJECT}
@@ -84,12 +77,12 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud builds submit
 
-# kubectl apply -f airflow/manifests/rbac.yaml
-# cat airflow/manifests/postgres.yaml | envsubst | kubectl apply -f - 
-# cat airflow/manifests/airflow.yaml | envsubst | kubectl apply -f - 
+kubectl apply -f manifests/rbac.yaml
+cat manifests/postgres.yaml | envsubst | kubectl apply -f - 
+cat manifests/airflow.yaml | envsubst | kubectl apply -f - 
 
 
-pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
-if [ -n "$pods" ]; then
-    kubectl delete pod $pods
-fi
+# pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+# if [ -n "$pods" ]; then
+#     kubectl delete pod $pods
+# fi

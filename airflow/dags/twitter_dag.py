@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 default_args = {
     "owner": "airflow",
-    "start_date": pendulum.yesterday(),
+    "start_date": datetime.date(2022, 1, 1),
     "depends_on_past": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=60),
@@ -28,57 +28,42 @@ default_args = {
     "name_prefix": "",
 }
 
-
+today = datetime.date.today()
+first_day_of_previous_month = datetime.date(today.year, today.month - 1, 1)
 today = datetime.today().strftime("%Y-%m-%d")
 POD_TEMPALTE = os.path.join(os.path.dirname(__file__), "templates", "pod_template.yaml")
 BASE = "/git/repo/scrapers"
 
 with DAG(
-    dag_id="vgchartz",
-    schedule_interval=None,
+    dag_id="twitter",
+    schedule_interval="0 0 1 * *",
     default_args=default_args,
-    catchup=False,
-    tags=["vgchartz"],
+    catchup=True,
+    tags=["Twitter"],
     # description="initial load/full refresh data pipeline",
 ) as dag:
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-    v1 = KubernetesJobOperator(
-            task_id=f"scrape-vgchartz-hw-sales",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"scrape-vg-hw-sales",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }]
-            },
-        )
-    
-    v2 = KubernetesJobOperator(
-            task_id=f"scrape-vgchartz-game-sales",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"scrape-vg-game-sales",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }]
-            },
-        )
+
             
-    v1
-    v2
+    t = KubernetesJobOperator(
+            task_id=f"scrape-tweets",
+            body_filepath=POD_TEMPALTE,
+            command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
+            jinja_job_args={
+                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                "name": f"scrape-tweets",
+                "gitsync": True,
+                "volumes": [
+                    {
+                        "name": "persistent-volume",
+                        "type": "persistentVolumeClaim",
+                        "reference": "data-pv-claim",
+                        "mountPath": "/etc/scraped_data/",
+                    }]
+            },
+            envs={
+                'start_date': '{{ ds }}'
+            }
+        )
