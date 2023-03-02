@@ -101,7 +101,7 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         'User Rating' : soup.find('div', class_="user").text if soup.find('div', class_="user") else None,
         'User Rating Count' : user_rating_count,
         'Summary': data.get('description'),
-        'Image': data.find("img", class_="product_image large_image")["src"]
+        'Image': data['image']
         })
     except BaseException as e:
             print("raised exception, wtf")
