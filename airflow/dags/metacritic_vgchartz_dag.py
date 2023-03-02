@@ -20,8 +20,8 @@ default_args = {
     "depends_on_past": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=60),
-    "concurrency": 20,
-    "max_active_runs": 5,
+    "concurrency": 4,
+    "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
@@ -43,8 +43,8 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-# "xbox-series-x", "xbox-one","xbox"
-    consoles = [  "xbox360", ]
+# 
+    consoles = [  "xbox360","xbox-series-x", "xbox-one","xbox" ]
     for console in consoles:
         
         t1 = KubernetesJobOperator(
