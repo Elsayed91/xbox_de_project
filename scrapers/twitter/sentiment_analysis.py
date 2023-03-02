@@ -149,7 +149,7 @@ def scrape_tweets(hashtags: list[str], since_date: str, until_date: str, lang: s
              + f' until:{until_date}'
              + ''.join([f' -{kw}' for kw in exclude_keywords]))
     tweets_list = []
-    print(f"processing tweets from {singe_date} until {until_date}.")
+    print(f"processing tweets from {since_date} until {until_date}.")
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
         if i >= num_tweets:
             break
