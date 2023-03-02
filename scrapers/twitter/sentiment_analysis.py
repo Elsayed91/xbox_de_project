@@ -146,7 +146,7 @@ def scrape_tweets(hashtags: list[str], since_date: str, until_date: str, lang: s
         A pandas DataFrame
     """
     query = (f' {hashtag_operator} '.join(hashtags) + f' lang:{lang} since:{since_date}' 
-             + f' until:{until_date_str}'
+             + f' until:{until_date}'
              + ''.join([f' -{kw}' for kw in exclude_keywords]))
     tweets_list = []
 
