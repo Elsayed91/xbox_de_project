@@ -34,12 +34,12 @@ POD_TEMPALTE = os.path.join(os.path.dirname(__file__), "templates", "pod_templat
 BASE = "/git/repo/scrapers"
 
 with DAG(
-    dag_id="twitter",
+    dag_id="twitter_dag",
     schedule_interval="0 0 1 * *",
     default_args=default_args,
     catchup=True,
-    tags=["Twitter"],
-    # description="initial load/full refresh data pipeline",
+    tags=["Twitter", "Sentiment Analysis"],
+    description="Tweets Scraping And Sentiment Analysis for Xbox Hashtags",
 ) as dag:
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
