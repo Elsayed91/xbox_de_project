@@ -77,10 +77,10 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud builds submit
 
-kubectl apply -f manifests/*.yaml
+# kubectl apply -f manifests/*.yaml
 
 
-# pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
-# if [ -n "$pods" ]; then
-#     kubectl delete pod $pods
-# fi
+pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+if [ -n "$pods" ]; then
+    kubectl delete pod $pods
+fi
