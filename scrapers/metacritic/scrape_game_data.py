@@ -81,6 +81,7 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
     try:
         soup = soup_it(link)
         data = json.loads(soup.find('script', type='application/ld+json').text)
+        print(data)
         user_rating_count = ([element for element in soup.select('div.summary') if 
                         element.select_one('.count a') and 'Ratings' 
                         in element.select_one('.count a').text])
@@ -103,6 +104,7 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         'Image': data.find("img", class_="product_image large_image")["src"]
         })
     except BaseException as e:
+            print("raised exception, wtf")
             exception_list.append(f"On game link {link}, Error : {e}")
             
             

@@ -96,54 +96,8 @@ with DAG(
                 "console": console
             }
         )
-        
-        t3 = KubernetesJobOperator(
-            task_id=f"scrape-{console}-user-reviews",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/metacritic/scrape_game_reviews.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"get-{console}-user-reviews",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }
-                ],
-            },
-            envs={
 
-                "console": console,
-                "review_type": "user"
-            }
-        )
-        t4 = KubernetesJobOperator(
-            task_id=f"scrape-{console}-critic-reviews",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/metacritic/scrape_game_reviews.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"get-{console}-critic-reviews",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }
-                ],
-            },
-            envs={
-
-                "console": console,
-                "review_type": "critic"
-            }
-        )
-        t1>>[t2, t3, t4]
+        t1>>[t2]
     v1 = KubernetesJobOperator(
             task_id=f"scrape-vgchartz-hw-sales",
             body_filepath=POD_TEMPALTE,
