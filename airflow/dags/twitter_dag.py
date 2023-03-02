@@ -28,8 +28,7 @@ default_args = {
     "name_prefix": "",
 }
 
-today = datetime.date.today()
-first_day_of_previous_month = datetime.date(today.year, today.month - 1, 1)
+
 today = datetime.today().strftime("%Y-%m-%d")
 POD_TEMPALTE = os.path.join(os.path.dirname(__file__), "templates", "pod_template.yaml")
 BASE = "/git/repo/scrapers"
