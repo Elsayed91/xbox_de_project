@@ -229,4 +229,4 @@ if __name__ == '__main__':
     df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
     data_vol = os.getenv('data_volume', '/etc/scraped_data')
     df.to_csv(f"{data_vol}/tweets-{start_date_str}.csv", index=False)
-    print(f"saved data to csv file tweets-{start_date_str}.csv")
+    print(f"saved data to file tweets-{start_date_str}.csv")
