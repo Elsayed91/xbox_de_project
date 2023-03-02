@@ -30,6 +30,7 @@ executed. The function calls the scrape_tweets function to scrape tweets and the
 the get_sentiment_scores function to calculate the sentiment scores of the tweets. The
 function prints out the sentiment scores of each tweet.
 """
+import logging
 import os
 import re
 
@@ -40,6 +41,13 @@ from better_profanity import profanity
 from textblob import TextBlob
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 def clean_tweet(tweet: str, stopwords: list[str] = []) -> str:
     """
@@ -149,7 +157,7 @@ def scrape_tweets(hashtags: list[str], since_date: str, until_date: str, lang: s
              + f' until:{until_date}'
              + ''.join([f' -{kw}' for kw in exclude_keywords]))
     tweets_list = []
-    print(f"processing tweets from {since_date} until {until_date}.")
+    logger.info(f"processing tweets from {since_date} until {until_date}.")
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
         if i >= num_tweets:
             break
@@ -229,4 +237,4 @@ if __name__ == '__main__':
     df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
     data_vol = os.getenv('data_volume', '/etc/scraped_data')
     df.to_csv(f"{data_vol}/tweets-{start_date_str}.csv", index=False)
-    print(f"saved data to file tweets-{start_date_str}.csv")
+    logger.info(f"saved data to file tweets-{start_date_str}.csv")
