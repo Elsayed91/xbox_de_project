@@ -44,7 +44,7 @@ with DAG(
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
 # 
-    consoles = [  "xbox360","xbox-series-x", "xbox-one","xbox" ]
+    consoles = [ "xbox360","xbox-series-x", "xboxone","xbox" ]
     for console in consoles:
         
         t1 = KubernetesJobOperator(
