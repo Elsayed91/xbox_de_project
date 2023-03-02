@@ -66,3 +66,5 @@ with DAG(
                 'start_date': '{{ ds }}'
             }
         )
+    
+    t

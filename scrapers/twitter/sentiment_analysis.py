@@ -179,7 +179,7 @@ def main(hashtags: list[str], since_date: str, until_date: str, lang: str,
     main function that utilizes scrape_tweets, clean_tweets and get_sentiment_scores
     to get a dataframe of tweets with desired data.
     """
-    tweets_df = scrape_tweets(hashtags, since_date, lang, exclude_keywords, num_tweets)
+    tweets_df = scrape_tweets(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
 
     # Clean text and add column to DataFrame
     if not tweets_df.empty:
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     start_date_str, end_date_str = get_date_range(start_date)
     lang = os.getenv("lang",'en')
     exclude_keywords = ['sale', 'discount', 'buy', 'shop', 'promote', 'click', 'shopify']
-    num_tweets = os.getenv("num_tweets",5000)
+    num_tweets = os.getenv("num_tweets", 5000)
     df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
     data_vol = os.getenv('data_volume', '/etc/scraped_data')
     df.to_csv(f"{data_vol}/tweets-{start_date_str}.csv", index=False)

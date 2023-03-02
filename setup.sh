@@ -77,9 +77,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud builds submit
 
-kubectl apply -f manifests/rbac.yaml
-cat manifests/postgres.yaml | envsubst | kubectl apply -f - 
-cat manifests/airflow.yaml | envsubst | kubectl apply -f - 
+kubectl apply -f manifests/*.yaml
 
 
 # pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
