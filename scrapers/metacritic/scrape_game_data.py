@@ -134,9 +134,6 @@ def main(console: str) -> None:
         scrape_game_data(game, data_list, exception_list)
     
     df1 = (pd.DataFrame.from_dict(data_list))
-    df1['Meta Score'] = df1['Meta Score'].astype(int)
-    df1['Critic Reviews Count'] = df1['Critic Reviews Count'].astype(int)
-    df1['User Rating Count'] = df1['User Rating Count'].astype(int)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
 
