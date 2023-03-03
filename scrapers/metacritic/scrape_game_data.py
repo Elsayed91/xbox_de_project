@@ -79,9 +79,26 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         None
     """
     try:
-        soup = soup_it(link)
+        
         game_sublink = link.replace("https://www.metacritic.com", "")
-        data = json.loads(soup.select_one('script[type="application/ld+json"]').text)
+
+        MAX_RETRIES = 3
+    
+        retries = 0
+        while True:
+            try:
+                soup = soup_it(link)
+                data = json.loads(soup.find('script', type='application/ld+json').text) 
+                break
+            except Exception as e:
+                retries += 1
+                if retries >= MAX_RETRIES:
+                    print(f"Failed to scrape data from {link} after {MAX_RETRIES} retries.")
+                    exception_list.append(f"On game link {link}, Error : {e}")
+                    return
+                else:
+                    print(f"Retrying {link}...")
+                    continue
         try:
             user_score = soup.find('div', class_="user").text
             user_score = float(user_score) if user_score != 'tbd' else None
