@@ -83,18 +83,25 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         data = json.loads(soup.select_one('script[type="application/ld+json"]').text)
 
         # Scrape developer and publisher from different sections of the page
-        developer = soup.select_one('.developer a').text.strip() if soup.select_one('.developer a') else None
+        developer_element = soup.select_one('.developer a')
+        print(f'developer element: {developer_element}')
+        developer = developer_element.text.strip() if developer_element else None
+        print(f'developer text: {developer}')
+
         publisher = ", ".join([x['name'] for x in data.get('publisher', [])])
+        print(f'publisher text: {publisher}')
 
         # Scrape user rating and count from the user reviews section of the page
         user_rating_count = 0
         user_rating_element = soup.select_one('.metascore_w.user.large.game.mixed')
+        print(f'user rating element: {user_rating_element}')
         if user_rating_element:
             user_rating_count = int(user_rating_element.find_next_sibling('span').text.strip('()'))
 
         # Scrape user score from the user reviews section of the page
         user_score = None
         user_score_element = soup.find('div', class_='metascore_w user large game')
+        print(f'user score element: {user_score_element}')
         if user_score_element:
             user_score = float(user_score_element.text.strip())
 
@@ -114,8 +121,8 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         }
         data_list.append(game_data)
     except BaseException as e:
-            print(f"On game link {link}, Error : {e}")
-            exception_list.append(f"On game link {link}, Error : {e}")
+        print(f"On game link {link}, Error : {e}")
+        exception_list.append(f"On game link {link}, Error : {e}")
             
             
 
