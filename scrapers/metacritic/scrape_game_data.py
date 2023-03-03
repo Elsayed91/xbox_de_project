@@ -81,7 +81,6 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
     try:
         soup = soup_it(link)
         data = json.loads(soup.find('script', type='application/ld+json').text)
-        print(data)
         user_rating_count = ([element for element in soup.select('div.summary') if 
                         element.select_one('.count a') and 'Ratings' 
                         in element.select_one('.count a').text])
@@ -104,7 +103,7 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         'Image': data['image']
         })
     except BaseException as e:
-            print("raised exception, wtf")
+            print(f"raised exception, {e}")
             exception_list.append(f"On game link {link}, Error : {e}")
             
             
@@ -128,6 +127,7 @@ def main(console: str) -> None:
         scrape_game_data(game, data_list, exception_list)
     
     df1 = (pd.DataFrame.from_dict(data_list))
+    df1['Meta Score'] = df1['Meta Score'].astype(int)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
 
