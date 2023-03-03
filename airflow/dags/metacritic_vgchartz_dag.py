@@ -100,7 +100,7 @@ with DAG(
                 "console": console,
             }
         )
-        with TaskGroup(group_id='process-metacritic-data') as tg1:
+        with TaskGroup(group_id=f'process-{console}-data') as tg1:
             t2 = KubernetesJobOperator(
                 task_id=f"scrape-{console}-game-data",
                 body_filepath=POD_TEMPALTE,
