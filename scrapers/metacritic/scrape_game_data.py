@@ -80,42 +80,31 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
     """
     try:
         soup = soup_it(link)
+        game_sublink = link.replace("https://www.metacritic.com", "")
         data = json.loads(soup.select_one('script[type="application/ld+json"]').text)
-
-        # Scrape developer and publisher from different sections of the page
-        developer_element = soup.select_one('.developer a')
-        print(f'developer element: {developer_element}')
-        developer = developer_element.text.strip() if developer_element else None
-        print(f'developer text: {developer}')
-
-        publisher = ", ".join([x['name'] for x in data.get('publisher', [])])
-        print(f'publisher text: {publisher}')
-
-        # Scrape user rating and count from the user reviews section of the page
-        user_rating_count = 0
-        user_rating_element = soup.select_one('.metascore_w.user.large.game.mixed')
-        print(f'user rating element: {user_rating_element}')
-        if user_rating_element:
-            user_rating_count = int(user_rating_element.find_next_sibling('span').text.strip('()'))
-
-        # Scrape user score from the user reviews section of the page
-        user_score = None
-        user_score_element = soup.find('div', class_='metascore_w user large game')
-        print(f'user score element: {user_score_element}')
-        if user_score_element:
-            user_score = float(user_score_element.text.strip())
+        user_score = soup.find('div', class_="user").text
+        user_score = float(user_score) if user_score != 'tbd' else None
+        
+        try:
+            critic_review_count = int(soup.find('span', {'class': 'count'}).find('a').text.split()[0])
+        except:
+            critic_review_count = 0
+        try:
+            user_rating_count = int(soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip().split()[0])
+        except:
+            user_rating_count = 0
 
         game_data = {
             'Name': data.get('name'),
             'Release Date': datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
             'Maturity Rating': data.get('contentRating', "Unspecified").replace("ESRB ", ""),
             'Genre': ", ".join(data.get('genre', [])),
-            'Developer': developer,
-            'Publisher': publisher,
+            'Developer': soup.select_one('.developer a').text,
+            'Publisher': ", ".join([x['name'] for x in data['publisher']]),
             'Meta Score': int(data['aggregateRating']['ratingValue']) if 'aggregateRating' in data else None,
-            'Critic Reviews Count': int(data['aggregateRating']['ratingCount']) if 'aggregateRating' in data else 0,
+            'Critic Reviews Count': critic_review_count,
             'User Score': user_score,
-            'User Rating Count': user_rating_count,
+            'User Rating Count' : user_rating_count,
             'Summary': data.get('description'),
             'Image': data['image']
         }
@@ -145,6 +134,9 @@ def main(console: str) -> None:
         scrape_game_data(game, data_list, exception_list)
     
     df1 = (pd.DataFrame.from_dict(data_list))
+    df1['Meta Score'] = df1['Meta Score'].astype(int)
+    df1['Critic Reviews Count'] = df1['Critic Reviews Count'].astype(int)
+    df1['User Rating Count'] = df1['User Rating Count'].astype(int)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
 
