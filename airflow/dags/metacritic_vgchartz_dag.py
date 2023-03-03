@@ -47,28 +47,28 @@ with DAG(
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
 
-    t = KubernetesJobOperator(
-            task_id=f"scrape-tweets",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"scrape-tweets",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }]
-            },
-            envs={
-                'start_date': '{{ ds }}'
-            }
-        )
+    # t = KubernetesJobOperator(
+    #         task_id=f"scrape-tweets",
+    #         body_filepath=POD_TEMPALTE,
+    #         command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
+    #         jinja_job_args={
+    #             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #             "name": f"scrape-tweets",
+    #             "gitsync": True,
+    #             "volumes": [
+    #                 {
+    #                     "name": "persistent-volume",
+    #                     "type": "persistentVolumeClaim",
+    #                     "reference": "data-pv-claim",
+    #                     "mountPath": "/etc/scraped_data/",
+    #                 }]
+    #         },
+    #         envs={
+    #             'start_date': '{{ ds }}'
+    #         }
+    #     )
     
-    backfill_first = LatestOnlyOperator(task_id="latest_only")
+    # backfill_first = LatestOnlyOperator(task_id="latest_only")
     
     
     with TaskGroup(group_id=f'process-metacritic-data') as tg:
@@ -173,41 +173,42 @@ with DAG(
                 )
             t1>>tg1
             
-    v1 = KubernetesJobOperator(
-            task_id=f"scrape-vgchartz-hw-sales",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"scrape-vg-hw-sales",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }]
-            },
-        )
+    # v1 = KubernetesJobOperator(
+    #         task_id=f"scrape-vgchartz-hw-sales",
+    #         body_filepath=POD_TEMPALTE,
+    #         command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
+    #         jinja_job_args={
+    #             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #             "name": f"scrape-vg-hw-sales",
+    #             "gitsync": True,
+    #             "volumes": [
+    #                 {
+    #                     "name": "persistent-volume",
+    #                     "type": "persistentVolumeClaim",
+    #                     "reference": "data-pv-claim",
+    #                     "mountPath": "/etc/scraped_data/",
+    #                 }]
+    #         },
+    #     )
     
-    v2 = KubernetesJobOperator(
-            task_id=f"scrape-vgchartz-game-sales",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": f"scrape-vg-game-sales",
-                "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }]
-            },
-        )
+    # v2 = KubernetesJobOperator(
+    #         task_id=f"scrape-vgchartz-game-sales",
+    #         body_filepath=POD_TEMPALTE,
+    #         command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
+    #         jinja_job_args={
+    #             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #             "name": f"scrape-vg-game-sales",
+    #             "gitsync": True,
+    #             "volumes": [
+    #                 {
+    #                     "name": "persistent-volume",
+    #                     "type": "persistentVolumeClaim",
+    #                     "reference": "data-pv-claim",
+    #                     "mountPath": "/etc/scraped_data/",
+    #                 }]
+    #         },
+    #     )
 
-    t >> backfill_first >> [v1,v2,tg]
+    # # t >> backfill_first >> 
+    # [v1,v2,tg]
 
