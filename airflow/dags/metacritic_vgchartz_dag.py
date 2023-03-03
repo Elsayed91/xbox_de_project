@@ -69,10 +69,10 @@ with DAG(
     #     )
     
     # backfill_first = LatestOnlyOperator(task_id="latest_only")
-    
+    # "xbox360","xbox-series-x", "xboxone",
     
     with TaskGroup(group_id=f'process-metacritic-data') as tg:
-        consoles = [ "xbox360","xbox-series-x", "xboxone","xbox" ]
+        consoles = [ "xbox" ]
         for console in consoles:
             
             t1 = KubernetesJobOperator(
