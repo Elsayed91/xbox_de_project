@@ -85,9 +85,12 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
                         element.select_one('.count a') and 'Ratings' 
                         in element.select_one('.count a').text])
         if user_rating_count:
-            user_rating_count = user_rating_count[0].select_one('.count a').text.split()[0]
+            try:
+                user_rating_count = user_rating_count[0].select_one('.count a').text.split()[0]
+            except:
+                user_rating_count = 0
         else:
-            user_rating_count = None
+            user_rating_count = 0
         data_list.append({
         'Name' : data.get('name'),
         'Release Date' : datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
@@ -128,6 +131,9 @@ def main(console: str) -> None:
     
     df1 = (pd.DataFrame.from_dict(data_list))
     df1['Meta Score'] = df1['Meta Score'].astype(int)
+    df1['User Rating'] = df1['User Rating'].astype(float)
+    df1['Critic Reviews Count'] = df1['Critic Reviews Count'].astype(int)
+    df1['User Rating Count'] = df1['User Rating Count'].astype(int)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
 
