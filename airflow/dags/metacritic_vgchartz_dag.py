@@ -38,7 +38,7 @@ BASE = "/git/repo/scrapers"
 
 with DAG(
     dag_id="full-refresh",
-    schedule_interval=None,
+    schedule_interval="0 0 1 * *",
     default_args=default_args,
     catchup=True,
     tags=["full-refresh"],
