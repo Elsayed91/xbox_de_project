@@ -81,15 +81,12 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
     try:
         soup = soup_it(link)
         data = json.loads(soup.find('script', type='application/ld+json').text)
-        user_rating_count = ([element for element in soup.select('div.summary') if 
-                        element.select_one('.count a') and 'Ratings' 
-                        in element.select_one('.count a').text])
-        if user_rating_count:
-            try:
-                user_rating_count = user_rating_count[0].select_one('.count a').text.split()[0]
-            except:
-                user_rating_count = 0
-        else:
+        try:
+            user_rating_count = ([element for element in soup.select('div.summary') if 
+                element.select_one('.count a') and 'Ratings' 
+                in element.select_one('.count a').text])
+            user_rating_count = user_rating_count[0].select_one('.count a').text.split()[0]
+        except:
             user_rating_count = 0
         data_list.append({
         'Name' : data.get('name'),
