@@ -171,7 +171,7 @@ with DAG(
                     "review_type": "critic"
                 }
             )
-        t1>>tg1
+        
     v1 = KubernetesJobOperator(
             task_id=f"scrape-vgchartz-hw-sales",
             body_filepath=POD_TEMPALTE,
@@ -208,5 +208,5 @@ with DAG(
             },
         )
 
-    v1
-    v2
+    t >> backfill_first >> [v1,v2, t1>>tg1]
+
