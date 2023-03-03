@@ -130,8 +130,7 @@ def main(console: str) -> None:
     df1 = (pd.DataFrame.from_dict(data_list))
     print(df1.head())
     add_gamepass_status(df1)
-    with open(f"/etc/scraped_data/{console}-games.csv", 'w', newline='', encoding='utf-8') as file:
-        df1.to_csv(file, index=False)
+    df.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
 
 
 

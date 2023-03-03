@@ -118,9 +118,8 @@ def main(console: str, review_type: str) -> None:
         scrape_reviews(game, data_list, exception_list)
     
     df = pd.DataFrame.from_dict(data_list)
-    with open(f"/etc/scraped_data/{file_name}", 'w', newline='', encoding='utf-8') as file:
-        df.to_csv(file, index=False)
-        
+    df.to_parquet('/etc/scraped_data/{file_name}.parquet')
+
 if __name__ == '__main__':
     main(os.getenv("console"), os.getenv("review_type"))
     

@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 default_args = {
     "owner": "airflow",
-    "start_date": datetime(2022, 8, 1),
+    "start_date": datetime(2022, 12, 1),
     "depends_on_past": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=60),

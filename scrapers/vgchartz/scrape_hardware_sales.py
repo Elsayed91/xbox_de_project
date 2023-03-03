@@ -147,4 +147,4 @@ if __name__ == '__main__':
     consoles = ["XS", "XOne", "X360"]
     regions = ["USA", "Europe", "Japan", "Global"]
     df = main(regions, consoles)
-    df.to_csv("/etc/scraped_data/vgc_hw_sales.csv", index=False)
+    df.to_parquet("/etc/scraped_data/vgc_hw_sales.parquet")

@@ -189,7 +189,8 @@ def clean_data(df):
 def main():
     df = scrape_vgchartz(console_list = ['XS', 'XOne', 'X360', 'XB'])
     df = clean_data(df)
-    df.to_csv('/etc/scraped_data/vgc_game_sales.csv', index=False)
+    df.to_parquet("/etc/scraped_data/vgc_game_sales.parquet")
+
 
 if __name__ == '__main__':
     main()

@@ -236,5 +236,5 @@ if __name__ == '__main__':
     num_tweets = os.getenv("num_tweets", 2000)
     df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
     data_vol = os.getenv('data_volume', '/etc/scraped_data')
-    df.to_csv(f"{data_vol}/tweets-{start_date_str}.csv", index=False)
+    df.to_parquet(f"{data_vol}/tweets-{start_date_str}.parquet")
     logger.info(f"saved data to file tweets-{start_date_str}.csv")
