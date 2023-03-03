@@ -82,30 +82,26 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         soup = soup_it(link)
         game_sublink = link.replace("https://www.metacritic.com", "")
         data = json.loads(soup.select_one('script[type="application/ld+json"]').text)
-        print(f"data.get('name'): {data.get('name')}")
-        print(f"data.get('datePublished'): {data.get('datePublished')}")
-        print(f"data.get('contentRating'): {data.get('contentRating')}")
-        print(f"data.get('genre', []): {data.get('genre', [])}")
-        print(f"soup.select_one('.developer a').text: {soup.select_one('.developer a').text}")
-        print(f"[x['name'] for x in data['publisher']]: {[x['name'] for x in data['publisher']]}")
-        print(f"soup.find('div', class_=\"user\").text: {soup.find('div', class_='user').text}")
-        print(f"soup.find('span', {'class': 'count'}).find('a').text: {soup.find('span', {'class': 'count'}).find('a').text}")
-        print(f"soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip(): {soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip()}")
-        print(f"data.get('description'): {data.get('description')}")
-        print(f"data['image']: {data['image']}")
-
-        user_score = soup.find('div', class_="user").text
-        user_score = float(user_score) if user_score != 'tbd' else None
+        try:
+            user_score = soup.find('div', class_="user").text
+            user_score = float(user_score) if user_score != 'tbd' else None
+        except:
+            user_score = None
+        print(user_score)
         
         try:
             critic_review_count = int(soup.find('span', {'class': 'count'}).find('a').text.split()[0])
         except:
             critic_review_count = 0
+            
+        print(critic_review_count)
         try:
             user_rating_count = int(soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip().split()[0])
         except:
             user_rating_count = 0
-
+        print(user_rating_count)
+        
+        print(f"dev is {soup.select_one('.developer a').text}")
         game_data = {
             'Name': data.get('name'),
             'Release Date': datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
