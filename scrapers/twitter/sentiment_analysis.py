@@ -233,7 +233,7 @@ if __name__ == '__main__':
     start_date_str, end_date_str = get_date_range(start_date)
     lang = os.getenv("lang",'en')
     exclude_keywords = ['sale', 'discount', 'buy', 'shop', 'promote', 'click', 'shopify']
-    num_tweets = os.getenv("num_tweets", 2000)
+    num_tweets = os.getenv("num_tweets", 1000)
     df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
     data_vol = os.getenv('data_volume', '/etc/scraped_data')
     df.to_parquet(f"{data_vol}/tweets-{start_date_str}.parquet")
