@@ -131,7 +131,6 @@ def main(console: str) -> None:
     
     df1 = (pd.DataFrame.from_dict(data_list))
     df1['Meta Score'] = df1['Meta Score'].astype(int)
-    df1['User Rating'] = df1['User Rating'].astype(float)
     df1['Critic Reviews Count'] = df1['Critic Reviews Count'].astype(int)
     df1['User Rating Count'] = df1['User Rating Count'].astype(int)
     df1 = add_gamepass_status(df1)
