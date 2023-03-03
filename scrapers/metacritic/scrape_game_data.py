@@ -98,27 +98,25 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
                     return
                 else:
                     print(f"Retrying {link}...")
+                    time.sleep(1)
                     continue
         try:
             user_score = soup.find('div', class_="user").text
             user_score = float(user_score) if user_score != 'tbd' else None
         except:
             user_score = None
-        print(user_score)
         
         try:
             critic_review_count = int(soup.find('span', {'class': 'count'}).find('a').text.split()[0])
         except:
             critic_review_count = 0
             
-        print(critic_review_count)
+
         try:
             user_rating_count = int(soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip().split()[0])
         except:
             user_rating_count = 0
-        print(user_rating_count)
-        
-        print(f"dev is {soup.select_one('.developer a').text}")
+
         game_data = {
             'Name': data.get('name'),
             'Release Date': datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
@@ -154,9 +152,9 @@ def main(console: str) -> None:
     data_list = []
     exception_list = []
     game_list = read_txt(console)
-    import time 
+
     for game in game_list:
-        time.sleep(1)
+        
         print(f"processing {game} data.")
         scrape_game_data(game, data_list, exception_list)
         
