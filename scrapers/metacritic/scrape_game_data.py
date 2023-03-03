@@ -78,49 +78,52 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
     Returns:
         None
     """
-    retry_count = 0
-    max_retries = 2
-    while retry_count < max_retries:
+    try:
+        soup = soup_it(link)
+        game_sublink = link.replace("https://www.metacritic.com", "")
+        data = json.loads(soup.select_one('script[type="application/ld+json"]').text)
+        print(f"data.get('name'): {data.get('name')}")
+        print(f"data.get('datePublished'): {data.get('datePublished')}")
+        print(f"data.get('contentRating'): {data.get('contentRating')}")
+        print(f"data.get('genre', []): {data.get('genre', [])}")
+        print(f"soup.select_one('.developer a').text: {soup.select_one('.developer a').text}")
+        print(f"[x['name'] for x in data['publisher']]: {[x['name'] for x in data['publisher']]}")
+        print(f"soup.find('div', class_=\"user\").text: {soup.find('div', class_='user').text}")
+        print(f"soup.find('span', {'class': 'count'}).find('a').text: {soup.find('span', {'class': 'count'}).find('a').text}")
+        print(f"soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip(): {soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip()}")
+        print(f"data.get('description'): {data.get('description')}")
+        print(f"data['image']: {data['image']}")
+
+        user_score = soup.find('div', class_="user").text
+        user_score = float(user_score) if user_score != 'tbd' else None
+        
         try:
-            soup = soup_it(link)
-            game_sublink = link.replace("https://www.metacritic.com", "")
-            data = json.loads(soup.select_one('script[type="application/ld+json"]').text)
-            user_score = soup.find('div', class_="user").text
-            user_score = float(user_score) if user_score != 'tbd' else None
+            critic_review_count = int(soup.find('span', {'class': 'count'}).find('a').text.split()[0])
+        except:
+            critic_review_count = 0
+        try:
+            user_rating_count = int(soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip().split()[0])
+        except:
+            user_rating_count = 0
 
-            try:
-                critic_review_count = int(soup.find('span', {'class': 'count'}).find('a').text.split()[0])
-            except:
-                critic_review_count = 0
-            try:
-                user_rating_count = int(soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip().split()[0])
-            except:
-                user_rating_count = 0
-
-            game_data = {
-                'Name': data.get('name'),
-                'Release Date': datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
-                'Maturity Rating': data.get('contentRating', "Unspecified").replace("ESRB ", ""),
-                'Genre': ", ".join(data.get('genre', [])),
-                'Developer': soup.select_one('.developer a').text,
-                'Publisher': ", ".join([x['name'] for x in data['publisher']]),
-                'Meta Score': int(data['aggregateRating']['ratingValue']) if 'aggregateRating' in data else None,
-                'Critic Reviews Count': critic_review_count,
-                'User Score': user_score,
-                'User Rating Count' : user_rating_count,
-                'Summary': data.get('description'),
-                'Image': data['image']
-            }
-            data_list.append(game_data)
-            return  # Return on success
-        except BaseException as e:
-            print(f"On game link {link}, Error : {e}")
-            exception_list.append(f"On game link {link}, Error : {e}")
-            retry_count += 1
-            time.sleep(1)  # Sleep for 1 second before retrying
-    # If we reach this point, it means we have exhausted all retries
-    print(f"On game link {link}, all retries failed")
-    exception_list.append(f"On game link {link}, all retries failed")
+        game_data = {
+            'Name': data.get('name'),
+            'Release Date': datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
+            'Maturity Rating': data.get('contentRating', "Unspecified").replace("ESRB ", ""),
+            'Genre': ", ".join(data.get('genre', [])),
+            'Developer': soup.select_one('.developer a').text,
+            'Publisher': ", ".join([x['name'] for x in data['publisher']]),
+            'Meta Score': int(data['aggregateRating']['ratingValue']) if 'aggregateRating' in data else None,
+            'Critic Reviews Count': critic_review_count,
+            'User Score': user_score,
+            'User Rating Count' : user_rating_count,
+            'Summary': data.get('description'),
+            'Image': data['image']
+        }
+        data_list.append(game_data)
+    except BaseException as e:
+        print(f"On game link {link}, Error : {e}")
+        exception_list.append(f"On game link {link}, Error : {e}")
             
             
 
