@@ -130,7 +130,7 @@ def main(console: str) -> None:
     df1 = (pd.DataFrame.from_dict(data_list))
     print(df1.head())
     add_gamepass_status(df1)
-    df.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
+    df1.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
 
 
 
