@@ -102,10 +102,10 @@ def main(console: str, review_type: str) -> None:
     """
     if review_type.lower() == "user":
         scrape_reviews = scrape_user_reviews
-        file_name = f"{console}-user-reviews.csv"
+        file_name = f"{console}-user-reviews"
     elif review_type.lower() == "critic":
         scrape_reviews = scrape_metacritic_reviews
-        file_name = f"{console}-critic-reviews.csv"
+        file_name = f"{console}-critic-reviews"
     else:
         print("Invalid review type. Please enter either 'user' or 'critic'.")
         return

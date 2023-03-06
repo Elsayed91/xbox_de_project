@@ -35,6 +35,12 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # gcloud config set compute/zone $GCP_ZONE >/dev/null
 # gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" -q >/dev/null
 # gcloud config set builds/use_kaniko True
+# bq --location=${GCP_REGION} mk -d \
+#     twitter_data
+# bq --location=${GCP_REGION} mk -d \
+#     vgchartz_data
+# bq --location=${GCP_REGION} mk -d \
+#     metacritic_data
 
 # gcloud container clusters create ${GKE_CLUSTER_NAME}  \
 #     --zone=${GCP_ZONE} \
@@ -80,7 +86,16 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # kubectl apply -f manifests/*.yaml
 
 # gsutil mb -c standard -l ${GCP_REGION} gs://${DATA_BUCKET}
-pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
-if [ -n "$pods" ]; then
-    kubectl delete pod $pods
-fi
+# pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+# if [ -n "$pods" ]; then
+#     kubectl delete pod $pods
+# fi
+
+exists=$(bq query --use_legacy_sql=false \
+  --format=json \
+  --max_rows=1 \
+  "SELECT COUNT(*) as table_exists \
+  FROM \`stellarismusv4.tweets.INFORMATION_SCHEMA.TABLES\` \
+  WHERE table_name = 'tweets' \
+              AND table_type IN ('TABLE', 'BASE TABLE')" | sed -n 's/.*"table_exists":"\([^"]*\)".*/\1/p')
+$((exists))
