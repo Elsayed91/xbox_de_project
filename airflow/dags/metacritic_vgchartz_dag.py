@@ -209,7 +209,7 @@ with DAG(
             },
         )
     x1 = KubernetesJobOperator(
-        task_id="ingest_and_load",
+        task_id="load_to_bq",
         body_filepath=POD_TEMPALTE,
         command=["/bin/bash", "/git/repo/airflow/dags/scripts/gs_script.sh"],
         jinja_job_args={
