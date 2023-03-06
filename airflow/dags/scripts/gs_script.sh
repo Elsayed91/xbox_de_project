@@ -42,8 +42,8 @@ bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.
 
 
 #Load vgchartz data
-bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_vgchartz_hw_sales \
+bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_hw_sales \
 "gs://${DATA_BUCKET}/vgchartz/vgc_hw_sales.parquet"
 
-bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_vgchartz_game_sales  \
+bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_game_sales  \
 "gs://${DATA_BUCKET}/vgchartz/vgc_game_sales.parquet"
