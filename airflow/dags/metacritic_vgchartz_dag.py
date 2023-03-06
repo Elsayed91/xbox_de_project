@@ -221,7 +221,7 @@ with DAG(
                         "name": "persistent-volume",
                         "type": "persistentVolumeClaim",
                         "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
+                        "mountPath": "/pvc",
                 }
             ],
         },
