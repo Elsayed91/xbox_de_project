@@ -68,7 +68,7 @@ with DAG(
             }
         )
     
-    backfill_first = LatestOnlyOperator(task_id="finish_backfilling_first")
+    backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
     
     
     with TaskGroup(group_id=f'process-metacritic-data') as tg:
