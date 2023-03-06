@@ -214,9 +214,8 @@ with DAG(
         command=["/bin/bash", "/git/repo/airflow/dags/scripts/gs_script.sh"],
         jinja_job_args={
             "image": "google/cloud-sdk:alpine",
-            "name": "from-aws-to-gcs",
+            "name": "ingest-and-load-to-bq",
             "gitsync": True,
-            "nodeSelector": BASE_NODE_POOL,
             "volumes": [
                 {
                         "name": "persistent-volume",
