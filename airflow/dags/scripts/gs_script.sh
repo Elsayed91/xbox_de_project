@@ -1,13 +1,16 @@
 #!/bin/bash
+# the script performs the following tasks:
+#   1. Copies Parquet files for Twitter, VGChartz, and Metacritic to their respective
+#   directories in GCS
+#   2. Loads data from Twitter Parquet files into BigQuery
+#   3. Loads data from VGChartz and Metacritic Parquet files into their respective BigQuery
+#   datasets.
+
 LOCAL_DIR=$LOCAL_DIR
 
 gsutil -m cp pvc/tweets-*.parquet gs://${DATA_BUCKET}/twitter/
 gsutil -m cp pvc/vgc_*.parquet gs://${DATA_BUCKET}/vgchartz/
 gsutil -m cp pvc/xbox*.parquet gs://${DATA_BUCKET}/metacritic/
-
-
-
-
 
 
 #load twitter data

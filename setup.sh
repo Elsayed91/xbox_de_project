@@ -91,11 +91,3 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 #     kubectl delete pod $pods
 # fi
 
-exists=$(bq query --use_legacy_sql=false \
-  --format=json \
-  --max_rows=1 \
-  "SELECT COUNT(*) as table_exists \
-  FROM \`stellarismusv4.tweets.INFORMATION_SCHEMA.TABLES\` \
-  WHERE table_name = 'tweets' \
-              AND table_type IN ('TABLE', 'BASE TABLE')" | sed -n 's/.*"table_exists":"\([^"]*\)".*/\1/p')
-$((exists))
