@@ -3,12 +3,11 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'components/*/**'
+      - 'scrapers/*/**'
   pull_request:
-    branches:
-    - main
+    branches: [ "main" ]
     paths:
-      - 'components/**'
+      - 'scrapers/*/**'
 
 jobs:
   test_pyapps:
