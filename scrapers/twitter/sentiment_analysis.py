@@ -1,7 +1,6 @@
 """
 A module that contains several functions for extracting sentiment from Twitter data. The
 functions are as follows:
- 
 get_date_range(since_date_str: str) -> tuple[str, str]: Is used to get the exact date
 range for each month, since months have different number of days.
 
