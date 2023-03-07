@@ -50,7 +50,18 @@ def scrape_metacritic_reviews(
             print(page)
             game_url = url + str(page)
 
-            soup = soup_it(game_url)
+            # Retry soup_it if it returns None
+            for i in range(3):
+                soup = soup_it(game_url)
+                if soup is not None:
+                    break
+                print(f"Retrying soup_it for {game_url}")
+            else:
+                exception_list.append(
+                    f"On game link {game_url}, Error : soup_it returned None"
+                )
+                continue
+
             print(f"processing critic review for {game_url}")
             game = soup.find("div", class_="product_title").find("h1").text.strip()
             platform = soup.find("span", class_="platform").text.strip()
@@ -77,6 +88,56 @@ def scrape_metacritic_reviews(
         exception_list.append(f"On game link {game_url}, Error : {e}")
 
 
+# def scrape_metacritic_reviews(
+#     game_link: str, critic_review_list: list, exception_list: list
+# ) -> None:
+#     """
+#     Scrapes critic reviews for a game from Metacritic and appends them to the
+#     critic_review_list.
+
+#     Args:
+#         game_link (str): The Metacritic URL for the game.
+#         critic_review_list (list): The list to which the critic reviews will be appended.
+#         exception_list (list): The list to which exceptions will be appended if they
+#         occur.
+
+#     Returns:
+#         None
+#     """
+#     try:
+#         url = game_link + "/critic-reviews?page="
+#         pages = get_last_page_num(url)
+#         for page in range(pages):
+#             print(page)
+#             game_url = url + str(page)
+
+#             soup = soup_it(game_url)
+#             print(f"processing critic review for {game_url}")
+#             game = soup.find("div", class_="product_title").find("h1").text.strip()
+#             platform = soup.find("span", class_="platform").text.strip()
+#             for review in soup.find_all("div", class_="review_content"):
+#                 if review.find("div", class_="source") == None:
+#                     break
+
+#                 critic_review_list.append(
+#                     {
+#                         "Game": game,
+#                         "Platform": platform,
+#                         "Critic": review.find("div", class_="source").find("a").text,
+#                         "Review Source": review.find("div", class_="source").find("a")[
+#                             "href"
+#                         ],
+#                         "Date": review.find("div", class_="date").text,
+#                         "Score": review.find("div", class_="review_grade")
+#                         .find_all("div")[0]
+#                         .text,
+#                         "Review": review.find("div", class_="review_body").text.strip(),
+#                     }
+#                 )
+#     except BaseException as e:
+#         exception_list.append(f"On game link {game_url}, Error : {e}")
+
+
 def scrape_user_reviews(
     game_link: str, review_list: list, exception_list: list
 ) -> None:
@@ -92,36 +153,15 @@ def scrape_user_reviews(
     Returns:
         None
     """
-
-    url = game_link + "/user-reviews?page="
-    pages = get_last_page_num(url)
-    for page in range(pages):
-        game_url = url + str(page)
-
-        try:
-            MAX_RETRIES = 3
-            retries = 0
-            while True:
-                try:
-                    soup = soup_it(game_url)
-                    platform = soup.find("span", class_="platform").text.strip()
-                    break
-                except Exception as e:
-                    retries += 1
-                    if retries >= MAX_RETRIES:
-                        print(
-                            f"Failed to scrape data from {link} after {MAX_RETRIES} retries."
-                        )
-                        exception_list.append(f"On game link {link}, Error : {e}")
-                        return
-                    else:
-                        print(f"Retrying {link}...")
-                        time.sleep(1)
-                        continue
-
+    try:
+        url = game_link + "/user-reviews?page="
+        pages = get_last_page_num(url)
+        for page in range(pages):
+            game_url = url + str(page)
+            soup = soup_it(game_url)
             print(f"processing user review for {game_url}")
-
             game = soup.find("div", class_="product_title").find("h1").text.strip()
+            platform = soup.find("span", class_="platform").text.strip()
             for review in soup.find_all("div", class_="review_content"):
                 if review.find("div", class_="name") == None:
                     break
@@ -141,10 +181,8 @@ def scrape_user_reviews(
                         else review.find("div", class_="review_body").find("span").text,
                     }
                 )
-
-        except BaseException as e:
-            print(f"On game link {game_url}, Error : {e}")
-            exception_list.append(f"On game link {game_url}, Error : {e}")
+    except BaseException as e:
+        exception_list.append(f"On game link {game_url}, Error : {e}")
 
 
 # def scrape_user_reviews(
