@@ -10,24 +10,24 @@ from scrapers.vgchartz.scrape_game_sales import *
 #     url = "https://www.google.com"
 #     soup = get_page_html(url)
 #     assert soup.title.string == "Google"
-    
+
 # def test_scrape_genre_list():
-#     genre_list = ['Action', 'Action-Adventure', 'Adventure', 'Board Game', 'Education', 
+#     genre_list = ['Action', 'Action-Adventure', 'Adventure', 'Board Game', 'Education',
 #                 'Fighting', 'Misc', 'MMO', 'Music', 'Party', 'Platform', 'Puzzle',
 #                 'Racing', 'Role-Playing', 'Sandbox', 'Shooter', 'Simulation', 'Sports',
 #                 'Strategy', 'Visual Novel']
 #     assert isinstance(genre_list, list)
 #     assert len(genre_list) > 0
 #     assert all(isinstance(genre, str) for genre in genre_list)
-    
-    
+
+
 # def test_build_url():
 #     genre = "Action"
 #     console_type = "Xbox One"
 #     page_num = 1
 #     expected_url = "https://www.vgchartz.com/games/games.php?page=1&results=200&genre=Action&console=Xbox+One&order=Sales&ownership=Both&direction=DESC&showtotalsales=1&shownasales=1&showpalsales=1&showjapansales=1&showothersales=1&showpublisher=1&showdeveloper=1&showreleasedate=1&showlastupdate=1&showshipped=1"
 #     assert build_url(genre, console_type, page_num) == expected_url
-    
+
 # def test_scrape_game_info():
 #     html = """
 #     <html>
@@ -175,14 +175,30 @@ from scrapers.vgchartz.scrape_game_sales import *
 #     pd.testing.assert_frame_equal(output_df.reset_index(drop=True), expected_output.reset_index(drop=True))
 
 
-
 def test_scrape_vgchartz():
-    console_list = ['XOne']
-    result = scrape_vgchartz(console_list,['Adventure'])
+    console_list = ["XOne"]
+    result = scrape_vgchartz(console_list, ["Adventure"])
     print(result.columns)
 
     assert isinstance(result, pd.DataFrame)
     assert not result.empty
-    assert all(col in result.columns for col in ['Rank', 'Gamex', 'Game', 'Console', 'Publisher', 'Developer',
-       'Total Shipped', 'Total Sales', 'NA Sales', 'EU Sales', 'Japan Sales',
-       'Other Sales', 'Release Date', 'Last Update', 'Genre'])
+    assert all(
+        col in result.columns
+        for col in [
+            "Rank",
+            "Gamex",
+            "Game",
+            "Console",
+            "Publisher",
+            "Developer",
+            "Total Shipped",
+            "Total Sales",
+            "NA Sales",
+            "EU Sales",
+            "Japan Sales",
+            "Other Sales",
+            "Release Date",
+            "Last Update",
+            "Genre",
+        ]
+    )

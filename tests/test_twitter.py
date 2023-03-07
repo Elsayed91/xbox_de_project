@@ -9,10 +9,11 @@ from scrapers.twitter.sentiment_analysis import *
 
 
 def test_get_date_range():
-    assert get_date_range('2022-02-15') == ('2022-01-01', '2022-01-31')
-    assert get_date_range('2021-12-31') == ('2021-11-01', '2021-11-30')
-    assert get_date_range('2020-02-29') == ('2020-01-01', '2020-01-31')
-    
+    assert get_date_range("2022-02-15") == ("2022-01-01", "2022-01-31")
+    assert get_date_range("2021-12-31") == ("2021-11-01", "2021-11-30")
+    assert get_date_range("2020-02-29") == ("2020-01-01", "2020-01-31")
+
+
 # def test_clean_tweet():
 #     # Test basic cleaning of a tweet
 #     assert clean_tweet("Hello, world!") == "hello world"
@@ -24,18 +25,18 @@ def test_get_date_range():
 #     assert clean_tweet("I don't like Mondays.") == "i dont like mondays"
 
 #     # Test removal of mentions and hashtags
-#     assert (clean_tweet("This tweet contains a @mention and a #hashtag.") 
+#     assert (clean_tweet("This tweet contains a @mention and a #hashtag.")
 #             == "this tweet contains a and a")
 
 #     # Test removal of URLs
-#     assert (clean_tweet("Check out this link: https://www.example.com.") == 
+#     assert (clean_tweet("Check out this link: https://www.example.com.") ==
 #             "check out this link")
 
 #     # Test removal of brackets
 #     assert clean_tweet("This [text] is in brackets!") == "this text is in brackets"
 
 #     # Test handling of stopwords
-#     assert (clean_tweet("This tweet contains stopwords.", stopwords=["contains"]) 
+#     assert (clean_tweet("This tweet contains stopwords.", stopwords=["contains"])
 #             == "this tweet stopwords")
 
 #     # Test handling of an empty string
@@ -67,7 +68,7 @@ def test_get_date_range():
 #     compound = 0.5
 #     expected_label = 'positive'
 #     assert get_sentiment_label(compound) == expected_label
-    
+
 #     # negative label
 #     compound = -0.5
 #     expected_label = 'negative'
@@ -84,7 +85,7 @@ def test_get_date_range():
 #     assert isinstance(scrape_tweets(hashtags=['python'], since_date='2022-01-01', until_date='2022-01-02', lang='en', exclude_keywords=[], num_tweets=10), pd.DataFrame)
 
 # def test_scrape_tweets_columns():
-#     columns = ['Datetime', 'Tweet Id', 'Original Text', 'Username', 'Likes', 'Views', 
+#     columns = ['Datetime', 'Tweet Id', 'Original Text', 'Username', 'Likes', 'Views',
 #                'Replies', 'Retweets', 'Followers', 'Extra Hashtags']
 #     df = scrape_tweets(hashtags=['python'], since_date='2022-01-01', until_date='2022-01-02', lang='en', exclude_keywords=[], num_tweets=10)
 #     assert df.columns.tolist() == columns
@@ -117,10 +118,10 @@ def test_get_date_range():
 
 # def test_scrape_tweets_excluded_keywords():
 #     df = scrape_tweets(hashtags=['python'], since_date='2022-01-01', until_date='2022-01-02', lang='en', exclude_keywords=['programming'], num_tweets=10)
-#     assert (all(keyword not in text for keyword in ['programming'] 
+#     assert (all(keyword not in text for keyword in ['programming']
 #                 for text in df['Original Text']))
-    
-    
+
+
 # def test_main():
 #     # Define parameters
 #     hashtags = ['python']
@@ -133,12 +134,12 @@ def test_get_date_range():
 
 #     # Run main function and get DataFrame
 #     tweets_df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
-    
+
 #     # Test if the function returns a pandas DataFrame
 #     assert isinstance(tweets_df, pd.DataFrame)
 #     # Test if the function returns a DataFrame with the expected columns
 #     assert set(tweets_df.columns) == set(expected_columns)
-    
+
 #     # Test if the function returns a DataFrame with the expected number of rows
 #     assert len(tweets_df) == num_tweets
 
@@ -178,7 +179,7 @@ def test_get_date_range():
 #     ]
 #     assert not df.empty
 #     assert list(df.columns) == expected_columns
-    
+
 # def test_integration_main_handles_invalid_inputs():
 #     # Invalid hashtag
 #     hashtags = ['#nonexistenthashta123321321321dsg']
@@ -196,7 +197,7 @@ def test_get_date_range():
 #     since_date = '2022-01-01'
 #     until_date = '2022-01-02'
 #     lang = 'nonexistentlanguage'
-    
+
 #     exclude_keywords = []
 #     num_tweets = 10
 

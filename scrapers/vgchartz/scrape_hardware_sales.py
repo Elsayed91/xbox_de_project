@@ -56,8 +56,9 @@ def get_sales_data(url: str) -> dict:
     return ast.literal_eval(str(data))
 
 
-def get_sales_dataframe(data: dict, consoles: list[str] = None, 
-    start_date: str = None, end_date: str = None) -> pd.DataFrame:
+def get_sales_dataframe(
+    data: dict, consoles: list[str] = None, start_date: str = None, end_date: str = None
+) -> pd.DataFrame:
     """
     Converts sales data to a Pandas DataFrame and filters by console and date.
 
@@ -72,25 +73,28 @@ def get_sales_dataframe(data: dict, consoles: list[str] = None,
     """
     # Create the DataFrame with the specified column order
     sales_data = []
-    for series in data['series']:
-        sales_data.append({'console': series['name'], 'sales': series['data']})
+    for series in data["series"]:
+        sales_data.append({"console": series["name"], "sales": series["data"]})
 
-    sales_df = pd.DataFrame(columns=['console', 'date', 'sales'])
+    sales_df = pd.DataFrame(columns=["console", "date", "sales"])
     for data in sales_data:
-        console = data['console']
+        console = data["console"]
         if consoles is not None and console not in consoles:
             continue
-        for point in data['sales']:
-            date = pd.to_datetime(point['x'], unit='ms')
+        for point in data["sales"]:
+            date = pd.to_datetime(point["x"], unit="ms")
             if start_date is not None and date < pd.to_datetime(start_date):
                 continue
             if end_date is not None and date >= pd.to_datetime(end_date):
                 continue
-            sales = point['y']
-            data_dict = {'console': console, 'date': date, 'sales': sales}
-            sales_df = pd.concat([sales_df, pd.DataFrame([data_dict])], ignore_index=True)
+            sales = point["y"]
+            data_dict = {"console": console, "date": date, "sales": sales}
+            sales_df = pd.concat(
+                [sales_df, pd.DataFrame([data_dict])], ignore_index=True
+            )
 
     return sales_df
+
 
 def calculate_other_sales(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -104,28 +108,39 @@ def calculate_other_sales(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: A DataFrame with columns 'console', 'date', 'region' and 'sales',
         where the sales for the 'Others' region have been calculated.
     """
-    df_other = (df.groupby(['console', 'date', 'region'])
-                .sales.sum().reset_index()
-                .pivot_table(index=['console', 'date'],
-                            columns='region',
-                            values='sales',
-                            fill_value=0)
-                .reset_index())
-    
-    df_other['Others'] = df_other['Global'] - df_other[['Europe', 'Japan', 'USA']].sum(axis=1)
+    df_other = (
+        df.groupby(["console", "date", "region"])
+        .sales.sum()
+        .reset_index()
+        .pivot_table(
+            index=["console", "date"], columns="region", values="sales", fill_value=0
+        )
+        .reset_index()
+    )
 
-    df_final = df_other.melt(id_vars=['console', 'date'], var_name='region', value_name='sales')
+    df_other["Others"] = df_other["Global"] - df_other[["Europe", "Japan", "USA"]].sum(
+        axis=1
+    )
+
+    df_final = df_other.melt(
+        id_vars=["console", "date"], var_name="region", value_name="sales"
+    )
     return df_final
 
-def main(regions: list[str], consoles: list[str], start_date:  Optional[str] = None, 
-         end_date: Optional[str] = None) -> pd.DataFrame:
+
+def main(
+    regions: list[str],
+    consoles: list[str],
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+) -> pd.DataFrame:
     """
     Retrieves and processes hardware sales data for the specified regions and consoles.
 
     Args:
         regions (list[str]): A list of regions to retrieve data for. Valid regions are
         "Global", "USA", "Europe", and "Japan".
-        consoles (list[str]): A list of console names to retrieve data for. 
+        consoles (list[str]): A list of console names to retrieve data for.
         start_date (str, optional): The start date for the data in the format
         "YYYY-MM-DD".
         end_date (str, optional): The end date for the data in the format "YYYY-MM-DD".
@@ -137,13 +152,16 @@ def main(regions: list[str], consoles: list[str], start_date:  Optional[str] = N
     for region in regions:
         url = f"https://www.vgchartz.com/tools/hw_date.php?reg={region}&ending=Weekly"
         sales_data = get_sales_data(url)
-        sales_df = get_sales_dataframe(sales_data, consoles, start_date=start_date, end_date=end_date)
+        sales_df = get_sales_dataframe(
+            sales_data, consoles, start_date=start_date, end_date=end_date
+        )
         sales_df["region"] = region
         df = pd.concat([df, sales_df], ignore_index=True, sort=False)
     df = calculate_other_sales(df)
     return df
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     consoles = ["XS", "XOne", "X360"]
     regions = ["USA", "Europe", "Japan", "Global"]
     df = main(regions, consoles)

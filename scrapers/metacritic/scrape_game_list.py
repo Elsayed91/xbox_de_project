@@ -28,17 +28,19 @@ def game_urls(link: str, pages: int) -> Generator[str, None, None]:
     """
     for page in range(pages):
         soup = soup_it(link + f"&page={page}")
-        title_elements = soup.find_all('a', class_='title')
+        title_elements = soup.find_all("a", class_="title")
         for elem in title_elements:
             yield f"https://www.metacritic.com{elem.get('href')}"
 
-if __name__=='__main__':
-    console = os.getenv('console')
-    url = ("https://www.metacritic.com/browse/games/release-date/" + 
-           f"available/{console}/name?&view=detailed")
+
+if __name__ == "__main__":
+    console = os.getenv("console")
+    url = (
+        "https://www.metacritic.com/browse/games/release-date/"
+        + f"available/{console}/name?&view=detailed"
+    )
     pages = get_last_page_num(url)
     url_list = [u for u in game_urls(url, pages)]
     with open(f"/etc/scraped_data/{console}-urls.txt", "w") as f:
         for url in url_list:
             f.write(url + "\n")
- 

@@ -35,7 +35,7 @@ from datetime import datetime
 import pandas as pd
 from fuzzywuzzy import fuzz, process
 
-try: 
+try:
     from scrape_utils import *
 except:
     from scrapers.metacritic.scrape_utils import *
@@ -64,7 +64,6 @@ def fuzzy_match(name: str, names: list, threshold: int = 60) -> str:
         raise TypeError(f"Failed to perform fuzzy matching: {e}")
 
 
-
 def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     """
     Adds a 'Gamepass_Status' column to the input DataFrame indicating whether each game is
@@ -76,20 +75,29 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         A copy of the input DataFrame with an additional 'Gamepass_Status' column.
     """
-    url = ('https://docs.google.com/spreadsheet/ccc?key=1ks'+
-        'pw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg&output=csv')
+    url = (
+        "https://docs.google.com/spreadsheet/ccc?key=1ks"
+        + "pw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg&output=csv"
+    )
     df = pd.read_csv(url, skiprows=[0])
-    df = df[['Game', 'Status']]
-    game_names = df['Game'].tolist()
-    statuses = df['Status'].tolist()
-    main_df['Gamepass_Status'] = main_df['Name'].apply(lambda x: fuzzy_match(x, game_names)).fillna('Not Included')
-    main_df['Gamepass_Status'] = main_df['Gamepass_Status'].fillna('Not Included')
-    main_df['Gamepass_Status'] = main_df['Gamepass_Status'].apply(lambda x: statuses[game_names.index(x)] if x in game_names else 'Not Included')
+    df = df[["Game", "Status"]]
+    game_names = df["Game"].tolist()
+    statuses = df["Status"].tolist()
+    main_df["Gamepass_Status"] = (
+        main_df["Name"]
+        .apply(lambda x: fuzzy_match(x, game_names))
+        .fillna("Not Included")
+    )
+    main_df["Gamepass_Status"] = main_df["Gamepass_Status"].fillna("Not Included")
+    main_df["Gamepass_Status"] = main_df["Gamepass_Status"].apply(
+        lambda x: statuses[game_names.index(x)] if x in game_names else "Not Included"
+    )
     return main_df
 
 
-
-def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]) -> None:
+def scrape_game_data(
+    link: str, data_list: list[dict], exception_list: list[str]
+) -> None:
     """
     Given a link, appends scraped data to a list of dictionaries representing game data
     and appends any exceptions to a list.
@@ -103,21 +111,22 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
         None
     """
     try:
-        
         game_sublink = link.replace("https://www.metacritic.com", "")
 
         MAX_RETRIES = 3
-    
+
         retries = 0
         while True:
             try:
                 soup = soup_it(link)
-                data = json.loads(soup.find('script', type='application/ld+json').text) 
+                data = json.loads(soup.find("script", type="application/ld+json").text)
                 break
             except Exception as e:
                 retries += 1
                 if retries >= MAX_RETRIES:
-                    print(f"Failed to scrape data from {link} after {MAX_RETRIES} retries.")
+                    print(
+                        f"Failed to scrape data from {link} after {MAX_RETRIES} retries."
+                    )
                     exception_list.append(f"On game link {link}, Error : {e}")
                     return
                 else:
@@ -125,42 +134,53 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
                     time.sleep(1)
                     continue
         try:
-            user_score = soup.find('div', class_="user").text
-            user_score = float(user_score) if user_score != 'tbd' else None
+            user_score = soup.find("div", class_="user").text
+            user_score = float(user_score) if user_score != "tbd" else None
         except:
             user_score = None
-        
-        try:
-            critic_review_count = int(soup.find('span', {'class': 'count'}).find('a').text.split()[0])
-        except:
-            critic_review_count = 0
-            
 
         try:
-            user_rating_count = int(soup.find_all('div', {'class': 'summary'})[1].find('a').text.strip().split()[0])
+            critic_review_count = int(
+                soup.find("span", {"class": "count"}).find("a").text.split()[0]
+            )
+        except:
+            critic_review_count = 0
+
+        try:
+            user_rating_count = int(
+                soup.find_all("div", {"class": "summary"})[1]
+                .find("a")
+                .text.strip()
+                .split()[0]
+            )
         except:
             user_rating_count = 0
 
         game_data = {
-            'Name': data.get('name'),
-            'Release Date': datetime.strptime(data.get('datePublished'), "%B %d, %Y").strftime("%Y-%m-%d"),
-            'Maturity Rating': data.get('contentRating', "Unspecified").replace("ESRB ", ""),
-            'Genre': ", ".join(data.get('genre', [])),
-            'Developer': soup.select_one('.developer a').text,
-            'Publisher': ", ".join([x['name'] for x in data['publisher']]),
-            'Meta Score': int(data['aggregateRating']['ratingValue']) if 'aggregateRating' in data else None,
-            'Critic Reviews Count': critic_review_count,
-            'User Score': user_score,
-            'User Rating Count' : user_rating_count,
-            'Summary': data.get('description'),
-            'Image': data['image']
+            "Name": data.get("name"),
+            "Release Date": datetime.strptime(
+                data.get("datePublished"), "%B %d, %Y"
+            ).strftime("%Y-%m-%d"),
+            "Maturity Rating": data.get("contentRating", "Unspecified").replace(
+                "ESRB ", ""
+            ),
+            "Genre": ", ".join(data.get("genre", [])),
+            "Developer": soup.select_one(".developer a").text,
+            "Publisher": ", ".join([x["name"] for x in data["publisher"]]),
+            "Meta Score": int(data["aggregateRating"]["ratingValue"])
+            if "aggregateRating" in data
+            else None,
+            "Critic Reviews Count": critic_review_count,
+            "User Score": user_score,
+            "User Rating Count": user_rating_count,
+            "Summary": data.get("description"),
+            "Image": data["image"],
         }
         data_list.append(game_data)
     except BaseException as e:
         print(f"On game link {link}, Error : {e}")
         exception_list.append(f"On game link {link}, Error : {e}")
-            
-            
+
 
 def main(console: str) -> None:
     """
@@ -178,19 +198,13 @@ def main(console: str) -> None:
     game_list = read_txt(console)
 
     for game in game_list:
-        
         print(f"processing {game} data.")
         scrape_game_data(game, data_list, exception_list)
-        
-    
-    df1 = (pd.DataFrame.from_dict(data_list))
+
+    df1 = pd.DataFrame.from_dict(data_list)
     df1 = add_gamepass_status(df1)
-    df1.to_parquet(f'/etc/scraped_data/{console}-games.parquet')
-
-
-
+    df1.to_parquet(f"/etc/scraped_data/{console}-games.parquet")
 
 
 if __name__ == "__main__":
-    
     main(os.getenv("console"))

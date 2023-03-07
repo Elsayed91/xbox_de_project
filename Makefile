@@ -4,7 +4,7 @@ SHELL=/bin/bash
 include .env
 
 # List of all targets that are not files
-.PHONY: git
+.PHONY: git install_dependencies test style
 
 # Load environment variables from .env file
 VARS:=$(shell sed -ne 's/ *\#.*$$//; /./ s/=.*$$// p' .env )
@@ -12,14 +12,19 @@ $(foreach v,$(VARS),$(eval $(shell echo export $(v)="$($(v))")))
 
 
 # Setup target to run the setup script
-setup:
+setup: install_dependencies
 	@bash setup.sh
 
-r:
-	@kubectl delete -f ${arg} && cat ${arg} | envsubst | kubectl apply -f -
+install_dependencies:
+	@pipenv install --dev
 
-rr: 
-	@cat ${arg} | envsubst | kubectl apply -f -
+test:
+	@pytest tests/ -s
+
+style: 
+	@black scrapers/
+	@isort scrapers/
+	@pylint --recursive=y -sn -rn scrapers/ --ignore-imports=yes  --errors-only --exit-zero
 
 git: 
 	@git add . && git commit -m "$$(openssl rand -hex 5)" && git push -u origin main

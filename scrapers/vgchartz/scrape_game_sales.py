@@ -27,7 +27,8 @@ def get_page_html(url: str) -> BeautifulSoup:
         page.
     """
     response = requests.get(url)
-    return  BeautifulSoup(response.content, 'html.parser')
+    return BeautifulSoup(response.content, "html.parser")
+
 
 def scrape_genre_list() -> list[str]:
     """
@@ -36,14 +37,13 @@ def scrape_genre_list() -> list[str]:
     Returns:
         A list of genre names.
     """
-    url = 'https://www.vgchartz.com/gamedb/'
+    url = "https://www.vgchartz.com/gamedb/"
     soup = get_page_html(url)
-    result_select = soup.find('select', {'name': 'genre'})
-    result_options = result_select.find_all('option')
+    result_select = soup.find("select", {"name": "genre"})
+    result_options = result_select.find_all("option")
     genre_list = []
-    genre_list = [result['value'] for result in result_options if result['value']]
+    genre_list = [result["value"] for result in result_options if result["value"]]
     return genre_list
-
 
 
 def build_url(genre: str, console_type: str, page_num: int) -> str:
@@ -57,33 +57,34 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
     Returns:
         str: The URL for the search results.
     """
-    base_url = 'https://www.vgchartz.com/games/games.php?'
+    base_url = "https://www.vgchartz.com/games/games.php?"
     url_params = {
-        'page': page_num,
-        'results': 200,
-        'genre': genre.replace(' ', '%20'),
-        'console': console_type,
-        'order': 'Sales',
-        'ownership': 'Both',
-        'direction': 'DESC',
-        'showtotalsales': 1,
-        'shownasales': 1,
-        'showpalsales': 1,
-        'showjapansales': 1,
-        'showothersales': 1,
-        'showpublisher': 1,
-        'showdeveloper': 1,
-        'showreleasedate': 1,
-        'showlastupdate': 1,
-        'showshipped': 1
+        "page": page_num,
+        "results": 200,
+        "genre": genre.replace(" ", "%20"),
+        "console": console_type,
+        "order": "Sales",
+        "ownership": "Both",
+        "direction": "DESC",
+        "showtotalsales": 1,
+        "shownasales": 1,
+        "showpalsales": 1,
+        "showjapansales": 1,
+        "showothersales": 1,
+        "showpublisher": 1,
+        "showdeveloper": 1,
+        "showreleasedate": 1,
+        "showlastupdate": 1,
+        "showshipped": 1,
     }
     url = base_url + urllib.parse.urlencode(url_params)
     return url
 
+
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Clean the scraped data by converting sales columns to float format, replacing 
-    'Series' in the 'Console' column with 'XS', dropping the 'Gamex' column, and 
+    Clean the scraped data by converting sales columns to float format, replacing
+    'Series' in the 'Console' column with 'XS', dropping the 'Gamex' column, and
     returning the cleaned DataFrame.
 
     Args:
@@ -93,14 +94,17 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         A pandas DataFrame with cleaned data.
     """
     for col in df.columns:
-        if 'Sales' in col or 'Units' in col:
-            df[col] = df[col].str.replace('m', '').astype(float)
-            
-    df['Console'] = df['Console'].str.replace('Series', 'XS')
-    df = df.drop(['Gamex'], axis=1)
+        if "Sales" in col or "Units" in col:
+            df[col] = df[col].str.replace("m", "").astype(float)
+
+    df["Console"] = df["Console"].str.replace("Series", "XS")
+    df = df.drop(["Gamex"], axis=1)
     return df
 
-def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd.DataFrame]]:
+
+def scrape_game_info(
+    soup: BeautifulSoup, genre: str
+) -> tuple[bool, Optional[pd.DataFrame]]:
     """
     Scrape game information from a BeautifulSoup object and return a pandas DataFrame.
 
@@ -112,19 +116,19 @@ def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd
         A tuple containing a boolean value indicating whether or not the DataFrame is
         empty, and the DataFrame of the scraped game information.
     """
-    soup_div = soup.find('div', {'id': 'generalBody'})
+    soup_div = soup.find("div", {"id": "generalBody"})
     if soup_div is None:
         return False, None
 
     console_list = []
-    all_trs = soup_div.find('table').find_all('tr')
+    all_trs = soup_div.find("table").find_all("tr")
     # tr_count = 0
     # for tr in all_trs:
     #     if tr_count > 2:
     #         console_list.append(tr.find_all("td")[3].find('img').attrs['alt'])
     #     tr_count += 1;
     for tr in all_trs[3:]:
-        console_list.append(tr.find_all("td")[3].find('img').attrs['alt'])
+        console_list.append(tr.find_all("td")[3].find("img").attrs["alt"])
 
     # Scrape the game info into DataFrame
     game_info_df = pd.read_html(str(soup_div))[0]
@@ -132,31 +136,35 @@ def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd
     if game_info_df.empty:
         return False, None
 
-#    clean up the dataframe
+    #    clean up the dataframe
     game_info_df.columns = [
-                            'Rank',
-                            'Gamex',
-                            'Game',
-                            'Console',
-                            'Publisher',
-                            'Developer',
-                            'Total Shipped',
-                            'Total Sales',
-                            'NA Sales',
-                            'EU Sales',
-                            'Japan Sales',
-                            'Other Sales',
-                            'Release Date',
-                            'Last Update',
-                            'Genre']
+        "Rank",
+        "Gamex",
+        "Game",
+        "Console",
+        "Publisher",
+        "Developer",
+        "Total Shipped",
+        "Total Sales",
+        "NA Sales",
+        "EU Sales",
+        "Japan Sales",
+        "Other Sales",
+        "Release Date",
+        "Last Update",
+        "Genre",
+    ]
 
-    game_info_df['Genre'] = genre
-    game_info_df['Game'] = game_info_df['Game'].str.replace(' Read the review', '')
-    game_info_df['Console'] = console_list
+    game_info_df["Genre"] = genre
+    game_info_df["Game"] = game_info_df["Game"].str.replace(" Read the review", "")
+    game_info_df["Console"] = console_list
 
     return True, game_info_df
 
-def scrape_vgchartz(console_list: list[str], genre_list: Optional[list[str]] = None) -> pd.DataFrame:
+
+def scrape_vgchartz(
+    console_list: list[str], genre_list: Optional[list[str]] = None
+) -> pd.DataFrame:
     """
     Scrapes game information from VGChartz for a list of game consoles.
 
@@ -189,8 +197,10 @@ def scrape_vgchartz(console_list: list[str], genre_list: Optional[list[str]] = N
                 page_exist, game_info_df = scrape_game_info(soup, genre)
                 if game_info_df is not None:
                     game_df = pd.concat([game_df, game_info_df], ignore_index=True)
-                    
-                    print(f"Appended Dataframe with page {page_num} of {console_type} games in Genre {genre}")
+
+                    print(
+                        f"Appended Dataframe with page {page_num} of {console_type} games in Genre {genre}"
+                    )
 
                 # increment page number
                 page_num += 1
@@ -198,8 +208,7 @@ def scrape_vgchartz(console_list: list[str], genre_list: Optional[list[str]] = N
     return game_df
 
 
-
-if __name__ == '__main__':
-    df = scrape_vgchartz(console_list = ['XS', 'XOne', 'X360', 'XB'])
+if __name__ == "__main__":
+    df = scrape_vgchartz(console_list=["XS", "XOne", "X360", "XB"])
     df = clean_data(df)
     df.to_parquet("/etc/scraped_data/vgc_game_sales.parquet")
