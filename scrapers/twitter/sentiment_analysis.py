@@ -1,7 +1,7 @@
 """
 A module that contains several functions for extracting sentiment from Twitter data. The
 functions are as follows:
-
+ 
 get_date_range(since_date_str: str) -> tuple[str, str]: Is used to get the exact date
 range for each month, since months have different number of days.
 
@@ -74,10 +74,12 @@ def get_date_range(since_date_str: str) -> tuple[str, str]:
     import datetime
 
     # Convert since date string to datetime.date object
-    since_date = datetime.datetime.strptime(since_date_str, '%Y-%m-%d').date()
+    since_date = datetime.datetime.strptime(since_date_str, "%Y-%m-%d").date()
 
     # Calculate the first day of the previous month
-    start_date = datetime.date(since_date.year, since_date.month, 1) - datetime.timedelta(days=1)
+    start_date = datetime.date(
+        since_date.year, since_date.month, 1
+    ) - datetime.timedelta(days=1)
     start_date = datetime.date(start_date.year, start_date.month, 1)
 
     # Calculate the last day of the previous month
@@ -86,7 +88,7 @@ def get_date_range(since_date_str: str) -> tuple[str, str]:
 
     # Convert the dates to string format and return them
     # '2022-01-01'
-    return start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
+    return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
 
 
 def clean_tweet(tweet: str, stopwords: list[str] = []) -> str:
@@ -103,6 +105,7 @@ def clean_tweet(tweet: str, stopwords: list[str] = []) -> str:
         str: The cleaned tweet.
     """
     import string
+
     if isinstance(tweet, float):
         return ""
 
@@ -151,13 +154,13 @@ def get_sentiment_scores(text: str) -> dict[str, float]:
     sia = SentimentIntensityAnalyzer()
     scores = sia.polarity_scores(text)
     return {
-        'Polarity': polarity,
-        'Subjectivity': subjectivity,
-        'Sentiment': get_sentiment_label(scores['compound']),
-        'Negative Score': scores['neg'],
-        'Neutral Score': scores['neu'],
-        'Positive Score': scores['pos'],
-        'Compound Score': scores['compound'],
+        "Polarity": polarity,
+        "Subjectivity": subjectivity,
+        "Sentiment": get_sentiment_label(scores["compound"]),
+        "Negative Score": scores["neg"],
+        "Neutral Score": scores["neu"],
+        "Positive Score": scores["pos"],
+        "Compound Score": scores["compound"],
     }
 
 
@@ -171,15 +174,22 @@ def get_sentiment_label(compound: float) -> str:
         or neutral.
     """
     if compound > 0.1:
-        return 'positive'
+        return "positive"
     elif compound < -0.1:
-        return 'negative'
+        return "negative"
     else:
-        return 'neutral'
+        return "neutral"
 
-def scrape_tweets(hashtags: list[str], since_date: str, until_date: str, lang: str, 
-                  exclude_keywords: list[str], num_tweets: int,
-                  hashtag_operator: str = 'OR') -> list[dict]:
+
+def scrape_tweets(
+    hashtags: list[str],
+    since_date: str,
+    until_date: str,
+    lang: str,
+    exclude_keywords: list[str],
+    num_tweets: int,
+    hashtag_operator: str = "OR",
+) -> list[dict]:
     """
     Use snscrape to scrape tweets and extract relevant data.>
     Args:
@@ -193,71 +203,118 @@ def scrape_tweets(hashtags: list[str], since_date: str, until_date: str, lang: s
     Returns:
         A pandas DataFrame
     """
-    query = (f' {hashtag_operator} '.join(hashtags) + f' lang:{lang} since:{since_date}' 
-             + f' until:{until_date}'
-             + ''.join([f' -{kw}' for kw in exclude_keywords]))
+    query = (
+        f" {hashtag_operator} ".join(hashtags)
+        + f" lang:{lang} since:{since_date}"
+        + f" until:{until_date}"
+        + "".join([f" -{kw}" for kw in exclude_keywords])
+    )
     tweets_list = []
     logger.info(f"processing tweets from {since_date} until {until_date}.")
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
         if i >= num_tweets:
             break
         tweet_dict = {
-            'Datetime': tweet.date,
-            'Tweet Id': tweet.id,
-            'Original Text': tweet.rawContent,
-            'Username': tweet.user.username,
-            'Likes': tweet.likeCount,
-            'Views': int(tweet.viewCount) if tweet.viewCount is not None else 0,
-            'Replies': tweet.replyCount,
-            'Retweets': tweet.retweetCount,
-            'Followers': tweet.user.followersCount,
-            'Extra Hashtags': 
-                [tag.lower() for tag in re.findall(r"#(\w+)", 
-                tweet.rawContent) if tag.lower() not 
-                in [h.lower().replace("#", "") for h in hashtags]],
-            
+            "Datetime": tweet.date,
+            "Tweet Id": tweet.id,
+            "Original Text": tweet.rawContent,
+            "Username": tweet.user.username,
+            "Likes": tweet.likeCount,
+            "Views": int(tweet.viewCount) if tweet.viewCount is not None else 0,
+            "Replies": tweet.replyCount,
+            "Retweets": tweet.retweetCount,
+            "Followers": tweet.user.followersCount,
+            "Extra Hashtags": [
+                tag.lower()
+                for tag in re.findall(r"#(\w+)", tweet.rawContent)
+                if tag.lower() not in [h.lower().replace("#", "") for h in hashtags]
+            ],
         }
         tweets_list.append(tweet_dict)
 
     return pd.DataFrame(tweets_list)
 
-def main(hashtags: list[str], since_date: str, until_date: str, lang: str, 
-        exclude_keywords: list[str], num_tweets: int) -> pd.DataFrame:
+
+def main(
+    hashtags: list[str],
+    since_date: str,
+    until_date: str,
+    lang: str,
+    exclude_keywords: list[str],
+    num_tweets: int,
+) -> pd.DataFrame:
     """
     main function that utilizes scrape_tweets, clean_tweets and get_sentiment_scores
     to get a dataframe of tweets with desired data.
     """
-    tweets_df = scrape_tweets(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
+    tweets_df = scrape_tweets(
+        hashtags, since_date, until_date, lang, exclude_keywords, num_tweets
+    )
 
     # Clean text and add column to DataFrame
     if not tweets_df.empty:
-        tweets_df['Cleaned Text'] = tweets_df['Original Text'].apply(clean_tweet)
+        tweets_df["Cleaned Text"] = tweets_df["Original Text"].apply(clean_tweet)
 
         # Get sentiment scores and add columns to DataFrame
-        sentiment_scores = tweets_df['Cleaned Text'].apply(get_sentiment_scores)
+        sentiment_scores = tweets_df["Cleaned Text"].apply(get_sentiment_scores)
         tweets_df = pd.concat([tweets_df, sentiment_scores.apply(pd.Series)], axis=1)
 
         # Add additional columns
-        tweets_df = tweets_df[['Datetime', 'Tweet Id', 'Original Text', 'Cleaned Text', 
-                'Polarity', 'Subjectivity', 'Sentiment', 'Negative Score', 
-                'Neutral Score', 'Positive Score', 'Compound Score', 'Likes', 
-                'Views', 'Replies', 'Retweets', 'Followers', 'Extra Hashtags']]
+        tweets_df = tweets_df[
+            [
+                "Datetime",
+                "Tweet Id",
+                "Original Text",
+                "Cleaned Text",
+                "Polarity",
+                "Subjectivity",
+                "Sentiment",
+                "Negative Score",
+                "Neutral Score",
+                "Positive Score",
+                "Compound Score",
+                "Likes",
+                "Views",
+                "Replies",
+                "Retweets",
+                "Followers",
+                "Extra Hashtags",
+            ]
+        ]
 
     return tweets_df
 
 
-
-    
-if __name__ == '__main__':	
-    hashtags = ['#xbox', '#xboxseriesx', '#xboxseriess', '#xboxone', 
-        '#xboxgames', '#xboxgamepass', '#xboxlive', '#xboxcommunity',
-        '#xboxlivegold', '#xboxgamepassultimate', '#gamepassultimate']
+if __name__ == "__main__":
+    hashtags = [
+        "#xbox",
+        "#xboxseriesx",
+        "#xboxseriess",
+        "#xboxone",
+        "#xboxgames",
+        "#xboxgamepass",
+        "#xboxlive",
+        "#xboxcommunity",
+        "#xboxlivegold",
+        "#xboxgamepassultimate",
+        "#gamepassultimate",
+    ]
     start_date = os.getenv("start_date")
     start_date_str, end_date_str = get_date_range(start_date)
-    lang = os.getenv("lang",'en')
-    exclude_keywords = ['sale', 'discount', 'buy', 'shop', 'promote', 'click', 'shopify']
+    lang = os.getenv("lang", "en")
+    exclude_keywords = [
+        "sale",
+        "discount",
+        "buy",
+        "shop",
+        "promote",
+        "click",
+        "shopify",
+    ]
     num_tweets = os.getenv("num_tweets", 1000)
-    df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
-    data_vol = os.getenv('data_volume', '/etc/scraped_data')
+    df = main(
+        hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets
+    )
+    data_vol = os.getenv("data_volume", "/etc/scraped_data")
     df.to_parquet(f"{data_vol}/tweets-{start_date_str}.parquet")
     logger.info(f"saved data to file tweets-{start_date_str}.parquet")
