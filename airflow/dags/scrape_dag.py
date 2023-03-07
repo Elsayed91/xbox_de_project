@@ -60,7 +60,7 @@ with DAG(
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
-    MOUNT_VOLUME_PATH = os.getenv("MOUNT_VOLUME_PATH", MOUNT_VOLUME_PATH)
+    MOUNT_VOLUME_PATH = os.getenv("MOUNT_VOLUME_PATH", "/pvc")
     # t = KubernetesJobOperator(
     #     task_id=f"scrape-tweets",
     #     body_filepath=POD_TEMPALTE,
