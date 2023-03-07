@@ -3,3 +3,7 @@
 scrapers/metacritic/__pycache__
 .ipynb_checkpoints
 scrapers/vgchartz/__pycache__
+.pytest_cache
+tests/__pycache__
+test_hw_sales.csv
+scrapers/twitter/__pycache__

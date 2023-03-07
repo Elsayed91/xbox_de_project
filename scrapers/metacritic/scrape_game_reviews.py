@@ -1,10 +1,25 @@
+"""
+The module contains functions to scrape user and critic reviews for games from Metacritic
+and save them to a parquet file..
+
+Functions:
+
+scrape_metacritic_reviews(game_link: str, critic_review_list: list, exception_list: list)
+-> None: Scrapes critic reviews for a game from Metacritic and appends them to the
+critic_review_list.
+
+scrape_user_reviews(game_link: str, review_list: list, exception_list: list) -> None:
+Scrapes user reviews for a game from Metacritic and appends them to the review_list.
+
+main(console: str, review_type: str) -> None: Main function that scrapes either user
+reviews or critic reviews for the games in game_list. The console argument is the console
+name for which the data is being scraped, and review_type is the type of review to scrape:
+"user" or "critic". The scraped data is saved to a Parquet file in the /etc/scraped_data
+directory.
+"""
 import os
-import random as rand
-import time
 
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 
 try: 
     from scrape_utils import *
@@ -59,7 +74,8 @@ def scrape_user_reviews(game_link: str, review_list: list, exception_list: list)
     Args:
         game_link (str): The Metacritic URL for the game.
         review_list (list): The list to which the user reviews will be appended.
-        exception_list (list): The list to which exceptions will be appended if they occur.
+        exception_list (list): The list to which exceptions will be appended if they
+        occur.
     
     Returns:
         None
@@ -88,15 +104,16 @@ def scrape_user_reviews(game_link: str, review_list: list, exception_list: list)
     except BaseException as e:
             exception_list.append(f"On game link {game_url}, Error : {e}")
             
-def main(console: str, review_type: str) -> None:
+def main(console: str, review_type: str, save_path: str) -> None:
     """
-    Main function that scrapes either user reviews or critic reviews for the games in game_list.
+    Main function that scrapes either user reviews or critic reviews for the games in
+    game_list.
     
     Args:
         game_list (list): The list of Metacritic URLs for the games.
         console (str): The console name for which the data is being scraped.
         review_type (str): The type of review to scrape: "user" or "critic".
-    
+        save_path (str): where the data will be saved.
     Returns:
         None
     """
@@ -118,8 +135,8 @@ def main(console: str, review_type: str) -> None:
         scrape_reviews(game, data_list, exception_list)
     
     df = pd.DataFrame.from_dict(data_list)
-    df.to_parquet(f'/etc/scraped_data/{file_name}.parquet')
+    df.to_parquet(f'{save_path}/{file_name}.parquet')
 
 if __name__ == '__main__':
-    main(os.getenv("console"), os.getenv("review_type"))
+    main(os.getenv("console"), os.getenv("review_type"), os.getenv("SAVE_PATH", "/etc/scraped_data"))
     

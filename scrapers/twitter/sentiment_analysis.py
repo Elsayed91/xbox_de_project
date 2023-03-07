@@ -2,6 +2,9 @@
 A module that contains several functions for extracting sentiment from Twitter data. The
 functions are as follows:
 
+get_date_range(since_date_str: str) -> tuple[str, str]: Is used to get the exact date
+range for each month, since months have different number of days.
+
 clean_tweet(tweet: str, stopwords: list[str] = []) -> str: This function takes a tweet as
 input and returns a cleaned version of it. The tweet is cleaned by removing URLs,
 @mentions, hashtags, punctuation, profanity, and non-alphanumeric characters. Optionally,
@@ -48,6 +51,43 @@ ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+
+
+def get_date_range(since_date_str: str) -> tuple[str, str]:
+    """
+    Returns a tuple of the first and last date of the previous month from the given date
+    string.
+
+    Args:
+        since_date_str (str): A string in the format '%Y-%m-%d' representing the starting
+        date.
+
+    Returns:
+        Tuple[str, str]: A tuple of two strings representing the start and end date of the
+        previous month in the format '%Y-%m-%d'.
+
+    Example:
+        >>> get_date_range('2022-02-15')
+        ('2022-01-01', '2022-01-31')
+    """
+    import calendar
+    import datetime
+
+    # Convert since date string to datetime.date object
+    since_date = datetime.datetime.strptime(since_date_str, '%Y-%m-%d').date()
+
+    # Calculate the first day of the previous month
+    start_date = datetime.date(since_date.year, since_date.month, 1) - datetime.timedelta(days=1)
+    start_date = datetime.date(start_date.year, start_date.month, 1)
+
+    # Calculate the last day of the previous month
+    last_day_of_month = calendar.monthrange(start_date.year, start_date.month)[1]
+    end_date = datetime.date(start_date.year, start_date.month, last_day_of_month)
+
+    # Convert the dates to string format and return them
+    # '2022-01-01'
+    return start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
+
 
 def clean_tweet(tweet: str, stopwords: list[str] = []) -> str:
     """
@@ -205,24 +245,7 @@ def main(hashtags: list[str], since_date: str, until_date: str, lang: str,
 
     return tweets_df
 
-def get_date_range(since_date_str):
-    import calendar
-    import datetime
 
-    # Convert since date string to datetime.date object
-    since_date = datetime.datetime.strptime(since_date_str, '%Y-%m-%d').date()
-
-    # Calculate the first day of the previous month
-    start_date = datetime.date(since_date.year, since_date.month, 1) - datetime.timedelta(days=1)
-    start_date = datetime.date(start_date.year, start_date.month, 1)
-
-    # Calculate the last day of the previous month
-    last_day_of_month = calendar.monthrange(start_date.year, start_date.month)[1]
-    end_date = datetime.date(start_date.year, start_date.month, last_day_of_month)
-
-    # Convert the dates to string format and return them
-    # '2022-01-01'
-    return start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
 
     
 if __name__ == '__main__':	
@@ -237,4 +260,4 @@ if __name__ == '__main__':
     df = main(hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets)
     data_vol = os.getenv('data_volume', '/etc/scraped_data')
     df.to_parquet(f"{data_vol}/tweets-{start_date_str}.parquet")
-    logger.info(f"saved data to file tweets-{start_date_str}.csv")
+    logger.info(f"saved data to file tweets-{start_date_str}.parquet")

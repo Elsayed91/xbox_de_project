@@ -175,9 +175,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: airflow-config
-  annotations:
-    reloader.stakater.com/match: "true"
 data:
+  TWITTER_DATASET: ${TWITTER_DATASET}
+  VGCHARTZ_DATASET: ${VGCHARTZ_DATASET}
+  METACRITIC_DATASET: ${METACRITIC_DATASET}
+  DATA_BUCKET: ${DATA_BUCKET}
+  DATA_VOLUME_PATH: ${DATA_VOLUME_PATH}
+  GOOGLE_CLOUD_PROJECT: ${PROJECT}
+  
   airflow.cfg: |-
     [celery]
     flower_url_prefix = /

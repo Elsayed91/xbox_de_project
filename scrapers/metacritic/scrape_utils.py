@@ -1,3 +1,18 @@
+"""
+This module provides utility functions for web scraping Metacritic's data. The functions
+in this module include:
+
+soup_it(url: str, headers: dict = None) -> BeautifulSoup: Sends an HTTP GET request to the
+given URL and returns the parsed HTML content as a BeautifulSoup object.
+get_last_page_num(page_link: str) -> int: Parses the specified web page to determine the
+number of pages of results.
+get_games_per_page(link: str) -> list[str]: Given a link, returns a list of hrefs of games
+in that link.
+read_txt(console: str, base_path: str = '/etc/scraped_data') -> list[str]: Reads the URLs
+stored in a text file and returns them as a list of strings. The console argument
+specifies the name of the console, and the base_path argument specifies the base path
+where the files are stored.
+"""
 import requests
 from bs4 import BeautifulSoup
 
@@ -62,11 +77,18 @@ def get_games_per_page(link: str) -> list[str]:
     return href_list
 
 
-def textToList(hashtags):
-    return hashtags.strip('[]').replace('\'', '').replace(' ', '').split(',')
+def read_txt(console: str, base_path: str = '/etc/scraped_data') -> list[str]:
+    """
+    Reads the URLs stored in a text file and returns them as a list of strings.
 
-def read_txt(console):
-    with open(f"/etc/scraped_data/{console}-urls.txt", "r") as f:  # open the file in "read" mode
+    Args:
+        console (str): The name of the console.
+        base_path (str): the base path where files are stored.
+
+    Returns:
+        list[str]: A list of URLs as strings.
+    """
+    with open(f"{base_path}/{console}-urls.txt", "r") as f:
         url_list = f.readlines()
 
     # remove any newline characters from the end of each URL

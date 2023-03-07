@@ -1,4 +1,10 @@
-import argparse
+"""
+The module scrapes a Metacritic to generate a list of urls for games released for a
+specific gaming console.
+It gets the desired console name from environment variables, constructs a URL for the
+console, gets the last page number, generates a list of URLs of games for that console,
+and writes the URLs to a file.
+"""
 import os
 import sys
 from typing import Generator
@@ -35,6 +41,4 @@ if __name__=='__main__':
     with open(f"/etc/scraped_data/{console}-urls.txt", "w") as f:
         for url in url_list:
             f.write(url + "\n")
-    # import json
-    # game_list_json = json.dumps(url_list)
-    # print(f"::kube_api:xcom={{\"game_list_{args.console}\":{game_list_json}}}")
+ 

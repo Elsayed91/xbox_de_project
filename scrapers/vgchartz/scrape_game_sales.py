@@ -1,7 +1,12 @@
-
+"""
+This module provides functions for scraping video game sales data from VGChartz.com. It
+includes functions for getting the page HTML, scraping the genre list, building a URL for
+the search results, cleaning the scraped data, and scraping the game information. The main
+function, scrape_vgchartz, takes a list of console names and an optional list of genres as
+input and returns a pandas DataFrame containing the scraped data.
+"""
 import time
 import urllib
-from timeit import default_timer as timer
 from typing import Optional
 
 import pandas as pd
@@ -75,8 +80,25 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
     url = base_url + urllib.parse.urlencode(url_params)
     return url
 
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean the scraped data by converting sales columns to float format, replacing 
+    'Series' in the 'Console' column with 'XS', dropping the 'Gamex' column, and 
+    returning the cleaned DataFrame.
 
+    Args:
+        df: A pandas DataFrame containing scraped video game sales data.
 
+    Returns:
+        A pandas DataFrame with cleaned data.
+    """
+    for col in df.columns:
+        if 'Sales' in col or 'Units' in col:
+            df[col] = df[col].str.replace('m', '').astype(float)
+            
+    df['Console'] = df['Console'].str.replace('Series', 'XS')
+    df = df.drop(['Gamex'], axis=1)
+    return df
 
 def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd.DataFrame]]:
     """
@@ -134,19 +156,21 @@ def scrape_game_info(soup: BeautifulSoup, genre: str) -> tuple[bool, Optional[pd
 
     return True, game_info_df
 
-def scrape_vgchartz(console_list: list[str]) -> pd.DataFrame:
+def scrape_vgchartz(console_list: list[str], genre_list: Optional[list[str]] = None) -> pd.DataFrame:
     """
     Scrapes game information from VGChartz for a list of game consoles.
 
     Args:
         console_list: A list of strings representing the names of the consoles to scrape.
+        genre_list: Optional list of strings representing the genres to scrape. If None,
+        all genres will be scraped.
 
     Returns:
         A pandas DataFrame containing game information scraped from VGChartz.
     """
-    # get genre and console list
-    genre_list = scrape_genre_list()
-    print(genre_list)
+    # get genre list if not provided
+    if genre_list is None:
+        genre_list = scrape_genre_list()
 
     # create empty dataframe to store game info
     game_df = pd.DataFrame()
@@ -174,23 +198,8 @@ def scrape_vgchartz(console_list: list[str]) -> pd.DataFrame:
     return game_df
 
 
-def clean_data(df):
-    
-    # convert sales columns to float format
-    for col in df.columns:
-        if 'Sales' in col or 'Units' in col:
-            df[col] = df[col].str.replace('m', '').astype(float)
-            
-    df['Console'] = df['Console'].str.replace('Series', 'XS')
-#     df['Console'] = df['Console'].str.replace('Xbox XS', 'XS')
-    df = df.drop(['Gamex'], axis=1)
-    return df
 
-def main():
+if __name__ == '__main__':
     df = scrape_vgchartz(console_list = ['XS', 'XOne', 'X360', 'XB'])
     df = clean_data(df)
     df.to_parquet("/etc/scraped_data/vgc_game_sales.parquet")
-
-
-if __name__ == '__main__':
-    main()

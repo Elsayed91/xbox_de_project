@@ -1,15 +1,38 @@
+"""
+This module provides functions to scrape game data of a specific console from Metacritic 
+and determine whether a game is available on Game Pass.
 
-import argparse
+The `fuzzy_match` function searches for the best fuzzy match for a given name in a list of
+names and returns the matched name if its score is above the given threshold, otherwise
+returns None. This is done to overcome slight differences in naming of games like
+apostrophes.
+
+The `add_gamepass_status` function adds a 'Gamepass_Status' column to the input DataFrame
+indicating whether each game is available on Game Pass.
+
+The `scrape_game_data` function scrapes game data from a Metacritic URL and appends
+scraped data to a list of dictionaries representing game data and appends any exceptions
+to a list.
+
+The `main` function is the entry point for the script and calls the add_gamepass_status
+and scrape_game_data functions to scrape game data from Metacritic and determine whether a
+game is available on Game Pass, and saves the scraped data to a parquet file.
+
+
+The scraping logic was inspired by a stackoverflow post, however most of the scraping
+logic was changed to allow for better error handling and improved scraping capabilities.
+Additionally the script in the post did have some faults.
+
+Reference: 
+https://stackoverflow.com/questions/70143803/metacritic-scraping-how-to-properly-extract-developer-data
+"""
 import datetime
 import json
 import os
-import random as rand
-import re
 import time
 from datetime import datetime
 
 import pandas as pd
-import requests
 from fuzzywuzzy import fuzz, process
 
 try: 
@@ -53,7 +76,8 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         A copy of the input DataFrame with an additional 'Gamepass_Status' column.
     """
-    url = 'https://docs.google.com/spreadsheet/ccc?key=1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg&output=csv'
+    url = ('https://docs.google.com/spreadsheet/ccc?key=1ks'+
+        'pw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg&output=csv')
     df = pd.read_csv(url, skiprows=[0])
     df = df[['Game', 'Status']]
     game_names = df['Game'].tolist()
@@ -72,8 +96,8 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
 
     Args:
         link (str): The URL of the game to scrape.
-        data_list (List[Dict]): A list of dictionaries representing game data.
-        exception_list (List[str]): A list of strings representing exceptions.
+        data_list (list[dict]): A list of dictionaries representing game data.
+        exception_list (list[str]): A list of strings representing exceptions.
 
     Returns:
         None
@@ -140,11 +164,11 @@ def scrape_game_data(link: str, data_list: list[dict], exception_list: list[str]
 
 def main(console: str) -> None:
     """
-    Given a URL, scrapes game data from all pages and writes the data to a CSV file.
+    Given a URL, scrapes game data from all pages and writes the data to a parquet file.
 
     Args:
         url (str): The URL of the first page to scrape.
-        console (str): The console name to include in the CSV filename.
+        console (str): The console name to include in the filename.
 
     Returns:
         None
