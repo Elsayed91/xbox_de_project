@@ -8,3 +8,4 @@ tests/__pycache__
 test_hw_sales.csv
 scrapers/twitter/__pycache__
 .ipynb_checkpoints/Untitled-checkpoint.ipynb
+.ipynb_checkpoints/
