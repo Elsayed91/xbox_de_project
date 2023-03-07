@@ -21,12 +21,6 @@ jobs:
           architecture: "x64"
         env:
           AGENT_TOOLSDIRECTORY: /opt/hostedtoolcache
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '11'
-      - uses: vemonet/setup-spark@v1
-        with:
-          spark-version: '3.1.1'
       - name: Install Pipenv
         run: |
           python -m pip install pipenv
