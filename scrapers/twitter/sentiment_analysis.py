@@ -4,7 +4,7 @@ functions are as follows:
 get_date_range(since_date_str: str) -> tuple[str, str]: Is used to get the exact date
 range for each month, since months have different number of days.
 
- 
+
 clean_tweet(tweet: str, stopwords: list[str] = []) -> str: This function takes a tweet as
 input and returns a cleaned version of it. The tweet is cleaned by removing URLs,
 @mentions, hashtags, punctuation, profanity, and non-alphanumeric characters. Optionally,
