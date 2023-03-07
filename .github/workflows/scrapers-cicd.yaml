@@ -15,12 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
-      - run: |
-          echo -n "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - name: Setup Python
         uses: actions/setup-python@v3
         with:
