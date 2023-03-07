@@ -165,6 +165,7 @@ def scrape_game_data(
                 "ESRB ", ""
             ),
             "Genre": ", ".join(data.get("genre", [])),
+            "Platform": data.get("gamePlatform"),
             "Developer": soup.select_one(".developer a").text,
             "Publisher": ", ".join([x["name"] for x in data["publisher"]]),
             "Meta Score": int(data["aggregateRating"]["ratingValue"])
