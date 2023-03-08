@@ -40,7 +40,7 @@ default_args = {
     "depends_on_past": False,
     "retries": 0,
     "retry_delay": timedelta(minutes=60),
-    "concurrency": 2,
+    "concurrency": 0,
     "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
@@ -82,9 +82,9 @@ with DAG(
     # )
 
     # backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
-
+    # "xbox360",, "xboxone", "xbox"
     with TaskGroup(group_id=f"process-metacritic-data") as tg:
-        consoles = ["xbox360", "xbox-series-x", "xboxone", "xbox"]
+        consoles = ["xbox-series-x"]
         for console in consoles:
             t1 = KubernetesJobOperator(
                 task_id=f"scrape-{console}-game-list",
