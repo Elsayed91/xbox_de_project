@@ -88,56 +88,6 @@ def scrape_metacritic_reviews(
         exception_list.append(f"On game link {game_url}, Error : {e}")
 
 
-# def scrape_metacritic_reviews(
-#     game_link: str, critic_review_list: list, exception_list: list
-# ) -> None:
-#     """
-#     Scrapes critic reviews for a game from Metacritic and appends them to the
-#     critic_review_list.
-
-#     Args:
-#         game_link (str): The Metacritic URL for the game.
-#         critic_review_list (list): The list to which the critic reviews will be appended.
-#         exception_list (list): The list to which exceptions will be appended if they
-#         occur.
-
-#     Returns:
-#         None
-#     """
-#     try:
-#         url = game_link + "/critic-reviews?page="
-#         pages = get_last_page_num(url)
-#         for page in range(pages):
-#             print(page)
-#             game_url = url + str(page)
-
-#             soup = soup_it(game_url)
-#             print(f"processing critic review for {game_url}")
-#             game = soup.find("div", class_="product_title").find("h1").text.strip()
-#             platform = soup.find("span", class_="platform").text.strip()
-#             for review in soup.find_all("div", class_="review_content"):
-#                 if review.find("div", class_="source") == None:
-#                     break
-
-#                 critic_review_list.append(
-#                     {
-#                         "Game": game,
-#                         "Platform": platform,
-#                         "Critic": review.find("div", class_="source").find("a").text,
-#                         "Review Source": review.find("div", class_="source").find("a")[
-#                             "href"
-#                         ],
-#                         "Date": review.find("div", class_="date").text,
-#                         "Score": review.find("div", class_="review_grade")
-#                         .find_all("div")[0]
-#                         .text,
-#                         "Review": review.find("div", class_="review_body").text.strip(),
-#                     }
-#                 )
-#     except BaseException as e:
-#         exception_list.append(f"On game link {game_url}, Error : {e}")
-
-
 def scrape_user_reviews(
     game_link: str, review_list: list, exception_list: list
 ) -> None:
@@ -158,7 +108,16 @@ def scrape_user_reviews(
         pages = get_last_page_num(url)
         for page in range(pages):
             game_url = url + str(page)
-            soup = soup_it(game_url)
+            for i in range(3):
+                soup = soup_it(game_url)
+                if soup is not None:
+                    break
+                print(f"Retrying soup_it for {game_url}")
+            else:
+                exception_list.append(
+                    f"On game link {game_url}, Error : soup_it returned None"
+                )
+                continue
             print(f"processing user review for {game_url}")
             game = soup.find("div", class_="product_title").find("h1").text.strip()
             platform = soup.find("span", class_="platform").text.strip()
@@ -214,10 +173,6 @@ def main(console: str, review_type: str, save_path: str) -> None:
     for game in game_list:
         print(f"processing {review_type} reviews for {game}")
         scrape_reviews(game, data_list, exception_list)
-        if game == "https://www.metacritic.com/game/xbox-series-x/elden-ring":
-            print("elden ring is processing")
-            print(data_list)
-
     df = pd.DataFrame.from_dict(data_list)
     df.to_parquet(f"{save_path}/{file_name}.parquet")
 
