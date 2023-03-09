@@ -61,7 +61,7 @@ def get_last_page_num(page_link: str) -> int:
             last_page_num = 1
         return last_page_num - 1
     else:
-        return 1
+        return 0
 
 
 def get_games_per_page(link: str) -> list[str]:

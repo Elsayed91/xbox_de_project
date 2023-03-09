@@ -106,6 +106,7 @@ def scrape_user_reviews(
     try:
         url = game_link + "/user-reviews?page="
         pages = get_last_page_num(url)
+        print(f"{url} has {pages} pages.")
         for page in range(pages):
             game_url = url + str(page)
             for i in range(3):

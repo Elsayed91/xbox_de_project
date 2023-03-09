@@ -110,8 +110,8 @@ def scrape_game_data(
     Returns:
         None
     """
-    MAX_RETRIES = 3
-
+    MAX_RETRIES = 5
+    retry_sleep_time = 5
     for attempt in range(MAX_RETRIES):
         try:
             soup = soup_it(link)
@@ -167,7 +167,8 @@ def scrape_game_data(
         except Exception as e:
             if attempt < MAX_RETRIES - 1:
                 print(f"Retrying {link}...")
-                time.sleep(20)
+                retry_sleep_time *= 2
+                time.sleep(retry_sleep_time)
             else:
                 print(f"Failed to scrape data from {link} after {MAX_RETRIES} retries.")
                 print(e)
