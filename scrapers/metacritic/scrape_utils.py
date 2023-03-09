@@ -32,9 +32,7 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
     from fake_useragent import UserAgent
 
     ua = UserAgent(fallback="chrome")
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
-    }
+    headers = {"User-Agent": ua.random}
     response = requests.get(url, headers=headers)
     return BeautifulSoup(response.text, "html.parser")
 
@@ -61,7 +59,7 @@ def get_last_page_num(page_link: str) -> int:
             last_page_num = 1
         return last_page_num - 1
     else:
-        return 0
+        return 1
 
 
 def get_games_per_page(link: str) -> list[str]:
