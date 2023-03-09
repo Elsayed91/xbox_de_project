@@ -159,7 +159,7 @@ def scrape_game_data(
         try:
             developer = soup.select_one(".developer a").text
         except:
-            devloper = None
+            developer = None
         game_data = {
             "Name": data.get("name"),
             "Release Date": datetime.strptime(
