@@ -86,7 +86,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # kubectl apply -f manifests/*.yaml
 
 # gsutil mb -c standard -l ${GCP_REGION} gs://${DATA_BUCKET}
-pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
 if [ -n "$pods" ]; then
     kubectl delete pod $pods
 fi
