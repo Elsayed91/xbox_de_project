@@ -176,7 +176,11 @@ def scrape_game_data(
         "Image": data["image"],
     }
     data_list.append(game_data)
-    retry_late_list.remove(link)
+
+    try:
+        retry_late_list.remove(link)
+    except ValueError:
+        pass
 
 
 def main(console: str) -> None:

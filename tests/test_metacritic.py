@@ -34,7 +34,11 @@ def test_scrape_game_data():
     link = "https://www.metacritic.com/game/switch/the-legend-of-zelda-links-awakening"
     data_list = []
     exception_list = []
-    scrape_game_data(link, data_list, exception_list)
+    retry_late_list = []
+    failed_links_list = []
+    scrape_game_data(
+        link, data_list, exception_list, retry_late_list, failed_links_list
+    )
     assert len(data_list) == 1
     assert data_list[0]["Name"] == "The Legend of Zelda: Link's Awakening"
     assert data_list[0]["Release Date"] == "2019-09-20"
