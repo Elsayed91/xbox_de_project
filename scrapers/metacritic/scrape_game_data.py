@@ -215,6 +215,7 @@ def main(console: str) -> None:
     df1 = pd.DataFrame.from_dict(data_list)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f"/etc/scraped_data/{console}-games.parquet")
+    print(failed_links_list)
 
 
 if __name__ == "__main__":
