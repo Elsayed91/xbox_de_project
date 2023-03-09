@@ -32,7 +32,9 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
     from fake_useragent import UserAgent
 
     ua = UserAgent(fallback="chrome")
-    headers = {"User-Agent": 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
+    }
     response = requests.get(url, headers=headers)
     return BeautifulSoup(response.text, "html.parser")
 
