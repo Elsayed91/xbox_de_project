@@ -166,7 +166,6 @@ with DAG(
             },
             envs={"console": console, "review_type": "critic"},
         )
-        t1 >> t2 >> t3 >> t4
 
     v1 = KubernetesJobOperator(
         task_id=f"scrape-vgchartz-hw-sales",
