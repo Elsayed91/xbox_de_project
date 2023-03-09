@@ -131,7 +131,7 @@ def scrape_game_data(
                     return
                 else:
                     print(f"Retrying {link}...")
-                    time.sleep(1)
+                    time.sleep(10)
                     continue
         try:
             user_score = soup.find("div", class_="user").text
