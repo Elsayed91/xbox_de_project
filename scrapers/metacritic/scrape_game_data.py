@@ -167,9 +167,10 @@ def scrape_game_data(
         except Exception as e:
             if attempt < MAX_RETRIES - 1:
                 print(f"Retrying {link}...")
-                time.sleep(10)
+                time.sleep(20)
             else:
                 print(f"Failed to scrape data from {link} after {MAX_RETRIES} retries.")
+                print(e)
                 exception_list.append(f"On game link {link}, Error : {e}")
 
 
@@ -191,7 +192,7 @@ def main(console: str) -> None:
     for game in game_list:
         print(f"processing {game} data.")
         scrape_game_data(game, data_list, exception_list)
-
+        time.sleep(2)
     df1 = pd.DataFrame.from_dict(data_list)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f"/etc/scraped_data/{console}-games.parquet")
