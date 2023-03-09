@@ -110,77 +110,67 @@ def scrape_game_data(
     Returns:
         None
     """
-    try:
-        game_sublink = link.replace("https://www.metacritic.com", "")
+    MAX_RETRIES = 3
 
-        MAX_RETRIES = 3
+    for attempt in range(MAX_RETRIES):
+        try:
+            soup = soup_it(link)
+            data = json.loads(soup.find("script", type="application/ld+json").text)
 
-        retries = 0
-        while True:
             try:
-                soup = soup_it(link)
-                data = json.loads(soup.find("script", type="application/ld+json").text)
-                break
-            except Exception as e:
-                retries += 1
-                if retries >= MAX_RETRIES:
-                    print(
-                        f"Failed to scrape data from {link} after {MAX_RETRIES} retries."
-                    )
-                    exception_list.append(f"On game link {link}, Error : {e}")
-                    return
-                else:
-                    print(f"Retrying {link}...")
-                    time.sleep(10)
-                    continue
-        try:
-            user_score = soup.find("div", class_="user").text
-            user_score = float(user_score) if user_score != "tbd" else None
-        except:
-            user_score = None
+                user_score = soup.find("div", class_="user").text
+                user_score = float(user_score) if user_score != "tbd" else None
+            except:
+                user_score = None
 
-        try:
-            critic_review_count = int(
-                soup.find("span", {"class": "count"}).find("a").text.split()[0]
-            )
-        except:
-            critic_review_count = 0
+            try:
+                critic_review_count = int(
+                    soup.find("span", {"class": "count"}).find("a").text.split()[0]
+                )
+            except:
+                critic_review_count = 0
 
-        try:
-            user_rating_count = int(
-                soup.find_all("div", {"class": "summary"})[1]
-                .find("a")
-                .text.strip()
-                .split()[0]
-            )
-        except:
-            user_rating_count = 0
+            try:
+                user_rating_count = int(
+                    soup.find_all("div", {"class": "summary"})[1]
+                    .find("a")
+                    .text.strip()
+                    .split()[0]
+                )
+            except:
+                user_rating_count = 0
 
-        game_data = {
-            "Name": data.get("name"),
-            "Release Date": datetime.strptime(
-                data.get("datePublished"), "%B %d, %Y"
-            ).strftime("%Y-%m-%d"),
-            "Maturity Rating": data.get("contentRating", "Unspecified").replace(
-                "ESRB ", ""
-            ),
-            "Genre": ", ".join(data.get("genre", [])),
-            "Platform": data.get("gamePlatform"),
-            "Developer": soup.select_one(".developer a").text,
-            "Publisher": ", ".join([x["name"] for x in data["publisher"]]),
-            "Meta Score": int(data["aggregateRating"]["ratingValue"])
-            if "aggregateRating" in data
-            else None,
-            "Critic Reviews Count": critic_review_count,
-            "User Score": user_score,
-            "User Rating Count": user_rating_count,
-            "Summary": data.get("description"),
-            "Image": data["image"],
-        }
-        data_list.append(game_data)
-    except BaseException as e:
-        print(f"On game link {link}, Error : {e}")
-        exception_list.append(f"On game link {link}, Error : {e}")
+            game_data = {
+                "Name": data.get("name"),
+                "Release Date": datetime.strptime(
+                    data.get("datePublished"), "%B %d, %Y"
+                ).strftime("%Y-%m-%d"),
+                "Maturity Rating": data.get("contentRating", "Unspecified").replace(
+                    "ESRB ", ""
+                ),
+                "Genre": ", ".join(data.get("genre", [])),
+                "Platform": data.get("gamePlatform"),
+                "Developer": soup.select_one(".developer a").text,
+                "Publisher": ", ".join([x["name"] for x in data["publisher"]]),
+                "Meta Score": int(data["aggregateRating"]["ratingValue"])
+                if "aggregateRating" in data
+                else None,
+                "Critic Reviews Count": critic_review_count,
+                "User Score": user_score,
+                "User Rating Count": user_rating_count,
+                "Summary": data.get("description"),
+                "Image": data["image"],
+            }
+            data_list.append(game_data)
+            break
+
+        except Exception as e:
+            if attempt < MAX_RETRIES - 1:
+                print(f"Retrying {link}...")
+                time.sleep(10)
+            else:
+                print(f"Failed to scrape data from {link} after {MAX_RETRIES} retries.")
+                exception_list.append(f"On game link {link}, Error : {e}")
 
 
 def main(console: str) -> None:
