@@ -28,6 +28,7 @@ https://stackoverflow.com/questions/70143803/metacritic-scraping-how-to-properly
 """
 import datetime
 import json
+import logging
 import os
 import time
 from datetime import datetime
@@ -39,6 +40,11 @@ try:
     from scrape_utils import *
 except:
     from scrapers.metacritic.scrape_utils import *
+
+logging.basicConfig(
+    format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
 
 
 def fuzzy_match(name: str, names: list, threshold: int = 60) -> str:
@@ -113,7 +119,7 @@ def scrape_game_data(
     try:
         game_sublink = link.replace("https://www.metacritic.com", "")
 
-        MAX_RETRIES = 3
+        MAX_RETRIES = 5
 
         retries = 0
         while True:
@@ -124,14 +130,17 @@ def scrape_game_data(
             except Exception as e:
                 retries += 1
                 if retries >= MAX_RETRIES:
-                    print(
+                    logging.error(
                         f"Failed to scrape data from {link} after {MAX_RETRIES} retries."
                     )
                     exception_list.append(f"On game link {link}, Error : {e}")
                     return
                 else:
-                    print(f"Retrying {link}...")
-                    time.sleep(1)
+                    backoff_time = 3**retries  # Exponential backoff
+                    logging.warning(
+                        f"Retrying {link} in {backoff_time} seconds... Error: {e}"
+                    )
+                    time.sleep(backoff_time)
                     continue
         try:
             user_score = soup.find("div", class_="user").text
@@ -183,7 +192,7 @@ def scrape_game_data(
         }
         data_list.append(game_data)
     except BaseException as e:
-        print(f"On game link {link}, Error : {e}")
+        logging.error(f"On game link {link}, Error: {e}")
         exception_list.append(f"On game link {link}, Error : {e}")
 
 
@@ -212,4 +221,14 @@ def main(console: str) -> None:
 
 
 if __name__ == "__main__":
-    main(os.getenv("console"))
+    # main(os.getenv("console"))
+    data_list = []
+    exception_list = []
+
+    scrape_game_data(
+        "https://www.metacritic.com/game/xbox-series-x/world-of-warships-legends",
+        data_list,
+        exception_list,
+    )
+    print(data_list)
+    print(exception_list)
