@@ -4,7 +4,7 @@ source "./.env"
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 
-# setup GCP
+
 # echo "Setting Up GCP Components."
 # echo "you will be prompted to login to your gcloud account, kindly do so."
 # gcloud auth application-default login --project $PROJECT -q
@@ -83,11 +83,16 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud builds submit
 
-# kubectl apply -f manifests/*.yaml
+# for FILE in ./manifests/*; do
+#     [[ -e "$FILE" ]] || continue
+#     cat "$FILE" | envsubst | kubectl apply -f -
+# done
 
-# gsutil mb -c standard -l ${GCP_REGION} gs://${DATA_BUCKET}
-pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
-if [ -n "$pods" ]; then
-    kubectl delete pod $pods
-fi
+airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
+kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause scrapers && airflow dags trigger scrapers
+
+# pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
+# if [ -n "$pods" ]; then
+#     kubectl delete pod $pods
+# fi
 

@@ -59,7 +59,7 @@ with DAG(
     catchup=True,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
-    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "stellarismusv4")
+    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
     MOUNT_VOLUME_PATH = os.getenv("MOUNT_VOLUME_PATH", "/pvc")
 
     t = KubernetesJobOperator(
