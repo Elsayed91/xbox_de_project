@@ -221,14 +221,4 @@ def main(console: str) -> None:
 
 
 if __name__ == "__main__":
-    # main(os.getenv("console"))
-    data_list = []
-    exception_list = []
-
-    scrape_game_data(
-        "https://www.metacritic.com/game/xbox-series-x/world-of-warships-legends",
-        data_list,
-        exception_list,
-    )
-    print(data_list)
-    print(exception_list)
+    main(os.getenv("console"))
