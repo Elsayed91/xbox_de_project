@@ -357,6 +357,8 @@ def scrape_game_data(
             script_tag = soup.find("script", type="application/ld+json")
             if script_tag is not None:
                 data = json.loads(script_tag.text)
+            else:
+                raise ValueError("No script tag found")
 
             game_data = extract_game_data(data, soup)
             if game_data is not None:
@@ -371,6 +373,12 @@ def scrape_game_data(
         if retries < 3:
             logging.warning(f"Retrying in 10 seconds...")
             time.sleep(10)
+
+    # Log the last value of the soup variable after three failed retries
+    if last_soup is not None:
+        logging.error(f"Failed after 3 retries. Last soup: {last_soup}")
+    else:
+        logging.error(f"Failed after 3 retries. Soup object is None.")
 
 
 def extract_game_data(data: dict, soup) -> dict:
