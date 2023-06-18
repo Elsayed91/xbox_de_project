@@ -363,6 +363,9 @@ def scrape_game_data(
             game_data = extract_game_data(data, soup)
             if game_data is not None:
                 data_list.append(game_data)
+                logging.info(
+                    f"Successfully scraped game data for {link} after {retries} retries."
+                )
                 return
 
         except Exception as e:
