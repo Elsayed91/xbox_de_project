@@ -88,9 +88,10 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 #     cat "$FILE" | envsubst | kubectl apply -f -
 # done
 
+# sleep 100
 airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
-kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause scrapers && airflow dags trigger scrapers
-
+kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause scrapers
+kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger scrapers
 # pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
 # if [ -n "$pods" ]; then
 #     kubectl delete pod $pods
