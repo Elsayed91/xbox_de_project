@@ -344,6 +344,9 @@ def retry(func, max_retries=3, backoff_factor=2):
     return wrapper
 
 
+import random
+
+
 def scrape_game_data(
     link: str, data_list: list[dict], exception_list: list[str]
 ) -> None:
@@ -372,10 +375,14 @@ def scrape_game_data(
             logging.error(f"On game link {link}, Error: {e}", exc_info=True)
             exception_list.append(f"On game link {link}, Error: {e}")
 
+        # Calculate the exponential backoff delay
+        delay = 2**retries
+        delay += (
+            random.randint(0, 1000) / 1000
+        )  # Add some jitter to avoid synchronization
+        time.sleep(delay)
+
         retries += 1
-        if retries < 3:
-            logging.warning(f"Retrying in 10 seconds...")
-            time.sleep(10)
 
     # Log the last value of the soup variable after three failed retries
     if last_soup is not None:
