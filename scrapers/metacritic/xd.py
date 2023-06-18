@@ -128,20 +128,39 @@ def retry(func, max_retries=3, backoff_factor=2):
     return wrapper
 
 
-@retry
 def scrape_game_data(
     link: str, data_list: list[dict], exception_list: list[str]
 ) -> None:
-    try:
-        soup = soup_it(link)
-        data = json.loads(soup.find("script", type="application/ld+json").text)
+    retries = 0
+    last_soup = None
+    while retries < 3:
+        try:
+            soup = soup_it(link)
+            last_soup = soup  # Store the last successful soup object
 
-        game_data = extract_game_data(data, soup)
-        data_list.append(game_data)
+            script_tag = soup.find("script", type="application/ld+json")
+            if script_tag is not None:
+                data = json.loads(script_tag.text)
 
-    except Exception as e:
-        logging.error(f"On game link {link}, Error: {e}", exc_info=True)
-        exception_list.append(f"On game link {link}, Error: {e}")
+            game_data = extract_game_data(data, soup)
+            if game_data is not None:
+                data_list.append(game_data)
+                return
+
+        except Exception as e:
+            logging.error(f"On game link {link}, Error: {e}", exc_info=True)
+            exception_list.append(f"On game link {link}, Error: {e}")
+
+        retries += 1
+        if retries < 3:
+            logging.warning(f"Retrying in 10 seconds...")
+            time.sleep(10)
+
+    # Log the last value of the soup variable after three failed retries
+    if last_soup is not None:
+        logging.error(f"Failed after 3 retries. Last soup: {last_soup}")
+    else:
+        logging.error(f"Failed after 3 retries. Soup object is None.")
 
 
 def extract_game_data(data: dict, soup) -> dict:
@@ -292,7 +311,7 @@ if __name__ == "__main__":
     exception_list = []
 
     scrape_game_data(
-        "https://www.metacritic.com/game/xbox-360/50-cent-blood-on-the-sand",
+        "https://www.metacritic.com/game/xbox/top-gear-rpm-tuning",
         data_list,
         exception_list,
     )
