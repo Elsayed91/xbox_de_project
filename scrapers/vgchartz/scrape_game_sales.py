@@ -122,11 +122,6 @@ def scrape_game_info(
 
     console_list = []
     all_trs = soup_div.find("table").find_all("tr")
-    # tr_count = 0
-    # for tr in all_trs:
-    #     if tr_count > 2:
-    #         console_list.append(tr.find_all("td")[3].find('img').attrs['alt'])
-    #     tr_count += 1;
     for tr in all_trs[3:]:
         console_list.append(tr.find_all("td")[3].find("img").attrs["alt"])
 

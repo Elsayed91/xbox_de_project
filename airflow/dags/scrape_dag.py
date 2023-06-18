@@ -170,12 +170,12 @@ with DAG(
             t1 >> tg1
 
     v1 = KubernetesJobOperator(
-        task_id=f"scrape-vgchartz-hw-sales",
+        task_id="scrape-vgchartz-hw-sales",
         body_filepath=POD_TEMPALTE,
         command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": f"scrape-vg-hw-sales",
+            "name": "scrape-vg-hw-sales",
             "gitsync": True,
             "volumes": [
                 {
@@ -189,12 +189,12 @@ with DAG(
     )
 
     v2 = KubernetesJobOperator(
-        task_id=f"scrape-vgchartz-game-sales",
+        task_id="scrape-vgchartz-game-sales",
         body_filepath=POD_TEMPALTE,
         command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": f"scrape-vg-game-sales",
+            "name": "scrape-vg-game-sales",
             "gitsync": True,
             "volumes": [
                 {
