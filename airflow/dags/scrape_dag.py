@@ -51,6 +51,8 @@ default_args = {
 today = datetime.today().strftime("%Y-%m-%d")
 POD_TEMPALTE = os.path.join(os.path.dirname(__file__), "templates", "pod_template.yaml")
 BASE = "/git/repo/scrapers"
+GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
+MOUNT_VOLUME_PATH = os.getenv("MOUNT_VOLUME_PATH", "/pvc")
 
 with DAG(
     dag_id="scrapers",
@@ -59,9 +61,6 @@ with DAG(
     catchup=True,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
-    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
-    MOUNT_VOLUME_PATH = os.getenv("MOUNT_VOLUME_PATH", "/pvc")
-
     t = KubernetesJobOperator(
         task_id=f"scrape-tweets",
         body_filepath=POD_TEMPALTE,

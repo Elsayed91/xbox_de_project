@@ -35,8 +35,6 @@ spec:
           envFrom:
             - secretRef:
                 name: airflow-secret
-            - configMapRef:
-                name: airflow-config
           resources: {}
           volumeMounts:
             - name: config
@@ -53,6 +51,8 @@ spec:
           envFrom:
             - secretRef:
                 name: airflow-secret
+            - configMapRef:
+                name: airflow-config
           ports:
             - name: worker-logs
               containerPort: 8793
@@ -105,6 +105,8 @@ spec:
           envFrom:
             - secretRef:
                 name: airflow-secret
+            - configMapRef:
+                name: airflow-config
           livenessProbe:
             failureThreshold: 20
             httpGet:
