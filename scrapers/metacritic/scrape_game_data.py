@@ -352,7 +352,7 @@ def scrape_game_data(
 ) -> None:
     retries = 0
     last_soup = None
-    while retries < 3:
+    while retries < 8:
         try:
             soup = soup_it(link)
             last_soup = soup  # Store the last successful soup object
@@ -369,6 +369,7 @@ def scrape_game_data(
                 logging.info(
                     f"Successfully scraped game data for {link} after {retries} retries."
                 )
+                time.sleep(1)
                 return
 
         except Exception as e:
@@ -376,7 +377,7 @@ def scrape_game_data(
             exception_list.append(f"On game link {link}, Error: {e}")
 
         # Calculate the exponential backoff delay
-        delay = 2**retries
+        delay = 5**retries
         delay += (
             random.randint(0, 1000) / 1000
         )  # Add some jitter to avoid synchronization
@@ -386,9 +387,9 @@ def scrape_game_data(
 
     # Log the last value of the soup variable after three failed retries
     if last_soup is not None:
-        logging.error(f"Failed after 3 retries. Last soup: {last_soup}")
+        logging.error(f"Failed after 8 retries. Last soup: {last_soup}")
     else:
-        logging.error(f"Failed after 3 retries. Soup object is None.")
+        logging.error(f"Failed after 8 retries. Soup object is None.")
 
 
 def extract_game_data(data: dict, soup) -> dict:

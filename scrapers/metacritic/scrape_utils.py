@@ -13,8 +13,11 @@ stored in a text file and returns them as a list of strings. The console argumen
 specifies the name of the console, and the base_path argument specifies the base path
 where the files are stored.
 """
+import time
+
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 
 def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
@@ -29,12 +32,35 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
     Returns:
         BeautifulSoup: A BeautifulSoup object representing the parsed HTML content.
     """
-    from fake_useragent import UserAgent
-
     ua = UserAgent(fallback="chrome")
     headers = {"User-Agent": ua.random}
-    response = requests.get(url, headers=headers)
-    return BeautifulSoup(response.text, "html.parser")
+
+    session = requests.Session()
+    session.headers.update(headers)
+
+    delay = 2  # Initial delay in seconds
+    max_retries = 5  # Maximum number of retries
+
+    for retry in range(max_retries):
+        try:
+            response = session.get(url)
+            response.raise_for_status()  # Raise an exception for non-2xx status codes
+            return BeautifulSoup(response.text, "html.parser")
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 429:
+                print(
+                    f"Received HTTP 429 error while processing URL {url}. Retrying in {delay} seconds..."
+                )
+                time.sleep(delay)
+                delay *= 2  # Double the delay for exponential backoff
+            else:
+                raise e  # Reraise the exception if it's not a rate limit issue
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            break
+
+    print(f"Failed to retrieve data after {max_retries} attempts.")
+    return None
 
 
 def get_last_page_num(page_link: str) -> int:
