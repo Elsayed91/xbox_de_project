@@ -29,6 +29,7 @@ https://stackoverflow.com/questions/70143803/metacritic-scraping-how-to-properly
 import datetime
 import json
 import os
+import random
 import time
 from datetime import datetime
 
