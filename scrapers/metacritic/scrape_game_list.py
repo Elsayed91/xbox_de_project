@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from scrape_utils import *
 
 
-def game_urls(link: str, pages: int) -> Generator[str, None, None]:
+def game_urls(link: str, headers: dict, pages: int) -> Generator[str, None, None]:
     """
     Given a link and number of pages, returns a generator of urls of games in those links.
 
@@ -27,7 +27,7 @@ def game_urls(link: str, pages: int) -> Generator[str, None, None]:
     Generator[str, None, None]: A generator of urls of games on the page.
     """
     for page in range(pages):
-        soup = soup_it(link + f"&page={page}")
+        soup = soup_it(link + f"&page={page}", headers)
         title_elements = soup.find_all("a", class_="title")
         for elem in title_elements:
             yield f"https://www.metacritic.com{elem.get('href')}"
