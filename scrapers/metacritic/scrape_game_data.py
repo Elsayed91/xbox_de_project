@@ -348,13 +348,14 @@ import random
 
 
 def scrape_game_data(
-    link: str, headers: dict, data_list: list[dict], exception_list: list[str]
+    link: str, data_list: list[dict], exception_list: list[str]
 ) -> None:
     retries = 0
     last_soup = None
+
     while retries < 8:
         try:
-            soup = soup_it(link, headers)
+            soup = soup_it(link)
             last_soup = soup  # Store the last successful soup object
 
             script_tag = soup.find("script", type="application/ld+json")
@@ -373,14 +374,15 @@ def scrape_game_data(
                 return
 
         except Exception as e:
-            logging.error(f"On game link {link}, Error: {e}", exc_info=True)
-            exception_list.append(f"On game link {link}, Error: {e}")
+            error_message = f"On game link {link}, Error: {e}"
+            logging.error(error_message, exc_info=True)
+            exception_list.append(error_message)
 
-        # Calculate the exponential backoff delay
-        delay = 5**retries
-        delay += (
-            random.randint(0, 1000) / 1000
-        )  # Add some jitter to avoid synchronization
+        # Calculate the incremental backoff delay
+        base_delay = 10
+        backoff_delay = retries + 1
+        jitter = random.randint(0, 1000) / 1000
+        delay = base_delay + backoff_delay + jitter
         time.sleep(delay)
 
         retries += 1
@@ -505,7 +507,7 @@ def extract_user_rating_count(soup) -> int:
     return 0
 
 
-def scrape_game_data_list(game_list: list[str], headers: dict) -> list[dict]:
+def scrape_game_data_list(game_list: list[str]) -> list[dict]:
     """
     Scrapes game data for the given list of game links.
     Returns a list of scraped game data.
@@ -515,14 +517,14 @@ def scrape_game_data_list(game_list: list[str], headers: dict) -> list[dict]:
 
     for game in game_list:
         logging.info(f"Processing {game} data.")
-        scrape_game_data(game, headers, data_list, exception_list)
+        scrape_game_data(game, data_list, exception_list)
 
     return data_list
 
 
-def main(console: str, headers: dict) -> None:
+def main(console: str) -> None:
     game_list = read_txt(console)
-    game_data_list = scrape_game_data_list(game_list, headers)
+    game_data_list = scrape_game_data_list(game_list)
 
     df1 = pd.DataFrame.from_dict(game_data_list)
     df1 = add_gamepass_status(df1)
@@ -535,6 +537,5 @@ if __name__ == "__main__":
         format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s",
         level=logging.INFO,
     )
-    headers = generate_random_header("www.metacritic.com")
-    if headers is not None:
-        main(os.getenv("console"), headers)
+
+    main(os.getenv("console"))
