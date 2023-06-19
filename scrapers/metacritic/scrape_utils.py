@@ -17,7 +17,6 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
 
 
 def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
@@ -32,34 +31,26 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
     Returns:
         BeautifulSoup: A BeautifulSoup object representing the parsed HTML content.
     """
+    from fake_useragent import UserAgent
+
     ua = UserAgent(fallback="chrome")
     headers = {"User-Agent": ua.random}
+    attempt = 0
 
-    session = requests.Session()
-    session.headers.update(headers)
-
-    delay = 2  # Initial delay in seconds
-    max_retries = 5  # Maximum number of retries
-
-    for retry in range(max_retries):
+    while attempt < 8:
         try:
-            response = session.get(url)
-            response.raise_for_status()  # Raise an exception for non-2xx status codes
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            time.sleep(1)  # Sleep for 1 second after a successful response
             return BeautifulSoup(response.text, "html.parser")
-        except requests.exceptions.HTTPError as e:
-            if response.status_code == 429:
-                print(
-                    f"Received HTTP 429 error while processing URL {url}. Retrying in {delay} seconds..."
-                )
-                time.sleep(delay)
-                delay *= 2  # Double the delay for exponential backoff
-            else:
-                raise e  # Reraise the exception if it's not a rate limit issue
-        except requests.exceptions.RequestException as e:
-            print(f"An error occurred: {e}")
-            break
+        except (RequestException, ConnectionError) as e:
+            print(f"Request failed ({e}). Retrying in 5 seconds...")
+            time.sleep(5)  # Sleep for 5 seconds after a failed response
+            attempt += 1
+            backoff = 2**attempt
+            time.sleep(backoff)  # Exponential backoff with increasing delay
 
-    print(f"Failed to retrieve data after {max_retries} attempts.")
+    print(f"All attempts failed to retrieve data from {url}.")
     return None
 
 

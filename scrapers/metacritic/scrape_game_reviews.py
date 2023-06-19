@@ -176,7 +176,6 @@ def main(console: str, review_type: str, save_path: str) -> None:
         scrape_reviews(game, data_list, exception_list)
     df = pd.DataFrame.from_dict(data_list)
     df.to_parquet(f"{save_path}/{file_name}.parquet")
-    return "completed."
 
 
 if __name__ == "__main__":
