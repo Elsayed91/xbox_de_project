@@ -65,18 +65,20 @@ def get_last_page_num(page_link: str) -> int:
         The number of pages of results.
     """
     soup = soup_it(page_link)
+
     last_page = soup.find_all("li", {"class": "page last_page"})
-    if last_page:
+    if last_page is not None and len(last_page) > 0:
         page_nums = last_page[0].find_all("a", {"class": "page_num"})
-        if len(page_nums) >= 2:
-            last_page_num = int(page_nums[1].text)
-        elif len(page_nums) == 1:
-            last_page_num = int(page_nums[0].text)
-        else:
-            last_page_num = 1
-        return last_page_num - 1
-    else:
-        return 0
+        if page_nums is not None and len(page_nums) > 0:
+            if len(page_nums) >= 2:
+                last_page_num = int(page_nums[1].text)
+            elif len(page_nums) == 1:
+                last_page_num = int(page_nums[0].text)
+            else:
+                last_page_num = 1
+            return last_page_num - 1
+
+    return 0
 
 
 def get_games_per_page(link: str) -> list[str]:

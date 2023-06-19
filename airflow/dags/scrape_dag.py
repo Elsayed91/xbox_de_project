@@ -84,7 +84,7 @@ with DAG(
     # backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
 
     with TaskGroup(group_id=f"process-metacritic-data") as tg:
-        consoles = ["xbox360", "xbox-series-x", "xboxone", "xbox"]
+        consoles = ["xbox360"]  # ,"xbox-series-x", "xboxone", "xbox"]
         for console in consoles:
             t1 = KubernetesJobOperator(
                 task_id=f"scrape-{console}-game-list",
