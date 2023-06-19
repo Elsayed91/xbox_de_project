@@ -43,7 +43,7 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
             response.raise_for_status()
             time.sleep(1)  # Sleep for 1 second after a successful response
             return BeautifulSoup(response.text, "html.parser")
-        except (RequestException, ConnectionError) as e:
+        except Exception as e:
             print(f"Request failed ({e}). Retrying in 5 seconds...")
             time.sleep(5)  # Sleep for 5 seconds after a failed response
             attempt += 1
