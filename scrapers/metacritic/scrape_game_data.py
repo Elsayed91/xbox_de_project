@@ -40,6 +40,8 @@ try:
 except:
     from scrapers.metacritic.scrape_utils import *
 
+import logging
+
 
 def fuzzy_match(name: str, names: list, threshold: int = 60) -> str:
     """
@@ -280,4 +282,9 @@ def main(console: str) -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s",
+        level=logging.INFO,
+    )
+
     main(os.getenv("console"))
