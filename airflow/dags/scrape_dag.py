@@ -58,7 +58,7 @@ with DAG(
     dag_id="scrapers",
     schedule_interval="0 0 1 * *",
     default_args=default_args,
-    catchup=True,
+    catchup=False,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
     # t = KubernetesJobOperator(
