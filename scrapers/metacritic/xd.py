@@ -128,39 +128,52 @@ def retry(func, max_retries=3, backoff_factor=2):
     return wrapper
 
 
+import random
+
+
 def scrape_game_data(
-    link: str, data_list: list[dict], exception_list: list[str]
+    link: str, headers: dict, data_list: list[dict], exception_list: list[str]
 ) -> None:
     retries = 0
     last_soup = None
-    while retries < 3:
+    while retries < 8:
         try:
-            soup = soup_it(link)
+            soup = soup_it(link, headers)
             last_soup = soup  # Store the last successful soup object
 
             script_tag = soup.find("script", type="application/ld+json")
             if script_tag is not None:
                 data = json.loads(script_tag.text)
+            else:
+                raise ValueError("No script tag found")
 
             game_data = extract_game_data(data, soup)
             if game_data is not None:
                 data_list.append(game_data)
+                logging.info(
+                    f"Successfully scraped game data for {link} after {retries} retries."
+                )
+                time.sleep(1)
                 return
 
         except Exception as e:
             logging.error(f"On game link {link}, Error: {e}", exc_info=True)
             exception_list.append(f"On game link {link}, Error: {e}")
 
+        # Calculate the exponential backoff delay
+        delay = 5**retries
+        delay += (
+            random.randint(0, 1000) / 1000
+        )  # Add some jitter to avoid synchronization
+        time.sleep(delay)
+
         retries += 1
-        if retries < 3:
-            logging.warning(f"Retrying in 10 seconds...")
-            time.sleep(10)
 
     # Log the last value of the soup variable after three failed retries
     if last_soup is not None:
-        logging.error(f"Failed after 3 retries. Last soup: {last_soup}")
+        logging.error(f"Failed after 8 retries. Last soup: {last_soup}")
     else:
-        logging.error(f"Failed after 3 retries. Soup object is None.")
+        logging.error(f"Failed after 8 retries. Soup object is None.")
 
 
 def extract_game_data(data: dict, soup) -> dict:
@@ -276,7 +289,7 @@ def extract_user_rating_count(soup) -> int:
     return 0
 
 
-def scrape_game_data_list(game_list: list[str]) -> list[dict]:
+def scrape_game_data_list(game_list: list[str], headers: dict) -> list[dict]:
     """
     Scrapes game data for the given list of game links.
     Returns a list of scraped game data.
@@ -286,14 +299,14 @@ def scrape_game_data_list(game_list: list[str]) -> list[dict]:
 
     for game in game_list:
         logging.info(f"Processing {game} data.")
-        scrape_game_data(game, data_list, exception_list)
+        scrape_game_data(game, headers, data_list, exception_list)
 
     return data_list
 
 
-def main(console: str) -> None:
+def main(console: str, headers: dict) -> None:
     game_list = read_txt(console)
-    game_data_list = scrape_game_data_list(game_list)
+    game_data_list = scrape_game_data_list(game_list, headers)
 
     df1 = pd.DataFrame.from_dict(game_data_list)
     df1 = add_gamepass_status(df1)
@@ -306,14 +319,16 @@ if __name__ == "__main__":
         format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s",
         level=logging.INFO,
     )
+    headers = generate_random_header("www.metacritic.com")
+    if headers is not None:
+        data_list = []
+        exception_list = []
 
-    data_list = []
-    exception_list = []
-
-    scrape_game_data(
-        "https://www.metacritic.com/game/xbox/top-gear-rpm-tuning",
-        data_list,
-        exception_list,
-    )
-    print(data_list)
-    print(exception_list)
+        scrape_game_data(
+            "https://www.metacritic.com/game/xbox/top-gear-rpm-tuning",
+            headers,
+            data_list,
+            exception_list,
+        )
+        print(data_list)
+        print(exception_list)

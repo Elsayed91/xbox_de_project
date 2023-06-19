@@ -20,10 +20,35 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 
-def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
+def generate_random_header(url: str) -> dict:
     """
-    Sends an HTTP GET request to the given URL and returns the parsed HTML content as a
-    BeautifulSoup object.
+    Generates a random User-Agent header and tests it on the provided URL.
+    If the header successfully works, it is returned; otherwise, None is returned.
+
+    Args:
+        url (str): The URL to test the generated header against.
+
+    Returns:
+        dict or None: A dictionary containing the User-Agent header if it works, or None if it doesn't.
+    """
+    ua = UserAgent(fallback="chrome")
+    headers = {"User-Agent": ua.random}
+
+    session = requests.Session()
+    session.headers.update(headers)
+
+    try:
+        response = session.get(f"https://{url}")
+        response.raise_for_status()  # Raise an exception for non-2xx status codes
+        return headers
+    except requests.exceptions.RequestException:
+        return None
+
+
+def soup_it(url: str, headers: dict) -> BeautifulSoup:
+    """
+    Sends an HTTP GET request to the given URL with the provided headers and returns the
+    parsed HTML content as a BeautifulSoup object.
 
     Args:
         url (str): The URL to request.
@@ -32,14 +57,12 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
     Returns:
         BeautifulSoup: A BeautifulSoup object representing the parsed HTML content.
     """
-    ua = UserAgent(fallback="chrome")
-    headers = {"User-Agent": ua.random}
-
     session = requests.Session()
+
     session.headers.update(headers)
 
-    delay = 2  # Initial delay in seconds
     max_retries = 5  # Maximum number of retries
+    delay = 10  # Initial delay in seconds
 
     for retry in range(max_retries):
         try:
@@ -52,7 +75,7 @@ def soup_it(url: str, headers: dict = None) -> BeautifulSoup:
                     f"Received HTTP 429 error while processing URL {url}. Retrying in {delay} seconds..."
                 )
                 time.sleep(delay)
-                delay *= 2  # Double the delay for exponential backoff
+                delay += 10  # Increment delay for exponential backoff
             else:
                 raise e  # Reraise the exception if it's not a rate limit issue
         except requests.exceptions.RequestException as e:
