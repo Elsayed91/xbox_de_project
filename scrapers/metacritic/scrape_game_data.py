@@ -121,7 +121,6 @@ def scrape_game_data(
                 logging.info(
                     f"Successfully scraped game data for {link} after {retries} retries."
                 )
-                time.sleep(1)
                 return
 
         except Exception as e:
