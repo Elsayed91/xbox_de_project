@@ -61,27 +61,27 @@ with DAG(
     catchup=True,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
-    t = KubernetesJobOperator(
-        task_id=f"scrape-tweets",
-        body_filepath=POD_TEMPALTE,
-        command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
-        jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": f"scrape-tweets",
-            "gitsync": True,
-            "volumes": [
-                {
-                    "name": "persistent-volume",
-                    "type": "persistentVolumeClaim",
-                    "reference": "data-pv-claim",
-                    "mountPath": "/etc/scraped_data/",
-                }
-            ],
-        },
-        envs={"start_date": "{{ ds }}"},
-    )
+    # t = KubernetesJobOperator(
+    #     task_id=f"scrape-tweets",
+    #     body_filepath=POD_TEMPALTE,
+    #     command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
+    #     jinja_job_args={
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #         "name": f"scrape-tweets",
+    #         "gitsync": True,
+    #         "volumes": [
+    #             {
+    #                 "name": "persistent-volume",
+    #                 "type": "persistentVolumeClaim",
+    #                 "reference": "data-pv-claim",
+    #                 "mountPath": "/etc/scraped_data/",
+    #             }
+    #         ],
+    #     },
+    #     envs={"start_date": "{{ ds }}"},
+    # )
 
-    backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
+    # backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
 
     with TaskGroup(group_id=f"process-metacritic-data") as tg:
         consoles = ["xbox360", "xbox-series-x", "xboxone", "xbox"]
@@ -231,4 +231,5 @@ with DAG(
             "DATA_BUCKET": os.getenv("DATA_BUCKET", "raw-103kdj49klf22k"),
         },
     )
-    t >> backfill_first >> tg >> tg2 >> x1
+    # t >> backfill_first >> tg >> tg2 >> x1
+    tg >> tg2 >> x1
