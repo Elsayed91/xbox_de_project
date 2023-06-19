@@ -231,4 +231,4 @@ with DAG(
             "DATA_BUCKET": os.getenv("DATA_BUCKET", "raw-103kdj49klf22k"),
         },
     )
-    t >> backfill_first >> [v1, v2, tg] >> x1
+    t >> backfill_first >> [v1, v2] >> tg >> x1
