@@ -166,7 +166,7 @@ with DAG(
                     },
                     envs={"console": console, "review_type": "critic"},
                 )
-                t2 >> t3 >> t4
+                # t2 >> t3 >> t4
             t1 >> tg1
     with TaskGroup(group_id=f"process-vgchartz-data") as tg2:
         v1 = KubernetesJobOperator(
