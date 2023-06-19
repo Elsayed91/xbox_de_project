@@ -311,7 +311,7 @@ if __name__ == "__main__":
         "click",
         "shopify",
     ]
-    num_tweets = os.getenv("num_tweets", 1000)
+    num_tweets = os.getenv("num_tweets", 10)
     df = main(
         hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets
     )

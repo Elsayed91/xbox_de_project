@@ -83,16 +83,16 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud builds submit
 
-# for FILE in ./manifests/*; do
-#     [[ -e "$FILE" ]] || continue
-#     cat "$FILE" | envsubst | kubectl apply -f -
-# done
+for FILE in ./manifests/*; do
+    [[ -e "$FILE" ]] || continue
+    cat "$FILE" | envsubst | kubectl apply -f -
+done
 
-kubectl wait --for=condition=Ready $(kubectl get pods -o name | grep airflow)
+kubectl wait --for=condition=Ready $(kubectl get pods -o name | grep airflow) --timeout=100s
 airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
 kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause scrapers
 kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger scrapers
-# pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
-# if [ -n "$pods" ]; then
-#     kubectl delete pod $pods
-# fi
+pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
+if [ -n "$pods" ]; then
+    kubectl delete pod $pods
+fi
