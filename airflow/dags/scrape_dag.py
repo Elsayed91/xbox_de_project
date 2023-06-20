@@ -110,11 +110,7 @@ with DAG(
             t2 = KubernetesJobOperator(
                 task_id=f"xdxdxd",
                 body_filepath=POD_TEMPALTE,
-                command=[
-                    "python",
-                    f"{BASE}/metacritic/read_xcom.py",
-                    "{{ ti.xcom_pull(task_ids='scrape-xbox360-game-list', key='xbox360-urls') }}",
-                ],
+                command=["python", f"{BASE}/metacritic/read_xcom.py"],
                 jinja_job_args={
                     "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                     "name": f"get-games-list",
@@ -130,10 +126,9 @@ with DAG(
                 },
                 envs={
                     "console": console,
+                    "game_list": "{{ ti.xcom_pull(task_ids='scrape-xbox360-game-list, key='xbox360-urls') }}",
                 },
-                parse_xcom_event="::",
             )
-        t1 >> t2
     #         with TaskGroup(group_id=f"process-{console}-data") as tg1:
     #             t2 = KubernetesJobOperator(
     #                 task_id=f"scrape-{console}-game-data",
