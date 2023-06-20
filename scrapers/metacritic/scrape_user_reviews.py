@@ -17,6 +17,8 @@ logging.basicConfig(level=logging.INFO)
 def scrape_user_reviews(game_link: str, max_retries: int = 8) -> None:
     url = game_link + "/user-reviews?page="
     review_pages = get_last_page(url)
+    if review_pages is None:
+        return None
     reviews = []
     for page in range(review_pages + 1):
         game_url = url + str(page)
@@ -103,7 +105,8 @@ if __name__ == "__main__":
     user_reviews = []
     for game_url in game_list:
         data = scrape_user_reviews(game_url)
-        user_reviews.extend(data)  # Extend instead of appending to flatten the list
+        if data is not None:
+            user_reviews.extend(data)
 
     df = pd.DataFrame.from_records(user_reviews)
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")

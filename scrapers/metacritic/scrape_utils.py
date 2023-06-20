@@ -85,7 +85,7 @@ def get_last_page(page_link: str) -> int:
         if page_nums:
             return int(page_nums[-1].text) - 1
 
-    return 0
+    return None
 
 
 def retrieve_xcom_game_list(console):

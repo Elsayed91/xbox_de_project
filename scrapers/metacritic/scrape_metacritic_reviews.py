@@ -17,6 +17,8 @@ logging.basicConfig(level=logging.INFO)
 def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> None:
     url = game_link + "/critic-reviews?page="
     review_pages = get_last_page(url)
+    if review_pages is None:
+        return None
     reviews = []
     for page in range(review_pages + 1):
         game_url = url + str(page)
@@ -129,7 +131,8 @@ if __name__ == "__main__":
     metacritic_reviews = []
     for game_url in game_list:
         data = scrape_metacritic_reviews(game_url)
-        metacritic_reviews.extend(data)
+        if data is not None:
+            metacritic_reviews.extend(data)
     df = pd.DataFrame.from_records(metacritic_reviews)
 
     df.to_parquet(f"{local_path}{console}-critic-reviews.parquet")
