@@ -228,8 +228,8 @@ if __name__ == "__main__":
     for game_url in game_list[:10]:
         data = scrape_game_data(game_url)
         game_data.extend(data)  # Use extend instead of append
-
-    df1 = pd.DataFrame.from_records(game_data)
+    print(game_data)
+    df1 = pd.DataFrame(game_data)
     print(df1.columns)
     # df1.fillna("", inplace=True)  # Replace missing values with empty strings
 
