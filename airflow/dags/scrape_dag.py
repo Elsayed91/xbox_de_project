@@ -136,6 +136,9 @@ with DAG(
                     task_id=f"scrape-{console}-user-reviews",
                     body_filepath=POD_TEMPALTE,
                     command=["python", f"{BASE}/metacritic/scrape_user_reviews.py"],
+                    arguments=[
+                        f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
+                    ],
                     jinja_job_args={
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                         "name": f"get-{console}-user-reviews",
@@ -157,6 +160,9 @@ with DAG(
                     command=[
                         "python",
                         f"{BASE}/metacritic/scrape_metacritic_reviews.py",
+                    ],
+                    arguments=[
+                        f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
                     ],
                     jinja_job_args={
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
