@@ -237,6 +237,7 @@ if __name__ == "__main__":
     df1 = pd.DataFrame.from_records(
         game_data,
     )
+    print(df1.columns)
     # df1.fillna("", inplace=True)  # Replace missing values with empty strings
 
     # # Optional: Convert columns to appropriate types
