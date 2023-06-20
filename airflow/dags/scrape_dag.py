@@ -111,15 +111,6 @@ with DAG(
                 task_id=f"xdxdxd",
                 body_filepath=POD_TEMPALTE,
                 command=["python", f"{BASE}/metacritic/read_xcom.py"],
-                args=[
-                    {
-                        {
-                            ti.xcom_pull(
-                                task_ids="scrape-xbox360-game-list", key="xbox360-urls"
-                            )
-                        }
-                    }
-                ],
                 jinja_job_args={
                     "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                     "name": f"get-games-list",
