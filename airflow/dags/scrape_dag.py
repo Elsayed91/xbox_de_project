@@ -126,7 +126,7 @@ with DAG(
                 },
                 envs={
                     "console": console,
-                    "game_list": "{{ ti.xcom_pull(task_ids='scrape-xbox360-game-list, key='xbox360-urls') }}",
+                    "game_list": "{{ ti.xcom_pull(task_ids='scrape-xbox360-game-list', key='xbox360-urls') }}",
                 },
             )
 
