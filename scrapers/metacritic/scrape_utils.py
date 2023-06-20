@@ -88,9 +88,9 @@ def get_last_page(page_link: str) -> int:
     return 0
 
 
-def retrieve_xcom_game_list(console):
+def retrieve_xcom_game_list(prefix):
     xcom_game_list = sys.argv[1]
-    prefix = f"https://www.metacritic.com/game/{console}/"
+    prefix = f"https://www.metacritic.com/"
     game_list = ast.literal_eval(xcom_game_list)
     game_list = [prefix + game for game in game_list]
     return game_list
