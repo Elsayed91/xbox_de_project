@@ -229,7 +229,5 @@ if __name__ == "__main__":
             game_data.append(data)
 
     df1 = pd.DataFrame.from_records(game_data)
-    print(df1.columns)
-    # df1 = add_gamepass_status(df1)
-    # df1.to_parquet(f"{local_path}{console}-games.parquet")
-    # print(df1.head())
+    df1 = add_gamepass_status(df1)
+    df1.to_parquet(f"{local_path}{console}-games.parquet")

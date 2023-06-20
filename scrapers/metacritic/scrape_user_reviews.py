@@ -105,12 +105,5 @@ if __name__ == "__main__":
         data = scrape_user_reviews(game_url)
         user_reviews.extend(data)  # Extend instead of appending to flatten the list
 
-    df = pd.DataFrame.from_records(
-        user_reviews, columns=["Game", "Platform", "User", "Date", "Score", "Review"]
-    )
-    df.fillna("", inplace=True)  # Replace missing values with empty strings
-
-    # Optional: Convert columns to string type
-    df = df.astype(str)
-    print(df.head())
+    df = pd.DataFrame.from_records(user_reviews)
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
