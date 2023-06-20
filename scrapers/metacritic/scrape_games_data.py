@@ -65,6 +65,7 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     )
     df = pd.read_csv(url, skiprows=[0])
     df = df[["Game", "Status"]]
+    print(df.head())
     game_names = df["Game"].tolist()
     statuses = df["Status"].tolist()
     main_df["Gamepass_Status"] = (
@@ -76,6 +77,7 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     main_df["Gamepass_Status"] = main_df["Gamepass_Status"].apply(
         lambda x: statuses[game_names.index(x)] if x in game_names else "Not Included"
     )
+    print(main_df.columns)
     return main_df
 
 
