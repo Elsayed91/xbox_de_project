@@ -24,7 +24,9 @@ def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> None:
         retries = 0
         while retries < max_retries:
             soup = get_soup(game_url)
-
+            if soup == 0:
+                # Skip the link if soup is 0
+                break
             if soup is None:
                 logger.warning("No script tag found for %s. Retrying...", game_link)
                 time.sleep(retries * 3)
