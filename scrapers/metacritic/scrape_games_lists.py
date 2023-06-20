@@ -31,7 +31,7 @@ def get_game_urls(link: str, pages: int) -> Generator[str, None, None]:
         soup = get_soup(link + f"&page={page}")
         title_elements = soup.find_all("a", class_="title")
         for elem in title_elements:
-            yield elem.get("href")
+            yield elem.get("href").rsplit("/", 1)[-1]
 
 
 def log_xcom_value(urls, key):
