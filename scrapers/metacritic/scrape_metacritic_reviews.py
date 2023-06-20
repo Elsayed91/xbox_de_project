@@ -18,7 +18,7 @@ def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> None:
     url = game_link + "/critic-reviews?page="
     review_pages = get_last_page(url)
     reviews = []
-    for page in range(review_pages + 1):
+    for page in range(2):  # range(review_pages + 1):
         game_url = url + str(page)
         logger.info("processing %s", game_url)
         retries = 0
