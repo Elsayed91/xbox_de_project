@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -5,14 +6,77 @@ import random
 import time
 from datetime import datetime
 
+import pandas as pd
+from fuzzywuzzy import fuzz, process
+
+try:
+    from scrape_utils import *
+except:
+    from scrapers.metacritic.scrape_utils import *
+
+import logging
+
 import requests
-from scrape_utils import *
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 MAX_RETRIES = 8
 RETRY_DELAY = 10
+
+
+def fuzzy_match(name: str, names: list, threshold: int = 60) -> str:
+    """
+    Finds the best fuzzy match for the given name in a list of names and returns the
+    matched name if its score is above the given threshold, otherwise returns None.
+
+    Args:
+        name (str): The name to search for.
+        names (list): A list of names to search in.
+        threshold (int): Optional. The minimum score required for a match.
+
+    Returns:
+        str: The best matched name if its score is above the threshold, otherwise None.
+    """
+    try:
+        matched = process.extractOne(name, names, scorer=fuzz.token_sort_ratio)
+        if matched[1] >= threshold:
+            return matched[0]
+        else:
+            return None
+    except TypeError as e:
+        raise TypeError(f"Failed to perform fuzzy matching: {e}")
+
+
+def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Adds a 'Gamepass_Status' column to the input DataFrame indicating whether each game is
+    available on Game Pass.
+
+    Args:
+        main_df: The input DataFrame containing a 'Name' column.
+
+    Returns:
+        A copy of the input DataFrame with an additional 'Gamepass_Status' column.
+    """
+    url = (
+        "https://docs.google.com/spreadsheet/ccc?key=1ks"
+        + "pw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg&output=csv"
+    )
+    df = pd.read_csv(url, skiprows=[0])
+    df = df[["Game", "Status"]]
+    game_names = df["Game"].tolist()
+    statuses = df["Status"].tolist()
+    main_df["Gamepass_Status"] = (
+        main_df["Name"]
+        .apply(lambda x: fuzzy_match(x, game_names))
+        .fillna("Not Included")
+    )
+    main_df["Gamepass_Status"] = main_df["Gamepass_Status"].fillna("Not Included")
+    main_df["Gamepass_Status"] = main_df["Gamepass_Status"].apply(
+        lambda x: statuses[game_names.index(x)] if x in game_names else "Not Included"
+    )
+    return main_df
 
 
 def scrape_game_data(link: str, max_retries: int = 8) -> dict:
@@ -156,9 +220,13 @@ def extract_user_rating_count(soup) -> int:
 
 if __name__ == "__main__":
     console = os.getenv("console")
+    local_path = os.getenv("local_path")
     game_list = retrieve_xcom_game_list(console)
     game_data = []
     for game_url in game_list:
         data = scrape_game_data(game_url)
         game_data.append(data)
+    df1 = pd.DataFrame.from_dict(game_data)
+    df1 = add_gamepass_status(df1)
+    df1.to_parquet(f"{local_path}{console}-games.parquet")
     print(game_data[:10])
