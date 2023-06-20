@@ -105,5 +105,5 @@ if __name__ == "__main__":
         data = scrape_user_reviews(game_url)
         user_reviews.append(data)
     print(user_reviews[:10])
-    df = pd.DataFrame(user_reviews)
+    df = pd.DataFrame.from_records(user_reviews)
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")

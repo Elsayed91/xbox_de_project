@@ -127,9 +127,8 @@ if __name__ == "__main__":
 
     game_list = retrieve_xcom_game_list(console)
     metacritic_reviews = []
-    for game_url in game_list:
+    for game_url in game_list[:10]:
         data = scrape_metacritic_reviews(game_url)
         metacritic_reviews.append(data)
-    print(metacritic_reviews[:10])
-    df = pd.DataFrame(metacritic_reviews)
+    df = pd.DataFrame.from_records(metacritic_reviews)
     df.to_parquet(f"{local_path}{console}-critic-reviews.parquet")
