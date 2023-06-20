@@ -173,7 +173,6 @@ with DAG(
                     },
                     envs={"console": console, "local_path": "/etc/scraped_data/"},
                 )
-                t2 >> t3 >> t4
             t1 >> tg1
     # with TaskGroup(group_id=f"process-vgchartz-data") as tg2:
     #     v1 = KubernetesJobOperator(
