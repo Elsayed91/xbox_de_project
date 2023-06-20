@@ -106,4 +106,5 @@ if __name__ == "__main__":
         user_reviews.append(data)
     print(user_reviews[:10])
     df = pd.DataFrame.from_records(user_reviews)
+    df.columns.astype(str)
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
