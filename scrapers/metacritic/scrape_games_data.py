@@ -226,10 +226,40 @@ if __name__ == "__main__":
     for game_url in game_list[:10]:
         data = scrape_game_data(game_url)
         if data is not None:
-            game_data.append(data)
-    print(game_data)
-    print(type(game_data))
-    df1 = pd.DataFrame.from_records(game_data)
+            game_data.extend(data)  # Use extend instead of append
+
+    if not game_data:
+        print("No game data found.")
+        # Handle the empty case or raise an error
+
+    df1 = pd.DataFrame.from_records(
+        game_data,
+        columns=[
+            "Name",
+            "Release Date",
+            "Maturity Rating",
+            "Genre",
+            "Platform",
+            "Developer",
+            "Publisher",
+            "Meta Score",
+            "Critic Reviews Count",
+            "User Score",
+            "User Rating Count",
+            "Summary",
+            "Image",
+        ],
+    )
+    # df1.fillna("", inplace=True)  # Replace missing values with empty strings
+
+    # # Optional: Convert columns to appropriate types
+    # df1["Release Date"] = pd.to_datetime(df1["Release Date"])
+    # df1["Meta Score"] = pd.to_numeric(df1["Meta Score"], errors="coerce")
+    # df1["Critic Reviews Count"] = pd.to_numeric(df1["Critic Reviews Count"], errors="coerce")
+    # df1["User Score"] = pd.to_numeric(df1["User Score"], errors="coerce")
+    # df1["User Rating Count"] = pd.to_numeric(df1["User Rating Count"], errors="coerce")
+
+    # Additional code...
     df1 = add_gamepass_status(df1)
+
     df1.to_parquet(f"{local_path}{console}-games.parquet")
-    print(df1.head())

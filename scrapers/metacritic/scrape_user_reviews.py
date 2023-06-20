@@ -105,10 +105,6 @@ if __name__ == "__main__":
         data = scrape_user_reviews(game_url)
         user_reviews.extend(data)  # Extend instead of appending to flatten the list
 
-    if not user_reviews:
-        print("No user reviews found.")
-        # Handle the empty case or raise an error
-
     df = pd.DataFrame.from_records(
         user_reviews, columns=["Game", "Platform", "User", "Date", "Score", "Review"]
     )
