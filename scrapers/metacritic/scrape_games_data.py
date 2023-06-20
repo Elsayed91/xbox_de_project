@@ -234,21 +234,6 @@ if __name__ == "__main__":
 
     df1 = pd.DataFrame.from_records(
         game_data,
-        columns=[
-            "Name",
-            "Release Date",
-            "Maturity Rating",
-            "Genre",
-            "Platform",
-            "Developer",
-            "Publisher",
-            "Meta Score",
-            "Critic Reviews Count",
-            "User Score",
-            "User Rating Count",
-            "Summary",
-            "Image",
-        ],
     )
     # df1.fillna("", inplace=True)  # Replace missing values with empty strings
 
