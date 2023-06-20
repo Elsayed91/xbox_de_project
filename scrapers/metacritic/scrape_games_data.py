@@ -155,7 +155,7 @@ def extract_user_rating_count(soup) -> int:
 
 
 if __name__ == "__main__":
-    console = os.getenv("console", "xbox")
+    console = os.getenv("console")
     game_list = retrieve_xcom_game_list(console)
     game_data = []
     for game_url in game_list:
