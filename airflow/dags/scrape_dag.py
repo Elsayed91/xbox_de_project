@@ -129,7 +129,7 @@ with DAG(
                             }
                         ],
                     },
-                    envs={"console": console},
+                    envs={"console": console, "local_path": "/etc/scraped_data/"},
                 )
 
                 t3 = KubernetesJobOperator(
