@@ -85,7 +85,8 @@ if __name__ == "__main__":
     )
     pages = get_last_page_num(url)
     url_list = [u for u in game_urls(url, pages)]
-    list_json = json.dumps(url_list)
+    url_dict = {"urls": url_list}
+    list_json = json.dumps(url_dict)
 
     # Log the XCom value using print
     print("::kube_api:xcom={}".format(list_json))
