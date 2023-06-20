@@ -86,35 +86,17 @@ def get_last_page(page_link: str) -> int:
     return 0
 
 
-def get_games_per_page(link: str) -> list[str]:
-    """
-    Given a link, returns a list of hrefs of games in that link.
+# def get_games_per_page(link: str) -> list[str]:
+#     """
+#     Given a link, returns a list of hrefs of games in that link.
 
-    Args:
-        link: The URL of the page to scrape.
+#     Args:
+#         link: The URL of the page to scrape.
 
-    Returns:
-        A list of hrefs of games on the page.
-    """
-    soup = get_soup(link)
-    title_elements = soup.find_all("a", class_="title")
-    href_list = [elem.get("href") for elem in title_elements]
-    return href_list
-
-
-def get_game_urls(link: str, pages: int) -> Generator[str, None, None]:
-    """
-    Given a link and number of pages, returns a generator of urls of games in those links.
-
-    Args:
-    link (str): The base URL of the page to scrape.
-    pages (int): The number of pages to scrape.
-
-    Returns:
-    Generator[str, None, None]: A generator of urls of games on the page.
-    """
-    for page in range(pages):
-        soup = get_soup(link + f"&page={page}")
-        title_elements = soup.find_all("a", class_="title")
-        for elem in title_elements:
-            yield f"{elem.get('href').rsplit('/', 1)[-1]}"
+#     Returns:
+#         A list of hrefs of games on the page.
+#     """
+#     soup = get_soup(link)
+#     title_elements = soup.find_all("a", class_="title")
+#     href_list = [elem.get("href") for elem in title_elements]
+#     return href_list

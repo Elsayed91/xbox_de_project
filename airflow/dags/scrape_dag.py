@@ -107,6 +107,28 @@ with DAG(
                     "console": console,
                 },
             )
+            t2 = KubernetesJobOperator(
+                task_id=f"xdxdxd",
+                body_filepath=POD_TEMPALTE,
+                command=["python", f"{BASE}/metacritic/scrape_games_lists.py"],
+                jinja_job_args={
+                    "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                    "name": f"get-games-list",
+                    "gitsync": True,
+                    "volumes": [
+                        {
+                            "name": "persistent-volume",
+                            "type": "persistentVolumeClaim",
+                            "reference": "data-pv-claim",
+                            "mountPath": "/etc/scraped_data/",
+                        }
+                    ],
+                },
+                envs={
+                    "console": console,
+                    "game_list": "{{ ti.xcom_pull(task_ids='scrape-{console}-game-list, key='{console}-urls') }}",
+                },
+            )
     #         with TaskGroup(group_id=f"process-{console}-data") as tg1:
     #             t2 = KubernetesJobOperator(
     #                 task_id=f"scrape-{console}-game-data",
