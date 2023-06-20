@@ -112,9 +112,7 @@ with DAG(
                 body_filepath=POD_TEMPALTE,
                 command=["python", f"{BASE}/metacritic/read_xcom.py"],
                 arguments=[
-                    "{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{}-game-list', dag_id='scrapers', key='{}-urls') }}".format(
-                        console, console
-                    )
+                    f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
                 ],
                 jinja_job_args={
                     "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
