@@ -103,8 +103,18 @@ if __name__ == "__main__":
     user_reviews = []
     for game_url in game_list[:10]:
         data = scrape_user_reviews(game_url)
-        user_reviews.append(data)
-    print(user_reviews[:10])
-    df = pd.DataFrame.from_records(user_reviews)
-    df.columns.astype(str)
+        user_reviews.extend(data)  # Extend instead of appending to flatten the list
+
+    if not user_reviews:
+        print("No user reviews found.")
+        # Handle the empty case or raise an error
+
+    df = pd.DataFrame.from_records(
+        user_reviews, columns=["Game", "Platform", "User", "Date", "Score", "Review"]
+    )
+    df.fillna("", inplace=True)  # Replace missing values with empty strings
+
+    # Optional: Convert columns to string type
+    df = df.astype(str)
+
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
