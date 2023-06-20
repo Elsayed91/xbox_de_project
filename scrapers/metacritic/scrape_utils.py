@@ -2,7 +2,9 @@
 xdd
 """
 
+import ast
 import logging
+import sys
 import time
 from typing import Generator
 
@@ -84,6 +86,14 @@ def get_last_page(page_link: str) -> int:
             return int(page_nums[-1].text) - 1
 
     return 0
+
+
+def retrieve_xcom_game_list(console):
+    xcom_game_list = sys.argv[1]
+    prefix = f"https://www.metacritic.com/game/{console}/"
+    game_list = ast.literal_eval(xcom_game_list)
+    game_list = [prefix + game for game in game_list]
+    return game_list
 
 
 # def get_games_per_page(link: str) -> list[str]:

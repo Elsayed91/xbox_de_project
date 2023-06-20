@@ -107,53 +107,54 @@ with DAG(
                     "console": console,
                 },
             )
-            t2 = KubernetesJobOperator(
-                task_id=f"xdxdxd",
-                body_filepath=POD_TEMPALTE,
-                command=["python", f"{BASE}/metacritic/read_xcom.py"],
-                arguments=[
-                    f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
-                ],
-                jinja_job_args={
-                    "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                    "name": f"get-games-list",
-                    "gitsync": True,
-                    "volumes": [
-                        {
-                            "name": "persistent-volume",
-                            "type": "persistentVolumeClaim",
-                            "reference": "data-pv-claim",
-                            "mountPath": "/etc/scraped_data/",
-                        }
-                    ],
-                },
-                envs={
-                    "console": console,
-                },
-                parse_xcom_event="xbox360-urls",
-            )
+            # t2 = KubernetesJobOperator(
+            #     task_id=f"xdxdxd",
+            #     body_filepath=POD_TEMPALTE,
+            #     command=["python", f"{BASE}/metacritic/read_xcom.py"],
 
-            t1 >> t2
-    #         with TaskGroup(group_id=f"process-{console}-data") as tg1:
-    #             t2 = KubernetesJobOperator(
-    #                 task_id=f"scrape-{console}-game-data",
-    #                 body_filepath=POD_TEMPALTE,
-    #                 command=["python", f"{BASE}/metacritic/scrape_game_data.py"],
-    #                 jinja_job_args={
-    #                     "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-    #                     "name": f"get-{console}-game-data",
-    #                     "gitsync": True,
-    #                     "volumes": [
-    #                         {
-    #                             "name": "persistent-volume",
-    #                             "type": "persistentVolumeClaim",
-    #                             "reference": "data-pv-claim",
-    #                             "mountPath": "/etc/scraped_data/",
-    #                         }
-    #                     ],
-    #                 },
-    #                 envs={"console": console},
-    #             )
+            #     jinja_job_args={
+            #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+            #         "name": f"get-games-list",
+            #         "gitsync": True,
+            #         "volumes": [
+            #             {
+            #                 "name": "persistent-volume",
+            #                 "type": "persistentVolumeClaim",
+            #                 "reference": "data-pv-claim",
+            #                 "mountPath": "/etc/scraped_data/",
+            #             }
+            #         ],
+            #     },
+            #     envs={
+            #         "console": console,
+            #     },
+            #     parse_xcom_event="xbox360-urls",
+            # )
+
+            with TaskGroup(group_id=f"process-{console}-data") as tg1:
+                t2 = KubernetesJobOperator(
+                    task_id=f"scrape-{console}-game-data",
+                    body_filepath=POD_TEMPALTE,
+                    command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
+                    arguments=[
+                        f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
+                    ],
+                    jinja_job_args={
+                        "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                        "name": f"get-{console}-game-data",
+                        "gitsync": True,
+                        "volumes": [
+                            {
+                                "name": "persistent-volume",
+                                "type": "persistentVolumeClaim",
+                                "reference": "data-pv-claim",
+                                "mountPath": "/etc/scraped_data/",
+                            }
+                        ],
+                    },
+                    envs={"console": console},
+                )
+            t1 >> tg1
 
     #             t3 = KubernetesJobOperator(
     #                 task_id=f"scrape-{console}-user-reviews",
