@@ -65,7 +65,6 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     )
     df = pd.read_csv(url, skiprows=[0])
     df = df[["Game", "Status"]]
-    print(df.head())
     game_names = df["Game"].tolist()
     statuses = df["Status"].tolist()
     main_df["Gamepass_Status"] = (
@@ -77,7 +76,6 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     main_df["Gamepass_Status"] = main_df["Gamepass_Status"].apply(
         lambda x: statuses[game_names.index(x)] if x in game_names else "Not Included"
     )
-    print(main_df.columns)
     return main_df
 
 
@@ -226,21 +224,13 @@ if __name__ == "__main__":
     game_list = retrieve_xcom_game_list(console)
     game_data = []
     for game_url in game_list[:10]:
+        print(game_url)
         data = scrape_game_data(game_url)
-        game_data.extend(data)  # Use extend instead of append
-    print(game_data)
-    df1 = pd.DataFrame(game_data)
-    print(df1.columns)
-    # df1.fillna("", inplace=True)  # Replace missing values with empty strings
+        print(data)
+        if data is not None:
+            game_data.extend(data)
 
-    # # Optional: Convert columns to appropriate types
-    # df1["Release Date"] = pd.to_datetime(df1["Release Date"])
-    # df1["Meta Score"] = pd.to_numeric(df1["Meta Score"], errors="coerce")
-    # df1["Critic Reviews Count"] = pd.to_numeric(df1["Critic Reviews Count"], errors="coerce")
-    # df1["User Score"] = pd.to_numeric(df1["User Score"], errors="coerce")
-    # df1["User Rating Count"] = pd.to_numeric(df1["User Rating Count"], errors="coerce")
-
-    # Additional code...
-    # df1 = add_gamepass_status(df1)
-
-    # df1.to_parquet(f"{local_path}{console}-games.parquet")
+    df1 = pd.DataFrame.from_records(game_data)
+    df1 = add_gamepass_status(df1)
+    df1.to_parquet(f"{local_path}{console}-games.parquet")
+    print(df1.head())
