@@ -18,7 +18,7 @@ def scrape_user_reviews(game_link: str, max_retries: int = 8) -> None:
     url = game_link + "/user-reviews?page="
     review_pages = get_last_page(url)
     reviews = []
-    for page in range(2):  # range(review_pages + 1):
+    for page in range(review_pages + 1):
         game_url = url + str(page)
         print(game_url)
         logger.info("processing %s", game_url)
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     game_list = retrieve_xcom_game_list(console)
     user_reviews = []
-    for game_url in game_list:
+    for game_url in game_list[:10]:
         data = scrape_user_reviews(game_url)
         user_reviews.append(data)
     print(user_reviews[:10])
