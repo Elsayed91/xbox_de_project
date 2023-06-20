@@ -129,6 +129,8 @@ with DAG(
                     "game_list": "{{ ti.xcom_pull(task_ids='scrape-xbox360-game-list, key='xbox360-urls') }}",
                 },
             )
+
+            t1 >> t2
     #         with TaskGroup(group_id=f"process-{console}-data") as tg1:
     #             t2 = KubernetesJobOperator(
     #                 task_id=f"scrape-{console}-game-data",
