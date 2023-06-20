@@ -223,7 +223,7 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     game_list = retrieve_xcom_game_list(console)
     game_data = []
-    for game_url in game_list[:10]:
+    for game_url in game_list:
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)

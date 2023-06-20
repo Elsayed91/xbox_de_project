@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     game_list = retrieve_xcom_game_list(console)
     metacritic_reviews = []
-    for game_url in game_list[:10]:
+    for game_url in game_list:
         data = scrape_metacritic_reviews(game_url)
         metacritic_reviews.extend(data)
     df = pd.DataFrame.from_records(metacritic_reviews)
