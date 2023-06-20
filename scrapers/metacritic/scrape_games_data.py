@@ -226,7 +226,7 @@ if __name__ == "__main__":
     for game_url in game_list:
         data = scrape_game_data(game_url)
         game_data.append(data)
-    df1 = pd.DataFrame.from_dict(game_data)
+    print(game_data[:10])
+    df1 = pd.DataFrame(game_data)
     df1 = add_gamepass_status(df1)
     df1.to_parquet(f"{local_path}{console}-games.parquet")
-    print(game_data[:10])

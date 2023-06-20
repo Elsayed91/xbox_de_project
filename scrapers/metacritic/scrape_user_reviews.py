@@ -102,6 +102,6 @@ if __name__ == "__main__":
     for game_url in game_list:
         data = scrape_user_reviews(game_url)
         user_reviews.append(data)
-    df = pd.DataFrame.from_dict(user_reviews)
-    df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
     print(user_reviews[:10])
+    df = pd.DataFrame(user_reviews)
+    df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
