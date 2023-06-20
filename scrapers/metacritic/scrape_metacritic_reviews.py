@@ -131,5 +131,6 @@ if __name__ == "__main__":
         data = scrape_metacritic_reviews(game_url)
         metacritic_reviews.extend(data)
     df = pd.DataFrame.from_records(metacritic_reviews)
+    df.head()
     # df.columns = df.columns.astype(str)
     df.to_parquet(f"{local_path}{console}-critic-reviews.parquet")

@@ -112,5 +112,5 @@ if __name__ == "__main__":
 
     # Optional: Convert columns to string type
     df = df.astype(str)
-
+    print(df.head())
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")

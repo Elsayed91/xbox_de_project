@@ -224,11 +224,9 @@ if __name__ == "__main__":
     game_list = retrieve_xcom_game_list(console)
     game_data = []
     for game_url in game_list[:10]:
-        print(game_url)
         data = scrape_game_data(game_url)
-        print(data)
         if data is not None:
-            game_data.extend(data)
+            game_data.append(data)
 
     df1 = pd.DataFrame.from_records(game_data)
     print(df1.columns)
