@@ -1,22 +1,22 @@
+"""
+"""
+# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name
 import datetime
 import json
 import logging
 import os
-import random
 import time
 from datetime import datetime
 
 import pandas as pd
+from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz, process
 
 try:
-    from scrape_utils import *
+    from scrape_utils import get_soup, read_txt
 except:
-    from scrapers.metacritic.scrape_utils import *
+    from scrapers.metacritic.scrape_utils import get_soup, read_txt
 
-import logging
-
-import requests
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -80,11 +80,22 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def scrape_game_data(link: str, max_retries: int = 8) -> dict:
+    """
+    Scrapes game data from the provided link.
+    Includes some error handling and some checks to skip faulty links.
+
+    Args:
+        link (str): The URL of the webpage to scrape game data from.
+        max_retries (int): The maximum number of retries in case of scraping failure.
+            Defaults to 8.
+
+    Returns:
+        dict: A dictionary containing the scraped game data, or None if scraping fails.
+    """
     retries = 0
     while retries < max_retries:
         soup = get_soup(link)
         if soup == 0:
-            # Skip the link if soup is 0
             break
 
         script_tag = soup.find("script", type="application/ld+json")
@@ -107,7 +118,14 @@ def scrape_game_data(link: str, max_retries: int = 8) -> dict:
 
 def extract_game_data(data: dict, soup) -> dict:
     """
-    Extracts relevant game data from the scraped soup and JSON data.
+    Extracts relevant game data from the scraped JSON data.
+
+    Args:
+        data (dict): A dictionary containing the JSON data scraped from the webpage.
+        soup: The BeautifulSoup object representing the scraped HTML.
+
+    Returns:
+        dict: A dictionary containing the extracted game data.
     """
     game_data = {}
 
@@ -131,6 +149,12 @@ def extract_game_data(data: dict, soup) -> dict:
 def extract_release_date(data: dict) -> str:
     """
     Extracts the release date from the JSON data.
+
+    Args:
+        data (dict): A dictionary containing the JSON data.
+
+    Returns:
+        str: The extracted release date in the format 'YYYY-MM-DD'.
     """
     release_date_str = data.get("datePublished")
     if release_date_str:
@@ -142,6 +166,12 @@ def extract_release_date(data: dict) -> str:
 def extract_maturity_rating(data: dict) -> str:
     """
     Extracts the maturity rating from the JSON data.
+
+    Args:
+        data (dict): A dictionary containing the JSON data.
+
+    Returns:
+        str: The extracted maturity rating.
     """
     return data.get("contentRating", "Unspecified").replace("ESRB ", "")
 
@@ -149,14 +179,26 @@ def extract_maturity_rating(data: dict) -> str:
 def extract_genre(data: dict) -> str:
     """
     Extracts the genre from the JSON data.
+
+    Args:
+        data (dict): A dictionary containing the JSON data.
+
+    Returns:
+        str: The extracted genre as a comma-separated string.
     """
     genre_list = data.get("genre", [])
     return ", ".join(genre_list)
 
 
-def extract_developer(soup) -> str:
+def extract_developer(soup: BeautifulSoup) -> str:
     """
     Extracts the developer from the scraped soup.
+
+    Args:
+        soup: The BeautifulSoup object representing the scraped HTML.
+
+    Returns:
+        str: The extracted developer.
     """
     developer = soup.select_one(".developer a")
     if developer:
@@ -167,6 +209,12 @@ def extract_developer(soup) -> str:
 def extract_publisher(data: dict) -> str:
     """
     Extracts the publisher from the JSON data.
+
+    Args:
+        data (dict): A dictionary containing the JSON data.
+
+    Returns:
+        str: The extracted publisher as a comma-separated string.
     """
     publisher_list = data.get("publisher", [])
     return ", ".join([x["name"] for x in publisher_list])
@@ -175,6 +223,12 @@ def extract_publisher(data: dict) -> str:
 def extract_meta_score(data: dict) -> int:
     """
     Extracts the meta score from the JSON data.
+
+    Args:
+        data (dict): A dictionary containing the JSON data.
+
+    Returns:
+        int: The extracted meta score as an integer.
     """
     aggregate_rating = data.get("aggregateRating")
     if aggregate_rating:
@@ -182,9 +236,15 @@ def extract_meta_score(data: dict) -> int:
     return None
 
 
-def extract_critic_review_count(soup) -> int:
+def extract_critic_review_count(soup: BeautifulSoup) -> int:
     """
-    Extracts the critic review count from the scraped soup.
+    Extracts the critic review count from the scraped data.
+
+    Args:
+        soup: The BeautifulSoup object representing the scraped HTML.
+
+    Returns:
+        int: The extracted critic review count.
     """
     critic_review_count = soup.find("span", {"class": "count"})
     if critic_review_count:
@@ -192,9 +252,15 @@ def extract_critic_review_count(soup) -> int:
     return 0
 
 
-def extract_user_score(soup) -> float:
+def extract_user_score(soup: BeautifulSoup) -> float:
     """
-    Extracts the user score from the scraped soup.
+    Extracts the user score from the scraped data.
+
+    Args:
+        soup: The BeautifulSoup object representing the scraped HTML.
+
+    Returns:
+        float: The extracted user score as a float.
     """
     user_score_element = soup.find("div", class_="user")
     if user_score_element:
@@ -204,9 +270,16 @@ def extract_user_score(soup) -> float:
     return None
 
 
-def extract_user_rating_count(soup) -> int:
+def extract_user_rating_count(soup: BeautifulSoup) -> int:
     """
-    Extracts the user rating count from the scraped soup.
+    Extracts the user rating count from the scraped data.
+
+    Args:
+        soup: The BeautifulSoup object representing the scraped HTML.
+
+    Returns:
+        int: The extracted user rating count.
+
     """
     user_rating_count_elements = soup.find_all("div", {"class": "summary"})
     if len(user_rating_count_elements) > 1:

@@ -6,9 +6,14 @@ import logging
 import os
 from typing import Generator
 
-# from scrape_game_data import scrape_game_data
-# from scrape_user_reviews import scrape_user_reviews
-from scrape_utils import get_last_page, get_soup
+# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name
+
+
+try:
+    from scrape_utils import get_last_page, get_soup
+except:
+    from scrapers.metacritic.scrape_utils import get_last_page, get_soup
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

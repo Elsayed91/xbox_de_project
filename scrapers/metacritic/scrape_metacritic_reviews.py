@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name
+
 import json
 import logging
 import os
@@ -6,9 +8,9 @@ import time
 import pandas as pd
 
 try:
-    from scrape_utils import *
+    from scrape_utils import get_last_page, get_soup, read_txt
 except:
-    from scrapers.metacritic.scrape_utils import *
+    from scrapers.metacritic.scrape_utils import get_last_page, get_soup, read_txt
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
