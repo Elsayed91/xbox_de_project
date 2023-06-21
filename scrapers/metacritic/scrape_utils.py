@@ -88,7 +88,7 @@ def get_last_page(page_link: str) -> int:
     return None
 
 
-def read_txt(console: str, base_path: str = "/etc/scraped_data/") -> list[str]:
+def read_txt(console: str, base_path: str) -> list[str]:
     """
     Reads the URLs stored in a text file and returns them as a list of strings.
 
