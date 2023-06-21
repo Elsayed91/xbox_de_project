@@ -127,7 +127,7 @@ if __name__ == "__main__":
     console = os.getenv("console")
     local_path = os.getenv("local_path")
 
-    game_list = read_txt(console)
+    game_list = read_txt(console, local_path)
     metacritic_reviews = []
     for game_url in game_list[:10]:
         data = scrape_metacritic_reviews(game_url)
