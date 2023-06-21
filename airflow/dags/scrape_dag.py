@@ -36,7 +36,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2022, 12, 1),
-    "depends_on_past": True,
+    "depends_on_past": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=60),
     "concurrency": 0,
@@ -243,5 +243,5 @@ with DAG(
             "DATA_BUCKET": os.getenv("DATA_BUCKET", "raw-103kdj49klf22k"),
         },
     )
-    t >> backfill_first >> [tg, tg2] >> x1
+    t >> backfill_first >> tg >> tg2 >> x1
     # tg >> tg2 >> x1
