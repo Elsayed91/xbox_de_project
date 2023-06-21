@@ -8,12 +8,13 @@
 
 LOCAL_DIR=$LOCAL_DIR
 
+echo "uploading files to GCP bucket..."
 gsutil -m cp pvc/tweets-*.parquet gs://${DATA_BUCKET}/twitter/
 gsutil -m cp pvc/vgc_*.parquet gs://${DATA_BUCKET}/vgchartz/
 gsutil -m cp pvc/xbox*.parquet gs://${DATA_BUCKET}/metacritic/
 
 
-#load twitter data
+echo "Loading twitter data"
 for file in $(find $LOCAL_DIR -type f -name 'tweets-*.parquet'); do
     TWITTER_DATASET=${TWITTER_DATASET}
     # Extract the table name from the filename
@@ -29,24 +30,23 @@ for file in $(find $LOCAL_DIR -type f -name 'tweets-*.parquet'); do
     echo $exists
     if [ $exists -eq 0 ]; then
         # Create the BigQuery table
-        bq load --autodetect --source_format=PARQUET $TWITTER_DATASET.$table $file
+        bq load --autodetect --source_format=PARQUET $TWITTER_DATASET.$table $file >/dev/null 2>&1
     else
         echo "Table $table already exists, skipping"
     fi
 done
 
-#load metacritic data
+
+echo "Loading metacritic data"
 bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_metacritic_gamedata \
-  "gs://${DATA_BUCKET}/metacritic/xbox*-games.parquet"
+  "gs://${DATA_BUCKET}/metacritic/xbox*-games.parquet" >/dev/null 2>&1
 bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_metacritic_critic_review \
-  "gs://${DATA_BUCKET}/metacritic/xbox*-critic-reviews.parquet"
+  "gs://${DATA_BUCKET}/metacritic/xbox*-critic-reviews.parquet" >/dev/null 2>&1
 bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_metacritic_user_review \
-"gs://${DATA_BUCKET}/metacritic/xbox*-user-reviews.parquet"
+  "gs://${DATA_BUCKET}/metacritic/xbox*-user-reviews.parquet" >/dev/null 2>&1
 
-
-#Load vgchartz data
+echo "Loading vgchartz data"
 bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_hw_sales \
-"gs://${DATA_BUCKET}/vgchartz/vgc_hw_sales.parquet"
-
-bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_game_sales  \
-"gs://${DATA_BUCKET}/vgchartz/vgc_game_sales.parquet"
+  "gs://${DATA_BUCKET}/vgchartz/vgc_hw_sales.parquet" >/dev/null 2>&1
+bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_game_sales \
+  "gs://${DATA_BUCKET}/vgchartz/vgc_game_sales.parquet" >/dev/null 2>&1

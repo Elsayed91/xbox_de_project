@@ -1,24 +1,32 @@
 """
-The tasks in the DAG use the KubernetesJobOperator to run scripts as Kubernetes jobs.
-The jobs carry out mainly scraping functions. 
+This DAG utilizes the KubernetesJobOperator to execute scripts as Kubernetes jobs. The
+primary purpose of these jobs is to perform scraping tasks.
 
-the DAG sequence is t >> backfill_first >> [v1,v2,tg] >> x1
+The DAG follows the sequence: 
+    twitter_task >> backfill_first >> metacritic_tg >> vgchartz_tg >> gcp_task
 
-t: the twitter scraping task. scrapes tweets from twitter for the previous month, and
-performs sentiment analysis as well.
+Task 'twitter_task': This task involves scraping tweets from Twitter for the previous
+month and performing sentiment analysis on them.
 
-backfill_first: ensures that twitter data is backfilled before scraping other sites
-that do not require backfilling.
+Task 'backfill_first': This task ensures that the Twitter data is backfilled before
+scraping other sites that do not require backfilling.
 
-[v1,v2,tg]: this is a task group that scrapes the other sites (Vgchartz & Metacritic),
-the v1 and v2 are vgchartz tasks, the tg is metacritic game data, user reviews, critic
-review task group, all of these run concurrently, reducing the run time substantially.
+Task group 'metacritic_tg': This task group consists of multiple tasks that scrape data
+from Metacritic. It scrapes the data for each game as well as the user and critic reviews.
 
-x1: saves the scraped data to a GCS bucket and then loads it to a bigquery table.
+Task group 'vgchartz_tg': This task group consists of 2 tasks that scrape data
+from Vgchartz. 
 
-The DAG runs on a cron schedule on the first day of each month. 
-Twitter data will be appended, other data will be replaced by latest version.
+Task 'gcp_task': This final task saves the scraped data to a Google Cloud Storage (GCS)
+bucket and subsequently loads it into a BigQuery table.
+
+The DAG is scheduled to run on a cron schedule, specifically on the first day of each
+month. The Twitter data is appended during each run, while the other data is replaced with
+the latest version.
 """
+# pylint: disable=pointless-statement
+# pylint: disable=wrong-import-order
+
 import os
 import sys
 from datetime import datetime, timedelta
@@ -26,8 +34,6 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.latest_only import LatestOnlyOperator
 from airflow.utils.task_group import TaskGroup
-
-# pylint: disable=wrong-import-order
 from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
@@ -53,7 +59,13 @@ today = datetime.today().strftime("%Y-%m-%d")
 POD_TEMPALTE = os.path.join(os.path.dirname(__file__), "templates", "pod_template.yaml")
 BASE = "/git/repo/scrapers"
 GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
-MOUNT_VOLUME_PATH = os.getenv("MOUNT_VOLUME_PATH", "/pvc")
+COMMON_VOLUME_CONFIG = {
+    "name": "persistent-volume",
+    "type": "persistentVolumeClaim",
+    "reference": "data-pv-claim",
+    "mountPath": "/etc/scraped_data/",
+}
+LOCAL_PATH = "/etc/scraped_data/"
 
 with DAG(
     dag_id="scrapers",
@@ -62,29 +74,22 @@ with DAG(
     catchup=True,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
-    t = KubernetesJobOperator(
-        task_id=f"scrape-tweets",
+    twitter_task = KubernetesJobOperator(
+        task_id="scrape-tweets",
         body_filepath=POD_TEMPALTE,
         command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": f"scrape-tweets",
+            "name": "scrape-tweets",
             "gitsync": True,
-            "volumes": [
-                {
-                    "name": "persistent-volume",
-                    "type": "persistentVolumeClaim",
-                    "reference": "data-pv-claim",
-                    "mountPath": "/etc/scraped_data/",
-                }
-            ],
+            "volumes": [COMMON_VOLUME_CONFIG],
         },
         envs={"start_date": "{{ ds }}"},
     )
 
     backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
 
-    with TaskGroup(group_id=f"process-metacritic-data") as tg:
+    with TaskGroup(group_id="process-metacritic-data") as metacritic_tg:
         consoles = ["xbox360", "xbox-series-x", "xboxone", "xbox"]
         for console in consoles:
             t1 = KubernetesJobOperator(
@@ -95,16 +100,9 @@ with DAG(
                     "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                     "name": f"get-games-list-{console}",
                     "gitsync": True,
-                    "volumes": [
-                        {
-                            "name": "persistent-volume",
-                            "type": "persistentVolumeClaim",
-                            "reference": "data-pv-claim",
-                            "mountPath": "/etc/scraped_data/",
-                        }
-                    ],
+                    "volumes": [COMMON_VOLUME_CONFIG],
                 },
-                envs={"console": console, "local_path": "/etc/scraped_data/"},
+                envs={"console": console, "local_path": LOCAL_PATH},
             )
 
             with TaskGroup(group_id=f"process-{console}-data") as tg1:
@@ -116,16 +114,9 @@ with DAG(
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                         "name": f"get-{console}-game-data",
                         "gitsync": True,
-                        "volumes": [
-                            {
-                                "name": "persistent-volume",
-                                "type": "persistentVolumeClaim",
-                                "reference": "data-pv-claim",
-                                "mountPath": "/etc/scraped_data/",
-                            }
-                        ],
+                        "volumes": [COMMON_VOLUME_CONFIG],
                     },
-                    envs={"console": console, "local_path": "/etc/scraped_data/"},
+                    envs={"console": console, "local_path": LOCAL_PATH},
                 )
 
                 t3 = KubernetesJobOperator(
@@ -136,16 +127,9 @@ with DAG(
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                         "name": f"get-{console}-user-reviews",
                         "gitsync": True,
-                        "volumes": [
-                            {
-                                "name": "persistent-volume",
-                                "type": "persistentVolumeClaim",
-                                "reference": "data-pv-claim",
-                                "mountPath": "/etc/scraped_data/",
-                            }
-                        ],
+                        "volumes": [COMMON_VOLUME_CONFIG],
                     },
-                    envs={"console": console, "local_path": "/etc/scraped_data/"},
+                    envs={"console": console, "local_path": LOCAL_PATH},
                 )
                 t4 = KubernetesJobOperator(
                     task_id=f"scrape-{console}-critic-reviews",
@@ -158,19 +142,12 @@ with DAG(
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                         "name": f"get-{console}-critic-reviews",
                         "gitsync": True,
-                        "volumes": [
-                            {
-                                "name": "persistent-volume",
-                                "type": "persistentVolumeClaim",
-                                "reference": "data-pv-claim",
-                                "mountPath": "/etc/scraped_data/",
-                            }
-                        ],
+                        "volumes": [COMMON_VOLUME_CONFIG],
                     },
                     envs={"console": console, "local_path": "/etc/scraped_data/"},
                 )
             t1 >> tg1
-    with TaskGroup(group_id=f"process-vgchartz-data") as tg2:
+    with TaskGroup(group_id="process-vgchartz-data") as vgchartz_tg:
         v1 = KubernetesJobOperator(
             task_id="scrape-vgchartz-hw-sales",
             body_filepath=POD_TEMPALTE,
@@ -179,14 +156,7 @@ with DAG(
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": "scrape-vg-hw-sales",
                 "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }
-                ],
+                "volumes": [COMMON_VOLUME_CONFIG],
             },
         )
 
@@ -198,40 +168,25 @@ with DAG(
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                 "name": "scrape-vg-game-sales",
                 "gitsync": True,
-                "volumes": [
-                    {
-                        "name": "persistent-volume",
-                        "type": "persistentVolumeClaim",
-                        "reference": "data-pv-claim",
-                        "mountPath": "/etc/scraped_data/",
-                    }
-                ],
+                "volumes": [COMMON_VOLUME_CONFIG],
             },
         )
-    x1 = KubernetesJobOperator(
-        task_id="load_to_bq",
+    gcp_task = KubernetesJobOperator(
+        task_id="load_to_gcp",
         body_filepath=POD_TEMPALTE,
-        command=["/bin/bash", "/git/repo/airflow/dags/scripts/gs_script.sh"],
+        command=["/bin/bash", "/git/repo/airflow/dags/scripts/gcp_script.sh"],
         jinja_job_args={
             "image": "google/cloud-sdk:alpine",
             "name": "ingest-and-load-to-bq",
             "gitsync": True,
-            "volumes": [
-                {
-                    "name": "persistent-volume",
-                    "type": "persistentVolumeClaim",
-                    "reference": "data-pv-claim",
-                    "mountPath": MOUNT_VOLUME_PATH,
-                }
-            ],
+            "volumes": [COMMON_VOLUME_CONFIG],
         },
         envs={
-            "LOCAL_DIR": MOUNT_VOLUME_PATH,
-            "TWITTER_DATASET": os.getenv("TWITTER_DATASET", "twitter_data"),
-            "VGCHARTZ_DATASET": os.getenv("VGCHARTZ_DATASET", "vgchartz_data"),
-            "METACRITIC_DATASET": os.getenv("METACRITIC_DATASET", "metacritic_data"),
-            "DATA_BUCKET": os.getenv("DATA_BUCKET", "raw-103kdj49klf22k"),
+            "LOCAL_DIR": os.getenv("MOUNT_VOLUME_PATH", "/pvc"),
+            "TWITTER_DATASET": os.getenv("TWITTER_DATASET"),
+            "VGCHARTZ_DATASET": os.getenv("VGCHARTZ_DATASET"),
+            "METACRITIC_DATASET": os.getenv("METACRITIC_DATASET"),
+            "DATA_BUCKET": os.getenv("DATA_BUCKET"),
         },
     )
-    t >> backfill_first >> tg >> tg2 >> x1
-    # tg >> tg2 >> x1
+    twitter_task >> backfill_first >> metacritic_tg >> vgchartz_tg >> gcp_task
