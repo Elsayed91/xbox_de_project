@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
     game_list = retrieve_xcom_game_list(console)
     metacritic_reviews = []
-    for game_url in game_list:
+    for game_url in game_list[:10]:
         data = scrape_metacritic_reviews(game_url)
         if data is not None:
             metacritic_reviews.extend(data)

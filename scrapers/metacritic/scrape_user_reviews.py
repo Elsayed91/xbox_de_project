@@ -103,7 +103,7 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     game_list = retrieve_xcom_game_list(console)
     user_reviews = []
-    for game_url in game_list:
+    for game_url in game_list[:10]:
         data = scrape_user_reviews(game_url)
         if data is not None:
             user_reviews.extend(data)
