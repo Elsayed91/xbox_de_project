@@ -37,13 +37,14 @@ default_args = {
     "owner": "airflow",
     "start_date": datetime(2022, 12, 1),
     "depends_on_past": True,
-    "retries": 0,
+    "retries": 1,
     "retry_delay": timedelta(minutes=60),
     "concurrency": 0,
     "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
+    "max_active_tasks_per_dag": 5,
 }
 
 
