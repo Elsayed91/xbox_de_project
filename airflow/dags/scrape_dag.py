@@ -23,13 +23,14 @@ import os
 import sys
 from datetime import datetime, timedelta
 
+from airflow import DAG
 from airflow.operators.latest_only import LatestOnlyOperator
 from airflow.utils.task_group import TaskGroup
+
+# pylint: disable=wrong-import-order
 from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
-
-from airflow import DAG
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -38,13 +39,13 @@ default_args = {
     "start_date": datetime(2022, 12, 1),
     "depends_on_past": False,
     "retries": 1,
-    "retry_delay": timedelta(minutes=60),
+    "retry_delay": timedelta(seconds=60),
     "concurrency": 0,
     "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
-    "max_active_tasks_per_dag": 5,
+    "max_active_tasks_per_dag": 4,
 }
 
 
@@ -113,9 +114,6 @@ with DAG(
                     task_id=f"scrape-{console}-game-data",
                     body_filepath=POD_TEMPALTE,
                     command=["python", f"{BASE}/metacritic/scrape_games_data.py"],
-                    arguments=[
-                        f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
-                    ],
                     jinja_job_args={
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                         "name": f"get-{console}-game-data",
@@ -136,9 +134,6 @@ with DAG(
                     task_id=f"scrape-{console}-user-reviews",
                     body_filepath=POD_TEMPALTE,
                     command=["python", f"{BASE}/metacritic/scrape_user_reviews.py"],
-                    arguments=[
-                        f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
-                    ],
                     jinja_job_args={
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
                         "name": f"get-{console}-user-reviews",
@@ -160,9 +155,6 @@ with DAG(
                     command=[
                         "python",
                         f"{BASE}/metacritic/scrape_metacritic_reviews.py",
-                    ],
-                    arguments=[
-                        f"{{{{ task_instance.xcom_pull(task_ids='process-metacritic-data.scrape-{console}-game-list', dag_id='scrapers', key='{console}-urls') }}}}"
                     ],
                     jinja_job_args={
                         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",

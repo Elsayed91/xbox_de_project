@@ -88,28 +88,20 @@ def get_last_page(page_link: str) -> int:
     return None
 
 
-def retrieve_xcom_game_list(console):
-    xcom_game_list = sys.argv[1]
-    if console in ["xbox360", "xboxone"]:
-        prefix = f"https://www.metacritic.com/game/xbox-{console.split('xbox')[-1]}"
-    else:
-        prefix = f"https://www.metacritic.com/game/{console}"
-    game_list = ast.literal_eval(xcom_game_list)
-    game_list = [f"{prefix}/{game}" for game in game_list]
-    return game_list
+def read_txt(console: str, base_path: str = "/etc/scraped_data") -> list[str]:
+    """
+    Reads the URLs stored in a text file and returns them as a list of strings.
 
+    Args:
+        console (str): The name of the console.
+        base_path (str): the base path where files are stored.
 
-# def get_games_per_page(link: str) -> list[str]:
-#     """
-#     Given a link, returns a list of hrefs of games in that link.
+    Returns:
+        list[str]: A list of URLs as strings.
+    """
+    with open(f"{base_path}{console}-urls.txt", "r") as f:
+        url_list = f.readlines()
 
-#     Args:
-#         link: The URL of the page to scrape.
-
-#     Returns:
-#         A list of hrefs of games on the page.
-#     """
-#     soup = get_soup(link)
-#     title_elements = soup.find_all("a", class_="title")
-#     href_list = [elem.get("href") for elem in title_elements]
-#     return href_list
+    # remove any newline characters from the end of each URL
+    url_list = [url.strip() for url in url_list]
+    return url_list

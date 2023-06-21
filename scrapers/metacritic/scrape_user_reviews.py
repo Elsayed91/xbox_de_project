@@ -101,7 +101,7 @@ def extract_user_reviews(soup) -> list[dict]:
 if __name__ == "__main__":
     console = os.getenv("console")
     local_path = os.getenv("local_path")
-    game_list = retrieve_xcom_game_list(console)
+    game_list = read_txt(console, local_path)
     user_reviews = []
     for game_url in game_list[:10]:
         data = scrape_user_reviews(game_url)

@@ -47,11 +47,13 @@ def log_xcom_value(urls, key):
 
 if __name__ == "__main__":
     console = os.getenv("console")
+    local_path = os.getenv("local_path")
     url = (
         "https://www.metacritic.com/browse/games/release-date/"
         + f"available/{console}/name?&view=detailed"
     )
     pages_count = get_last_page(url)
     url_list = [u for u in get_game_urls(url, pages_count)]
-    print(url_list)
-    log_xcom_value(url_list, key=f"{console}-urls")
+    with open(f"{local_path}{console}-urls.txt", "w") as f:
+        for url in url_list:
+            f.write(url + "\n")

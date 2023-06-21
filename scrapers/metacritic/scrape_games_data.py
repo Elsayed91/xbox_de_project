@@ -221,7 +221,7 @@ def extract_user_rating_count(soup) -> int:
 if __name__ == "__main__":
     console = os.getenv("console")
     local_path = os.getenv("local_path")
-    game_list = retrieve_xcom_game_list(console)
+    game_list = read_txt(console, local_path)
     game_data = []
     for game_url in game_list[:10]:
         data = scrape_game_data(game_url)
