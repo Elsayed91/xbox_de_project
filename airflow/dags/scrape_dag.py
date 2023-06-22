@@ -189,4 +189,4 @@ with DAG(
             "DATA_BUCKET": os.getenv("DATA_BUCKET"),
         },
     )
-    twitter_task >> backfill_first >> metacritic_tg >> vgchartz_tg >> gcp_task
+    twitter_task >> backfill_first >> [metacritic_tg, vgchartz_tg] >> gcp_task
