@@ -40,7 +40,7 @@ def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> list[str]
     url = game_link + "/critic-reviews?page="
     review_pages = get_last_page(url)
     if review_pages is None:
-        return None
+        return []
     reviews = []
     for page in range(review_pages + 1):
         game_url = url + str(page)
@@ -57,6 +57,11 @@ def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> list[str]
                 retries += 1
                 continue
             page_reviews = extract_metacritic_reviews(soup)
+            if page_reviews is None:
+                logger.warning("No reviews found for %s. Retrying...", game_url)
+                time.sleep(retries * 3)
+                retries += 1
+                continue
             reviews.extend(page_reviews)
             if retries > 0:
                 logger.info("Succeeded after %s retries for %s.", retries, game_link)
@@ -98,9 +103,10 @@ def extract_metacritic_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
                 }
             )
 
-        return reviews
-    else:
-        return 0
+        if not reviews:
+            return None
+
+    return reviews
 
 
 if __name__ == "__main__":

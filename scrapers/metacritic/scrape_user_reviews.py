@@ -60,6 +60,11 @@ def scrape_user_reviews(
                 retries += 1
                 continue
             page_reviews = extract_user_reviews(soup)
+            if page_reviews is None:
+                logger.warning("No reviews found for %s. Retrying...", game_url)
+                time.sleep(retries * 3)
+                retries += 1
+                continue
             reviews.extend(page_reviews)
             if retries > 0:
                 logger.info("Succeeded after %s retries for %s.", retries, game_link)
@@ -131,9 +136,10 @@ def extract_user_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
                 }
             )
 
-        return reviews
-    else:
-        return 0
+        if not reviews:
+            return None
+
+    return reviews
 
 
 if __name__ == "__main__":
