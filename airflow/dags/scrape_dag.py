@@ -182,7 +182,7 @@ with DAG(
             "volumes": [COMMON_VOLUME_CONFIG],
         },
         envs={
-            "LOCAL_DIR": "/pvc",
+            "LOCAL_DIR": LOCAL_PATH,
             "TWITTER_DATASET": os.getenv("TWITTER_DATASET"),
             "VGCHARTZ_DATASET": os.getenv("VGCHARTZ_DATASET"),
             "METACRITIC_DATASET": os.getenv("METACRITIC_DATASET"),
