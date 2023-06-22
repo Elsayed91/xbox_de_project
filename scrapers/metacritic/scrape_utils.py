@@ -6,7 +6,7 @@ This includes a handler for requests, a BeautifulSoup object creator and a pager
 import logging
 import os
 import time
-from typing import Generator, Optional
+from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
