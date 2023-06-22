@@ -7,11 +7,11 @@
 #   datasets.
 
 LOCAL_DIR=$LOCAL_DIR
-
+echo "$LOCAL_DIR - $DATA_BUCKET"
 echo "uploading files to GCP bucket..."
-gsutil -m cp pvc/tweets-*.parquet gs://${DATA_BUCKET}/twitter/
-gsutil -m cp pvc/vgc_*.parquet gs://${DATA_BUCKET}/vgchartz/
-gsutil -m cp pvc/xbox*.parquet gs://${DATA_BUCKET}/metacritic/
+gsutil -m cp $LOCAL_DIR/tweets-*.parquet gs://${DATA_BUCKET}/twitter/
+gsutil -m cp $LOCAL_DIR/vgc_*.parquet gs://${DATA_BUCKET}/vgchartz/
+gsutil -m cp $LOCAL_DIR/xbox*.parquet gs://${DATA_BUCKET}/metacritic/
 
 
 echo "Loading twitter data"

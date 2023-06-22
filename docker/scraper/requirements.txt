@@ -13,3 +13,4 @@ numpy==1.24.2
 vadersentiment==3.3.2
 better-profanity==0.7.0
 pyarrow
+fastparquet

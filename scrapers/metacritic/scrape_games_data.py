@@ -305,10 +305,6 @@ if __name__ == "__main__":
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)
-    print("done")
     df1 = pd.DataFrame.from_records(game_data)
-    print(df1.head(2))
     df1 = add_gamepass_status(df1)
-    print(df1.head(2))
     df1.to_parquet(f"{local_path}{console}-games.parquet")
-    print("done2")

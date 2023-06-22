@@ -103,18 +103,15 @@ def extract_user_reviews(soup) -> list[dict]:
 
 
 if __name__ == "__main__":
-    # console = os.getenv("console")
-    # local_path = os.getenv("local_path")
-    # game_list = read_txt(console, local_path)
-    # user_reviews = []
-    # for game_url in game_list[:10]:
-    #     data = scrape_user_reviews(game_url)
-    #     if data is not None:
-    #         user_reviews.extend(data)
+    console = os.getenv("console")
+    local_path = os.getenv("local_path")
+    game_list = read_txt(console, local_path)
+    user_reviews = []
+    for game_url in game_list[:10]:
+        data = scrape_user_reviews(game_url)
+        if data is not None:
+            user_reviews.extend(data)
 
-    # df = pd.DataFrame.from_records(user_reviews)
-    # df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
-    x = scrape_user_reviews(
-        "https://www.metacritic.com/game/xbox-360/grand-theft-auto-iv"
-    )
-    print(x)
+    df = pd.DataFrame.from_records(user_reviews)
+    df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
+
