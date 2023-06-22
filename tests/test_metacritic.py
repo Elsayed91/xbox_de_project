@@ -1,107 +1,100 @@
+import unittest
+from datetime import datetime
 from unittest import mock
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-# pylint: disable=bare-except, wildcard-import, undefined-variable, import-error, missing-function-docstring
+# pylint: disable=missing-function-docstring
 import pytest
+from bs4 import BeautifulSoup
 from scrapers.metacritic.scrape_games_data import *
 from scrapers.metacritic.scrape_games_lists import *
 from scrapers.metacritic.scrape_metacritic_reviews import *
 from scrapers.metacritic.scrape_user_reviews import *
 from scrapers.metacritic.scrape_utils import *
 
-
-def test_fuzzy_match():
-    names = ["Halo", "Forza Horizon", "Gears of War"]
-    assert fuzzy_match("Halo 3", names) == "Halo"
-    assert fuzzy_match("Gears", names, threshold=20) == "Gears of War"
-    assert fuzzy_match("Halo 3", names, threshold=80) == "Halo"
+# @pytest.fixture
+# def example_soup():
+#     return BeautifulSoup("<html>Example HTML</html>", "html.parser")
 
 
-@pytest.fixture
-def example_df() -> pd.DataFrame:
-    return pd.DataFrame({"Name": ["xdxdxdxd", "Terraria", "CrossfireX"]})
+# @pytest.fixture
+# def example_reviews():
+#     return [
+#         {
+#             "Game": "Example Game",
+#             "Platform": "Example Platform",
+#             "Critic": "Example Critic",
+#             "Review Source": "https://example.com",
+#             "Score": "100",
+#             "Review": "Example Review",
+#         }
+#     ]
 
 
-def test_add_gamepass_status(example_df):
-    output_df = add_gamepass_status(example_df)
+def test_extract_user_reviews():
+    soup = BeautifulSoup(example_html, "html.parser")
 
-    assert set(output_df.columns) == {"Name", "Gamepass_Status"}
-    assert output_df.loc[0, "Gamepass_Status"] == "Not Included"
-    assert output_df.loc[1, "Gamepass_Status"] == "Active"
-    assert output_df.loc[2, "Gamepass_Status"] == "Removed"
+    expected_reviews = [
+        {
+            "Game": "Example Game",
+            "Platform": "Example Platform",
+            "User": "Rockstar900",
+            "Date": "Dec 21, 2010",
+            "Score": "10",
+            "Review": "Wow. I really loved this game. It in every way blew me away. A captivating, epic, and deep storyline keeps you into it the entire way through. Me trying to find at least one thing to complain about. Nothing. This game really deserves GOTY. And I really have to say Niko Bellic is the only character in the GTA series that you can truly connect with. Understanding his difficult life and mis-adventures you can really feel his emotions. And for a free-roaming game they really knocked me out. The free roaming really is amazing. Its awesome how they can have such a nice, luminous city and still have amazing and almost flawless graphics. As for the multi-player, I didn't really play it that much but i love the fact that you can roam around Liberty City causing as much mayhem as you want. The ranked matches are good too, with death-match (etc...) it was pretty cool to see that in a GTA game. Surely I can truly say that you have not experienced free-roam/sandbox games until you have played GTA IV.",
+        }
+    ]
 
+    with patch(
+        "scrapers.metacritic.scrape_user_reviews.extract_game_info"
+    ) as mock_extract_game_info, patch(
+        "scrapers.metacritic.scrape_user_reviews.extract_review_text"
+    ) as mock_extract_review_text:
+        mock_extract_game_info.return_value = ("Example Game", "Example Platform")
+        mock_extract_review_text.return_value = expected_reviews[0]["Review"]
 
-# def test_scrape_game_data():
-#     link = "https://www.metacritic.com/game/switch/the-legend-of-zelda-links-awakening"
-#     data_list = []
-#     exception_list = []
-#     retry_late_list = []
-#     failed_links_list = []
-#     scrape_game_data(link, data_list, exception_list)
-#     assert len(data_list) == 1
-#     assert data_list[0]["Name"] == "The Legend of Zelda: Link's Awakening"
-#     assert data_list[0]["Release Date"] == "2019-09-20"
-#     assert data_list[0]["Maturity Rating"] == "E"
-#     assert data_list[0]["Genre"] == "Action Adventure, Open-World"
-#     assert data_list[0]["Developer"] == "Nintendo"
-#     assert data_list[0]["Publisher"] == "Nintendo"
-#     # these will work as long as you update them to the latest value
-#     # assert int(data_list[0]['Meta Score']) == 87
-#     # assert int(data_list[0]['Critic Reviews Count']) == 111
-#     # assert data_list[0]['User Rating'] == '8.4'
-#     # assert data_list[0]['User Rating Count'] == '1580'
-#     assert "Summary" in data_list[0]
-#     assert len(exception_list) == 0
+        reviews = extract_user_reviews(soup)
+        assert reviews == expected_reviews
 
 
-# def test_game_urls():
-#     # Test with a known URL and number of pages
-#     urls = list(
-#         game_urls(
-#             "https://www.metacritic.com/browse/games/release-date/available/switch/name?&view=detailed",
-#             2,
-#         )
-#     )
-#     assert (
-#         len(urls) == 200
-#     )  # There should be 200 game URLs on the first two pages for the Nintendo Switch
-#     assert all(
-#         url.startswith("https://www.metacritic.com/game/") for url in urls
-#     )  # All URLs should be for games on Metacritic
+def test_scrape_user_reviews():
+    example_link = "https://www.metacritic.com/game/example"
 
+    with patch(
+        "scrapers.metacritic.scrape_user_reviews.get_last_page"
+    ) as mock_get_last_page, patch(
+        "scrapers.metacritic.scrape_user_reviews.get_soup"
+    ) as mock_get_soup, patch(
+        "scrapers.metacritic.scrape_user_reviews.extract_user_reviews"
+    ) as mock_extract_user_reviews:
+        mock_get_last_page.return_value = 2
+        mock_get_soup.side_effect = lambda url: BeautifulSoup(
+            example_html, "html.parser"
+        )
+        mock_extract_user_reviews.return_value = [
+            {
+                "Game": "Example Game",
+                "Platform": "Example Platform",
+                "User": "TheChiefOfCOD",
+                "Date": "Dec 21, 2010",
+                "Score": "10",
+                "Review": "Wow. I really loved this game. It in every way blew me away. A captivating, epic, and deep storyline keeps you into it the entire way through. Me trying to find at least one thing to complain about. Nothing. This game really deserves GOTY. And I really have to say Niko Bellic is the only character in the GTA series that you can truly connect with. Understanding his difficult life and mis-adventures you can really feel his emotions. And for a free-roaming game they really knocked me out. The free roaming really is amazing. Its awesome how they can have such a nice, luminous city and still have amazing and almost flawless graphics. As for the multi-player, I didn't really play it that much but i love the fact that you can roam around Liberty City causing as much mayhem as you want. The ranked matches are good too, with death-match (etc...) it was pretty cool to see that in a GTA game. Surely I can truly say that you have not experienced free-roam/sandbox games until you have played GTA IV.",
+            }
+        ]
 
-# def test_soup_it():
-#     soup = soup_it("https://www.google.com")
-#     assert isinstance(soup, BeautifulSoup)
-#     url = "https://en.wikipedia.org/wiki/Python_(programming_language)"
-#     soup = soup_it(url)
-
-#     assert isinstance(soup, BeautifulSoup)
-#     assert soup.title.string == "Python (programming language) - Wikipedia"
-
-
-# def test_get_last_page_num():
-#     # Mocking the soup_it() function to return the mock response
-#     with patch("scrapers.metacritic.scrape_utils.soup_it") as mock_soup_it:
-#         mock_response = """
-#             <li class="page last_page"><a href="/games?page=6&amp;region=US" class="page_num" data-page="5">6</a></li>
-#         """
-#         mock_soup_it.return_value = BeautifulSoup(mock_response, "html.parser")
-
-#         # Test with last page link
-#         page_link = "https://example.com/games?page=6&region=US"
-#         assert get_last_page_num(page_link) == 5
+        reviews = scrape_user_reviews(example_link)
+        assert reviews == mock_extract_user_reviews.return_value
 
 
 # def test_get_games_per_page():
-#     # Mocking the soup_it() function to return the mock response
-#     with patch("scrapers.metacritic.scrape_utils.soup_it") as mock_soup_it:
+#     # Mocking the get_soup() function to return the mock response
+#     with patch("scrapers.metacritic.scrape_utils.get_soup") as mock_get_soup:
 #         mock_response = """
 #             <a class="title" href="https://example.com/game1">Game 1</a>
 #             <a class="title" href="https://example.com/game2">Game 2</a>
 #             <a class="title" href="https://example.com/game3">Game 3</a>
 #         """
-#         mock_soup_it.return_value = BeautifulSoup(mock_response, "html.parser")
+#         mock_get_soup.return_value = BeautifulSoup(mock_response, "html.parser")
 
 #         link = "https://example.com/games?page=1&region=US"
 #         expected_output = [
@@ -200,21 +193,6 @@ def test_add_gamepass_status(example_df):
 #         link = "https://example.com/search?q=keyword&page=1"
 #         expected_output = []
 #         assert get_games_per_page(link) == expected_output
-
-
-# @pytest.fixture
-# def file_path(tmp_path):
-#     file_path = tmp_path / "test-urls.txt"
-#     with open(file_path, "w") as f:
-#         f.write("https://www.example.com\nhttps://www.google.com\n")
-#     yield file_path
-#     os.remove(file_path)
-
-
-# def test_read_txt(file_path):
-#     console = "test"
-#     url_list = read_txt(console, base_path=str(file_path.parent))
-#     assert url_list == ["https://www.example.com", "https://www.google.com"]
 
 
 # import unittest

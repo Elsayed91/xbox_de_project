@@ -1,4 +1,6 @@
-# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name
+"""
+This module provides functionality for scraping Metacritic reviews for a game.
+"""
 
 import json
 import logging
@@ -6,17 +8,37 @@ import os
 import time
 
 import pandas as pd
+from bs4 import BeautifulSoup
 
 try:
-    from scrape_utils import get_last_page, get_soup, read_txt
+    from scrape_utils import extract_game_info, get_last_page, get_soup, read_txt
 except:
-    from scrapers.metacritic.scrape_utils import get_last_page, get_soup, read_txt
+    from scrapers.metacritic.scrape_utils import (
+        extract_game_info,
+        get_last_page,
+        get_soup,
+        read_txt,
+    )
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> None:
+def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> list[str]:
+    """
+    Scrapes metacritic reviews for a game from Metacritic.
+
+    Given the URL of a game on Metacritic and the maximum number of retries,
+    this function retrieves and returns the critic reviews for the game.
+
+    Args:
+        game_link (str): The URL of the game on Metacritic.
+        max_retries (int): The maximum number of retries in case of network errors.
+        Defaults to 8.
+
+    Returns:
+        list[str]: The list of critic reviews for the game.
+    """
     url = game_link + "/critic-reviews?page="
     review_pages = get_last_page(url)
     if review_pages is None:
@@ -44,24 +66,21 @@ def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> None:
     return reviews
 
 
-def extract_game_info(soup):
-    try:
-        game = soup.find("div", class_="product_title").find("h1").text.strip()
-        platform = soup.find("span", class_="platform").text.strip()
-    except AttributeError:
-        script_tag = soup.find("script", type="application/ld+json")
-        data = json.loads(script_tag.text)
-        game = data.get("name")
-        platform = data.get("gamePlatform")
-    return game, platform
+def extract_metacritic_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
+    """
+    Extracts the Metacritic reviews from the HTML soup.
 
+    Args:
+        soup: A BeautifulSoup object.
 
-def extract_metacritic_reviews(soup) -> list[dict]:
+    Returns:
+        A list of dictionaries containing the review data.
+    """
     reviews = []
     game, platform = extract_game_info(soup)
 
     for review in soup.find_all("div", class_="review_content"):
-        if review.find("div", class_="source") == None:
+        if review.find("div", class_="source") is None:
             break
         review_source_element = review.find("div", class_="source").find("a")
         review_source = review_source_element["href"] if review_source_element else None
@@ -74,51 +93,6 @@ def extract_metacritic_reviews(soup) -> list[dict]:
                 "Review Source": review_source,
                 "Score": review.find("div", class_="metascore_w").text.strip(),
                 "Review": review.find("div", class_="review_body").text.strip(),
-            }
-        )
-
-    return reviews
-
-
-def scrape_user_reviews(game_link: str) -> None:
-    url = game_link + "/user-reviews?page="
-    review_pages = get_last_page(url)
-
-    for page in range(review_pages + 1):
-        game_url = url + str(page)
-        soup = get_soup(game_url)
-        reviews = extract_user_reviews(soup)
-        return reviews
-
-
-def extract_user_reviews(soup) -> list[dict]:
-    reviews = []
-    game = soup.find("div", class_="product_title").find("h1").text.strip()
-    platform = soup.find("span", class_="platform").text.strip()
-
-    for review in soup.find_all("div", class_="review_content"):
-        if review.find("div", class_="name") is None:
-            break
-
-        user_element = review.find("div", class_="name")
-        if user_element is None:
-            break
-
-        user_span = user_element.find("span")
-        user = user_span.text.strip() if user_span else None
-
-        reviews.append(
-            {
-                "Game": game,
-                "Platform": platform,
-                "User": user,
-                "Date": review.find("div", class_="date").text.strip(),
-                "Score": review.find("div", class_="review_grade").text.strip(),
-                "Review": review.find(
-                    "span", class_="blurb blurb_expanded"
-                ).text.strip()
-                if review.find("span", class_="blurb blurb_expanded")
-                else review.find("div", class_="review_body").find("span").text.strip(),
             }
         )
 

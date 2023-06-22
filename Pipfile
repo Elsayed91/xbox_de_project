@@ -19,6 +19,7 @@ fake-useragent = {extras = ["metacritic"], version = "*"}
 google-cloud-storage = "*"
 gcsfs = "*"
 snscrape = {git = "https://github.com/JustAnotherArchivist/snscrape.git"}
+pytest-mock = "*"
 
 [dev-packages]
 airflow-kubernetes-job-operator = "*"

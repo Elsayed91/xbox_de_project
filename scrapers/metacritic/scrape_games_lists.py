@@ -1,13 +1,10 @@
 """
-
+This module is responsible for scraping the URLs of all games on Metacritic that belong to
+a specific console. The scraped URLs are compiled into a list and saved to a mounted disk.
 """
-import json
 import logging
 import os
 from typing import Generator
-
-# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name
-
 
 try:
     from scrape_utils import get_last_page, get_soup
@@ -39,17 +36,6 @@ def get_game_urls(link: str, pages: int) -> Generator[str, None, None]:
             yield f"https://www.metacritic.com{elem.get('href')}"
 
 
-def log_xcom_value(urls, key):
-    # Convert the list to a dictionary
-    url_dict = {key: urls}
-
-    # Convert the dictionary to JSON
-    list_json = json.dumps(url_dict)
-
-    # Log the XCom value using print
-    print(f"::kube_api:xcom={list_json}")
-
-
 if __name__ == "__main__":
     console = os.getenv("console")
     local_path = os.getenv("local_path")
@@ -59,6 +45,6 @@ if __name__ == "__main__":
     )
     pages_count = get_last_page(url)
     url_list = [u for u in get_game_urls(url, pages_count)]
-    with open(f"{local_path}{console}-urls.txt", "w") as f:
+    with open(f"{local_path}{console}-urls.txt", "w", encoding="utf-8") as f:
         for url in url_list:
             f.write(url + "\n")

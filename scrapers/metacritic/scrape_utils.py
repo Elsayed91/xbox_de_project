@@ -1,12 +1,12 @@
 """
-xdd
+This module provides functions for retrieving and parsing HTML content from the web.
+This includes a handler for requests, a BeautifulSoup object creator and a pager counter.
 """
 
-import ast
 import logging
-import sys
+import os
 import time
-from typing import Generator
+from typing import Generator, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -16,9 +16,19 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def handle_request(url, max_retries: int = 8, retry_delay: int = 5):
+def handle_request(
+    url: str, max_retries: int = 8, retry_delay: int = 5
+) -> Optional[requests.Response]:
     """
-    xdd
+    Handles a single HTTP request.
+
+    Args:
+        url: The URL to request.
+        max_retries: The maximum number of times to retry the request.
+        retry_delay: The delay between retries, in seconds.
+
+    Returns:
+        The response object, or None if the request failed.
     """
     delay = retry_delay
     for _ in range(max_retries):
@@ -99,9 +109,33 @@ def read_txt(console: str, base_path: str) -> list[str]:
     Returns:
         list[str]: A list of URLs as strings.
     """
-    with open(f"{base_path}{console}-urls.txt", "r") as f:
-        url_list = f.readlines()
-
-    # remove any newline characters from the end of each URL
+    try:
+        with open(f"{base_path}{console}-urls.txt", "r", encoding="utf-8") as f:
+            url_list = f.readlines()
+    except:
+        file_path = os.path.join(base_path, f"{console}-urls.txt")
+        with open(file_path, "r", encoding="utf-8") as f:
+            url_list = f.readlines()
     url_list = [url.strip() for url in url_list]
     return url_list
+
+
+def extract_game_info(soup: BeautifulSoup) -> tuple[str, str]:
+    """
+    Extracts the game name and platform from the HTML soup.
+
+    Args:
+        soup: A BeautifulSoup object.
+
+    Returns:
+        A tuple of the game name and platform.
+    """
+    try:
+        game = soup.find("div", class_="product_title").find("h1").text.strip()
+        platform = soup.find("span", class_="platform").text.strip()
+    except AttributeError:
+        script_tag = soup.find("script", type="application/ld+json")
+        data = json.loads(script_tag.text)
+        game = data.get("name")
+        platform = data.get("gamePlatform")
+    return game, platform

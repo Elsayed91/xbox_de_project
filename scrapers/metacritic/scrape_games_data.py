@@ -1,6 +1,10 @@
 """
+This module handles the scraping of Metacritic game data.
+It looks for a file, and iterates over all the links within and scraping the respective
+games.
+The column `gamepass_status` is added to the data for enrichment. 
 """
-# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name
+# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name, raise-missing-from
 import datetime
 import json
 import logging
@@ -282,8 +286,10 @@ def extract_user_rating_count(soup: BeautifulSoup) -> int:
 
     """
     user_rating_count_elements = soup.find_all("div", {"class": "summary"})
+    print(user_rating_count_elements)
     if len(user_rating_count_elements) > 1:
         user_rating_count_element = user_rating_count_elements[1].find("a")
+
         if user_rating_count_element is not None:
             user_rating_count_text = user_rating_count_element.text.strip().split()[0]
             if user_rating_count_text.isdigit():
@@ -296,7 +302,7 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     game_list = read_txt(console, local_path)
     game_data = []
-    for game_url in game_list[:10]:
+    for game_url in game_list[:100]:
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)
