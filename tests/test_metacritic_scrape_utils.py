@@ -4,8 +4,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from bs4 import BeautifulSoup
+from scrapers.metacritic.scrape_games_data import *
 from scrapers.metacritic.scrape_games_lists import *
+from scrapers.metacritic.scrape_metacritic_reviews import *
+from scrapers.metacritic.scrape_user_reviews import *
 from scrapers.metacritic.scrape_utils import *
+
+########################################################################
+# Scrape Utilities
+########################################################################
 
 
 def test_handle_request_success():

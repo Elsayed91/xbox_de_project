@@ -1,11 +1,37 @@
-from unittest.mock import MagicMock, patch
+# pylint: disable=missing-function-docstring, too-many-function-args, missing-module-docstring, unused-argument
 
 import pytest
 from bs4 import BeautifulSoup
 from scrapers.metacritic.scrape_user_reviews import (
+    extract_review_text,
     extract_user_reviews,
     scrape_user_reviews,
 )
+
+################################################################
+# Metacritic User-Reviews Tests
+################################################################
+
+
+txt = "GTA 4 is absolute masterpiece that was so ahead of time that even \
+                    over decade later it still beats overhyped trash like \
+                        Cyberpunk 2077."
+
+
+def test_extract_review_text():
+    soup = BeautifulSoup(
+        f"""
+        <div class="review_content">
+            <div class="review_body">
+                <span>{txt}</span>
+            </div>
+        </div>
+    """,
+        "html.parser",
+    )
+
+    review_text = extract_review_text(soup)
+    assert review_text == txt
 
 
 @pytest.fixture
@@ -101,66 +127,3 @@ def test_scrape_user_reviews(
     max_retries = 8
     reviews = scrape_user_reviews(game_link, max_retries)
     assert reviews == expected_reviews
-
-
-# example_html = """
-# <div class="review_content">
-#     <div class="review_section">
-#         <div class="review_stats">
-#             <div class="review_critic">
-#                 <div class="name">
-#                     <a href="/user/Rockstar900">Rockstar900</a>
-#                 </div>
-#                 <div class="date">Dec 12, 2020</div>
-#             </div>
-#             <div class="review_grade">
-#                 <div class="metascore_w user medium game positive indiv perfect">10</div>
-#             </div>
-#         </div>
-#         <div class="review_body">
-#             <span>GTA 4 is absolute masterpiece that was so ahead of time that even over decade later it still beats overhyped trash like Cyberpunk 2077.</span>
-#         </div>
-#     </div>
-#     <div class="review_section review_actions">
-#         <ul class="review_actions">
-#             <li class="review_action review_helpful">
-#                 <div class="review_helpful">
-#                     <div class="rating_thumbs">
-#                         <div class="helpful_summary thumb_count">
-#                             <a href="/login">
-#                                 <span class="total_ups">30</span>
-#                                 of
-#                                 <span class="total_thumbs">33</span>
-#                                 users found this helpful
-#                             </a>
-#                         </div>
-#                         <div style="clear:both;"></div>
-#                     </div>
-#                 </div>
-#             </li>
-#             <li class="review_action">
-#                 <a href="/user/Rockstar900">All this user's reviews</a>
-#             </li>
-#         </ul>
-#     </div>
-# </div>
-# """
-
-# expected_reviews = [
-#     {
-#         "Review": "GTA 4 is absolute masterpiece that was so ahead of time that even over decade later it still beats overhyped trash like Cyberpunk 2077.",
-#         "Review Source": "/user/Rockstar900",
-#         "Score": "10",
-#     }
-# ]
-
-# patched_extract_game_info = MagicMock(name="extract_game_info", id="139745475107360")
-
-
-# def test_extract_user_reviews(
-#     example_html, expected_reviews, patched_extract_game_info
-# ):
-#     soup = BeautifulSoup(example_html, "html.parser")
-#     reviews = extract_user_reviews(soup)
-
-#     assert reviews == expected_reviews
