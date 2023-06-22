@@ -113,5 +113,5 @@ if __name__ == "__main__":
             user_reviews.extend(data)
 
     df = pd.DataFrame.from_records(user_reviews)
+    df.reset_index(drop=True, inplace=True)
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
-

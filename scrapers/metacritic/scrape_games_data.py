@@ -4,7 +4,6 @@ It looks for a file, and iterates over all the links within and scraping the res
 games.
 The column `gamepass_status` is added to the data for enrichment. 
 """
-# pylint: disable=wrong-import-order,bare-except,invalid-name,redefined-outer-name, raise-missing-from
 import datetime
 import json
 import logging
