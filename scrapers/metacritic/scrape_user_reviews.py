@@ -101,36 +101,39 @@ def extract_user_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
         List[Dict[str, str]]: A list of dictionaries containing the extracted review data.
     """
     reviews = []
-    game, platform = extract_game_info(soup)
+    if soup is not None:
+        game, platform = extract_game_info(soup)
 
-    for review in soup.find_all("div", class_="review_content"):
-        if review.find("div", class_="name") is None:
-            break
+        for review in soup.find_all("div", class_="review_content"):
+            if review.find("div", class_="name") is None:
+                break
 
-        user_element = review.find("div", class_="name")
-        if user_element is None:
-            break
+            user_element = review.find("div", class_="name")
+            if user_element is None:
+                break
 
-        user_span = user_element.find("span")
-        user_a = user_element.find("a")
-        user = (
-            user_span.text.strip()
-            if user_span
-            else (user_a.text.strip() if user_a else None)
-        )
+            user_span = user_element.find("span")
+            user_a = user_element.find("a")
+            user = (
+                user_span.text.strip()
+                if user_span
+                else (user_a.text.strip() if user_a else None)
+            )
 
-        reviews.append(
-            {
-                "Game": game,
-                "Platform": platform,
-                "User": user,
-                "Date": review.find("div", class_="date").text.strip(),
-                "Score": review.find("div", class_="review_grade").text.strip(),
-                "Review": extract_review_text(review),
-            }
-        )
+            reviews.append(
+                {
+                    "Game": game,
+                    "Platform": platform,
+                    "User": user,
+                    "Date": review.find("div", class_="date").text.strip(),
+                    "Score": review.find("div", class_="review_grade").text.strip(),
+                    "Review": extract_review_text(review),
+                }
+            )
 
-    return reviews
+        return reviews
+    else:
+        return 0
 
 
 if __name__ == "__main__":

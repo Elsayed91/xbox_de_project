@@ -75,26 +75,32 @@ def extract_metacritic_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
         A list of dictionaries containing the review data.
     """
     reviews = []
-    game, platform = extract_game_info(soup)
 
-    for review in soup.find_all("div", class_="review_content"):
-        if review.find("div", class_="source") is None:
-            break
-        review_source_element = review.find("div", class_="source").find("a")
-        review_source = review_source_element["href"] if review_source_element else None
+    if soup is not None:
+        game, platform = extract_game_info(soup)
 
-        reviews.append(
-            {
-                "Game": game,
-                "Platform": platform,
-                "Critic": review.find("div", class_="review_critic").text.strip(),
-                "Review Source": review_source,
-                "Score": review.find("div", class_="metascore_w").text.strip(),
-                "Review": review.find("div", class_="review_body").text.strip(),
-            }
-        )
+        for review in soup.find_all("div", class_="review_content"):
+            if review.find("div", class_="source") is None:
+                break
+            review_source_element = review.find("div", class_="source").find("a")
+            review_source = (
+                review_source_element["href"] if review_source_element else None
+            )
 
-    return reviews
+            reviews.append(
+                {
+                    "Game": game,
+                    "Platform": platform,
+                    "Critic": review.find("div", class_="review_critic").text.strip(),
+                    "Review Source": review_source,
+                    "Score": review.find("div", class_="metascore_w").text.strip(),
+                    "Review": review.find("div", class_="review_body").text.strip(),
+                }
+            )
+
+        return reviews
+    else:
+        return 0
 
 
 if __name__ == "__main__":
