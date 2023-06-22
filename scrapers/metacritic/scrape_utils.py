@@ -22,6 +22,7 @@ def handle_request(
 ) -> Optional[requests.Response]:
     """
     Handles a single HTTP request.
+    Uses Exponential backoff when waiting between attempts.
 
     Args:
         url: The URL to request.
@@ -41,7 +42,7 @@ def handle_request(
                 # Too many requests, sleep and retry
                 logger.warning("Too many requests. Retrying after %s seconds...", delay)
                 time.sleep(delay)
-                delay *= 2  # Exponential backoff
+                delay *= 2
                 continue
             if response.status_code == 404:
                 # Broken link, skip and return None
