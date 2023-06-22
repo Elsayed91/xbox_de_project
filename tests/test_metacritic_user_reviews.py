@@ -1,5 +1,7 @@
 # pylint: disable=missing-function-docstring, too-many-function-args, missing-module-docstring, unused-argument
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 from bs4 import BeautifulSoup
 from scrapers.metacritic.scrape_user_reviews import (

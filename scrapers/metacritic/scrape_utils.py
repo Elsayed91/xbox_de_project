@@ -91,8 +91,8 @@ def get_last_page(page_link: str) -> int:
     """
 
     soup = get_soup(page_link)
+    # handle broken links like "https://www.metacritic.com/game/xbox-360/h0w-2-p1ng-a-trademarkremoved/user-reviews?page="
     if soup == 0:
-        # handle broken links like "https://www.metacritic.com/game/xbox-360/h0w-2-p1ng-a-trademarkremoved/user-reviews?page="
         return None
     last_page = soup.find("li", class_="page last_page")
     if last_page is not None:
