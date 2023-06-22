@@ -38,12 +38,14 @@ done
 
 
 echo "Loading metacritic data"
+echo $METACRITIC_DATASET
+echo ${DATA_BUCKET}
 bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_metacritic_gamedata \
-  "gs://${DATA_BUCKET}/metacritic/xbox*-games.parquet" >/dev/null 2>&1
+  "gs://${DATA_BUCKET}/metacritic/xbox*-games.parquet"
 bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_metacritic_critic_review \
-  "gs://${DATA_BUCKET}/metacritic/xbox*-critic-reviews.parquet" >/dev/null 2>&1
+  "gs://${DATA_BUCKET}/metacritic/xbox*-critic-reviews.parquet"
 bq load --replace=true --autodetect --source_format=PARQUET $METACRITIC_DATASET.bq_metacritic_user_review \
-  "gs://${DATA_BUCKET}/metacritic/xbox*-user-reviews.parquet" >/dev/null 2>&1
+  "gs://${DATA_BUCKET}/metacritic/xbox*-user-reviews.parquet" 
 
 echo "Loading vgchartz data"
 bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_hw_sales \
