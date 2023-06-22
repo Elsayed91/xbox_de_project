@@ -286,7 +286,6 @@ def extract_user_rating_count(soup: BeautifulSoup) -> int:
 
     """
     user_rating_count_elements = soup.find_all("div", {"class": "summary"})
-    print(user_rating_count_elements)
     if len(user_rating_count_elements) > 1:
         user_rating_count_element = user_rating_count_elements[1].find("a")
 
@@ -306,7 +305,10 @@ if __name__ == "__main__":
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)
-
+    print("done")
     df1 = pd.DataFrame.from_records(game_data)
+    print(df1.head(2))
     df1 = add_gamepass_status(df1)
+    print(df1.head(2))
     df1.to_parquet(f"{local_path}{console}-games.parquet")
+    print("done2")
