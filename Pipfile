@@ -20,6 +20,7 @@ google-cloud-storage = "*"
 gcsfs = "*"
 snscrape = {git = "https://github.com/JustAnotherArchivist/snscrape.git"}
 pytest-mock = "*"
+pyarrow = "*"
 
 [dev-packages]
 airflow-kubernetes-job-operator = "*"

@@ -30,8 +30,8 @@ parameters as inputs, and returns a pandas DataFrame containing the processed da
 columns for 'console', 'date', 'sales', and 'region'.
 """
 import ast
+import os
 import re
-import time
 from typing import Optional
 
 import js2py
@@ -164,5 +164,6 @@ def main(
 if __name__ == "__main__":
     consoles = ["XS", "XOne", "X360"]
     regions = ["USA", "Europe", "Japan", "Global"]
+    local_path = os.getenv("local_path")
     df = main(regions, consoles)
-    df.to_parquet("/etc/scraped_data/vgc_hw_sales.parquet")
+    df.to_parquet(f"{local_path}vgc_hw_sales.parquet")

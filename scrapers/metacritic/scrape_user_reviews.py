@@ -2,10 +2,10 @@
 This module provides functionality for scraping user reviews for a game.
 """
 
-import json
 import logging
 import os
 import time
+from typing import Optional
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -24,7 +24,22 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def scrape_user_reviews(game_link: str, max_retries: int = 8) -> None:
+def scrape_user_reviews(
+    game_link: str, max_retries: int = 8
+) -> Optional[list[dict[str, str]]]:
+    """
+    Scrapes user reviews for a game from a given game link.
+
+    Args:
+        game_link (str): The URL of the game on the website.
+        max_retries (int): The maximum number of retries in case of network errors.
+            Defaults to 8.
+
+    Returns:
+        Optional[List[Dict[str, str]]]: The list of user reviews for the game.
+        Returns None if review_pages is None.
+    """
+
     url = game_link + "/user-reviews?page="
     review_pages = get_last_page(url)
     if review_pages is None:
@@ -32,7 +47,6 @@ def scrape_user_reviews(game_link: str, max_retries: int = 8) -> None:
     reviews = []
     for page in range(review_pages + 1):
         game_url = url + str(page)
-        print(game_url)
         logger.info("processing %s", game_url)
         retries = 0
         while retries < max_retries:
@@ -53,7 +67,16 @@ def scrape_user_reviews(game_link: str, max_retries: int = 8) -> None:
     return reviews
 
 
-def extract_review_text(review):
+def extract_review_text(review: BeautifulSoup) -> str:
+    """
+    Extracts the review text from a review element.
+
+    Args:
+        review: A BeautifulSoup object representing a review element.
+
+    Returns:
+        str: The extracted review text.
+    """
     review_body_expanded = review.find("span", class_="blurb blurb_expanded")
     if review_body_expanded:
         return review_body_expanded.text.strip()
@@ -67,7 +90,16 @@ def extract_review_text(review):
     return ""
 
 
-def extract_user_reviews(soup) -> list[dict]:
+def extract_user_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
+    """
+    Extracts user reviews from the HTML soup.
+
+    Args:
+        soup: A BeautifulSoup object.
+
+    Returns:
+        List[Dict[str, str]]: A list of dictionaries containing the extracted review data.
+    """
     reviews = []
     game, platform = extract_game_info(soup)
 
@@ -87,7 +119,6 @@ def extract_user_reviews(soup) -> list[dict]:
             else (user_a.text.strip() if user_a else None)
         )
 
-        print(user)
         reviews.append(
             {
                 "Game": game,
@@ -107,11 +138,11 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     game_list = read_txt(console, local_path)
     user_reviews = []
-    for game_url in game_list[:10]:
+    for game_url in game_list:
         data = scrape_user_reviews(game_url)
         if data is not None:
             user_reviews.extend(data)
-
     df = pd.DataFrame.from_records(user_reviews)
     df.reset_index(drop=True, inplace=True)
     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
+    xd = pd.read_parquet(f"{local_path}{console}-user-reviews.parquet")

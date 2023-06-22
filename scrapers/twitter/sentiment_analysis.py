@@ -311,10 +311,10 @@ if __name__ == "__main__":
         "click",
         "shopify",
     ]
-    num_tweets = os.getenv("num_tweets", 100)
+    num_tweets = os.getenv("num_tweets")
     df = main(
         hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets
     )
-    data_vol = os.getenv("data_volume", "/etc/scraped_data")
-    df.to_parquet(f"{data_vol}/tweets-{start_date_str}.parquet")
+    data_vol = os.getenv("local_path")
+    df.to_parquet(f"{data_vol}tweets-{start_date_str}.parquet")
     logger.info(f"saved data to file tweets-{start_date_str}.parquet")

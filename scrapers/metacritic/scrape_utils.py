@@ -95,7 +95,7 @@ def get_last_page(page_link: str) -> int:
         if page_nums:
             return int(page_nums[-1].text) - 1
 
-    return None
+    return 0
 
 
 def read_txt(console: str, base_path: str) -> list[str]:

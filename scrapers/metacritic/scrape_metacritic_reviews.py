@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     game_list = read_txt(console, local_path)
     metacritic_reviews = []
-    for game_url in game_list[:10]:
+    for game_url in game_list:
         data = scrape_metacritic_reviews(game_url)
         if data is not None:
             metacritic_reviews.extend(data)

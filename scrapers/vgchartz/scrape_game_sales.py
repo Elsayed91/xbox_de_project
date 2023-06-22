@@ -5,6 +5,7 @@ the search results, cleaning the scraped data, and scraping the game information
 function, scrape_vgchartz, takes a list of console names and an optional list of genres as
 input and returns a pandas DataFrame containing the scraped data.
 """
+import os
 import time
 import urllib
 from typing import Optional
@@ -204,6 +205,7 @@ def scrape_vgchartz(
 
 
 if __name__ == "__main__":
+    local_path = os.getenv("local_path")
     df = scrape_vgchartz(console_list=["XS", "XOne", "X360", "XB"])
     df = clean_data(df)
-    df.to_parquet("/etc/scraped_data/vgc_game_sales.parquet")
+    df.to_parquet(f"{local_path}vgc_game_sales.parquet")

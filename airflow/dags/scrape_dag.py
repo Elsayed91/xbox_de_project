@@ -84,7 +84,7 @@ with DAG(
             "gitsync": True,
             "volumes": [COMMON_VOLUME_CONFIG],
         },
-        envs={"start_date": "{{ ds }}"},
+        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH},
     )
 
     backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
@@ -102,7 +102,7 @@ with DAG(
                     "gitsync": True,
                     "volumes": [COMMON_VOLUME_CONFIG],
                 },
-                envs={"console": console, "local_path": LOCAL_PATH},
+                envs={"console": console, "local_path": LOCAL_PATH, "num_tweets": 5000},
             )
 
             with TaskGroup(group_id=f"process-{console}-data") as tg1:
@@ -144,7 +144,7 @@ with DAG(
                         "gitsync": True,
                         "volumes": [COMMON_VOLUME_CONFIG],
                     },
-                    envs={"console": console, "local_path": "/etc/scraped_data/"},
+                    envs={"console": console, "local_path": LOCAL_PATH},
                 )
             t1 >> tg1
     with TaskGroup(group_id="process-vgchartz-data") as vgchartz_tg:
@@ -158,6 +158,7 @@ with DAG(
                 "gitsync": True,
                 "volumes": [COMMON_VOLUME_CONFIG],
             },
+            envs={"local_path": LOCAL_PATH},
         )
 
         v2 = KubernetesJobOperator(
@@ -170,6 +171,7 @@ with DAG(
                 "gitsync": True,
                 "volumes": [COMMON_VOLUME_CONFIG],
             },
+            envs={"local_path": LOCAL_PATH},
         )
     gcp_task = KubernetesJobOperator(
         task_id="load_to_gcp",
