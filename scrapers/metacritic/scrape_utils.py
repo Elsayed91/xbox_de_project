@@ -3,6 +3,7 @@ This module provides functions for retrieving and parsing HTML content from the 
 This includes a handler for requests, a BeautifulSoup object creator and a pager counter.
 """
 
+import json
 import logging
 import os
 import time
