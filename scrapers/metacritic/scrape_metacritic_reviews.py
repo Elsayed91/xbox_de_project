@@ -1,8 +1,6 @@
 """
 This module provides functionality for scraping Metacritic reviews for a game.
 """
-
-import json
 import logging
 import os
 import time
@@ -110,5 +108,5 @@ if __name__ == "__main__":
         if data is not None:
             metacritic_reviews.extend(data)
     df = pd.DataFrame.from_records(metacritic_reviews)
-
+    df.reset_index(drop=True, inplace=True)
     df.to_parquet(f"{local_path}{console}-critic-reviews.parquet")
