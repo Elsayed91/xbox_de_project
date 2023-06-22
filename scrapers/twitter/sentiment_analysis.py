@@ -286,6 +286,7 @@ def main(
 
 
 if __name__ == "__main__":
+    num_tweets = int(os.getenv("num_tweets"))
     hashtags = [
         "#xbox",
         "#xboxseriesx",
@@ -311,7 +312,7 @@ if __name__ == "__main__":
         "click",
         "shopify",
     ]
-    num_tweets = os.getenv("num_tweets")
+
     df = main(
         hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets
     )
