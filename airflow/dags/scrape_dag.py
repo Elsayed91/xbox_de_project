@@ -84,7 +84,7 @@ with DAG(
             "gitsync": True,
             "volumes": [COMMON_VOLUME_CONFIG],
         },
-        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH},
+        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 5000},
     )
 
     backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
@@ -102,7 +102,7 @@ with DAG(
                     "gitsync": True,
                     "volumes": [COMMON_VOLUME_CONFIG],
                 },
-                envs={"console": console, "local_path": LOCAL_PATH, "num_tweets": 5000},
+                envs={"console": console, "local_path": LOCAL_PATH},
             )
 
             with TaskGroup(group_id=f"process-{console}-data") as tg1:
