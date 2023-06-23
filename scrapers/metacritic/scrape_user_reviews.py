@@ -36,7 +36,7 @@ def scrape_user_reviews(
             Defaults to 8.
 
     Returns:
-        Optional[List[Dict[str, str]]]: The list of user reviews for the game.
+        Optional[list[dict[str, str]]]: The list of user reviews for the game.
         Returns None if review_pages is None.
     """
 
@@ -59,6 +59,13 @@ def scrape_user_reviews(
                 time.sleep(retries * 3)
                 retries += 1
                 continue
+            skip_element = soup.find("div", class_="review_top review_top_l")
+            if (
+                skip_element is not None
+                and "There are no user reviews yet" in skip_element.text
+            ):
+                logger.info("Skipping game %s due to skip element.", game_link)
+                break
             page_reviews = extract_user_reviews(soup)
             if page_reviews is None:
                 logger.warning("No reviews found for %s. Retrying...", game_url)
