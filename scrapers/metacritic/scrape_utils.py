@@ -138,9 +138,13 @@ def extract_game_info(soup: BeautifulSoup) -> tuple[str, str]:
     try:
         game = soup.find("div", class_="product_title").find("h1").text.strip()
         platform = soup.find("span", class_="platform").text.strip()
+
     except AttributeError:
         script_tag = soup.find("script", type="application/ld+json")
         data = json.loads(script_tag.text)
         game = data.get("name")
         platform = data.get("gamePlatform")
+    except Exception:
+        print("An error occurred at extract_game_info. Soup:", soup)
+        raise
     return game, platform

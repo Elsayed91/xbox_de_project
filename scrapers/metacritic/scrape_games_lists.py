@@ -45,6 +45,13 @@ if __name__ == "__main__":
     )
     pages_count = get_last_page(url)
     url_list = [u for u in get_game_urls(url, pages_count)]
+    broken_links = [
+        "https://www.metacritic.com/game/xbox-360/lets-cheer",
+        "https://www.metacritic.com/game/xbox-360/h0w-2-p1ng-a-trademarkremoved"
+        # Add more broken links as needed
+    ]
+    valid_urls = [u for u in url_list if u not in broken_links]
+
     with open(f"{local_path}{console}-urls.txt", "w", encoding="utf-8") as f:
-        for url in url_list:
+        for url in valid_urls:
             f.write(url + "\n")
