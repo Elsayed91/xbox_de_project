@@ -64,7 +64,7 @@ def scrape_user_reviews(
                 skip_element is not None
                 and "There are no user reviews yet" in skip_element.text
             ):
-                logger.info("Skipping game %s due to skip element.", game_link)
+                logger.info("Skipping game %s due to it having no reviews.", game_link)
                 break
             page_reviews = extract_user_reviews(soup)
             if page_reviews is None:
@@ -77,6 +77,12 @@ def scrape_user_reviews(
                 logger.info("Succeeded after %s retries for %s.", retries, game_link)
             break
     return reviews
+
+
+x = scrape_user_reviews(
+    "https://www.metacritic.com/game/xbox-360/dark-void-survivor-missions/user-reviews?page=0"
+)
+print(x)
 
 
 def extract_review_text(review: BeautifulSoup) -> str:
@@ -149,16 +155,16 @@ def extract_user_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
     return reviews
 
 
-if __name__ == "__main__":
-    console = os.getenv("console")
-    local_path = os.getenv("local_path")
-    game_list = read_txt(console, local_path)
-    user_reviews = []
-    for game_url in game_list:
-        data = scrape_user_reviews(game_url)
-        if data is not None:
-            user_reviews.extend(data)
-    df = pd.DataFrame.from_records(user_reviews)
-    df.reset_index(drop=True, inplace=True)
-    df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
-    xd = pd.read_parquet(f"{local_path}{console}-user-reviews.parquet")
+# if __name__ == "__main__":
+#     console = os.getenv("console")
+#     local_path = os.getenv("local_path")
+#     game_list = read_txt(console, local_path)
+#     user_reviews = []
+#     for game_url in game_list:
+#         data = scrape_user_reviews(game_url)
+#         if data is not None:
+#             user_reviews.extend(data)
+#     df = pd.DataFrame.from_records(user_reviews)
+#     df.reset_index(drop=True, inplace=True)
+#     df.to_parquet(f"{local_path}{console}-user-reviews.parquet")
+#     xd = pd.read_parquet(f"{local_path}{console}-user-reviews.parquet")

@@ -56,6 +56,15 @@ def scrape_metacritic_reviews(game_link: str, max_retries: int = 8) -> list[str]
                 time.sleep(retries * 3)
                 retries += 1
                 continue
+            # Check if the skip element is found
+            skip_element = soup.find("div", class_="review_top review_top_l")
+            if (
+                skip_element is not None
+                and skip_element.find("p").text.strip()
+                == "There are no critic reviews yet."
+            ):
+                logger.info("Skipping game %s due to it having no reviews.", game_link)
+                break
             page_reviews = extract_metacritic_reviews(soup)
             if page_reviews is None:
                 logger.warning("No reviews found for %s. Retrying...", game_url)
