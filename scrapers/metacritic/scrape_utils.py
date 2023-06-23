@@ -135,16 +135,38 @@ def extract_game_info(soup: BeautifulSoup) -> tuple[str, str]:
     Returns:
         A tuple of the game name and platform.
     """
+    # try:
+    #     game = soup.find("div", class_="product_title").find("h1").text.strip()
+    #     platform = soup.find("span", class_="platform").text.strip()
+
+    # except AttributeError:
+    #     script_tag = soup.find("script", type="application/ld+json")
+    #     data = json.loads(script_tag.text)
+    #     game = data.get("name")
+    #     platform = data.get("gamePlatform")
+    # except Exception:
+    #     print("An error occurred at extract_game_info. Soup:", soup)
+    #     raise
+    game = None
+    platform = None
+
+    # Try to find the game and platform in the HTML using the first method.
     try:
         game = soup.find("div", class_="product_title").find("h1").text.strip()
         platform = soup.find("span", class_="platform").text.strip()
+    except:
+        pass
 
-    except AttributeError:
-        script_tag = soup.find("script", type="application/ld+json")
-        data = json.loads(script_tag.text)
-        game = data.get("name")
-        platform = data.get("gamePlatform")
-    except Exception:
-        print("An error occurred at extract_game_info. Soup:", soup)
-        raise
+    # If the game and platform were not found in the HTML using the first method, try to find them using the second method.
+    if game is None or platform is None:
+        if soup is not None:
+            script_tag = soup.find("script", type="application/ld+json")
+            data = json.loads(script_tag.text)
+            game = data.get("name")
+            platform = data.get("gamePlatform")
+
+    # Assert that the game and platform are not None.
+    assert game is not None, "Game cannot be None"
+    assert platform is not None, "Platform cannot be None"
+
     return game, platform

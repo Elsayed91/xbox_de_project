@@ -44,7 +44,7 @@ default_args = {
     "owner": "airflow",
     "start_date": datetime(2022, 12, 1),
     "depends_on_past": False,
-    "retries": 1,
+    "retries": 0,
     "retry_delay": timedelta(seconds=60),
     "concurrency": 0,
     "max_active_runs": 1,
