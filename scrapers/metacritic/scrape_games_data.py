@@ -28,7 +28,7 @@ MAX_RETRIES = 8
 RETRY_DELAY = 10
 
 
-def fuzzy_match(name: str, names: list, threshold: int = 60) -> str:
+def fuzzy_match(name: str, names: list, threshold: int = 95) -> str:
     """
     Finds the best fuzzy match for the given name in a list of names and returns the
     matched name if its score is above the given threshold, otherwise returns None.
@@ -51,13 +51,16 @@ def fuzzy_match(name: str, names: list, threshold: int = 60) -> str:
         raise TypeError(f"Failed to perform fuzzy matching: {e}")
 
 
-def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
+def add_gamepass_status(
+    main_df: pd.DataFrame, fuzzy_matching: bool = False
+) -> pd.DataFrame:
     """
     Adds a 'Gamepass_Status' column to the input DataFrame indicating whether each game is
     available on Game Pass.
 
     Args:
         main_df: The input DataFrame containing a 'Name' column.
+        fuzzy_matching: A boolean indicating whether fuzzy matching should be used.
 
     Returns:
         A copy of the input DataFrame with an additional 'Gamepass_Status' column.
@@ -72,7 +75,7 @@ def add_gamepass_status(main_df: pd.DataFrame) -> pd.DataFrame:
     statuses = df["Status"].tolist()
     main_df["Gamepass_Status"] = (
         main_df["Name"]
-        .apply(lambda x: fuzzy_match(x, game_names))
+        .apply(lambda x: fuzzy_match(x, game_names) if fuzzy_matching else x)
         .fillna("Not Included")
     )
     main_df["Gamepass_Status"] = main_df["Gamepass_Status"].fillna("Not Included")

@@ -128,3 +128,10 @@ make setup
 ```
 
 
+## How to improve
+
+1. For starters, the game pass look up function is working properly for most part, but sometimes it just doesn't work.
+for example take the game at this link https://www.metacritic.com/game/xbox-series-x/potion-craft-alchemist-simulator
+this game is listed as potion-craft in the gamepass mastersheet. Okay, we can implement some sort of fuzzy matching, but this ends up putting us
+at a position where similar titles can be mistaken, leading to more inaccurate data. 
+At the moment there are 506 games in gamepass ultimate, however the table we create has 
