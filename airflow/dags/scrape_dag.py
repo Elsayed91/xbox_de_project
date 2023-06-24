@@ -47,7 +47,7 @@ default_args = {
     "retries": 1,
     "retry_delay": timedelta(seconds=60),
     "concurrency": 0,
-    "max_active_runs": 1,
+    # "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
@@ -74,18 +74,18 @@ with DAG(
     catchup=True,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
-    twitter_task = KubernetesJobOperator(
-        task_id="scrape-tweets",
-        body_filepath=POD_TEMPALTE,
-        command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
-        jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-            "name": "scrape-tweets",
-            "gitsync": True,
-            "volumes": [COMMON_VOLUME_CONFIG],
-        },
-        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 5000},
-    )
+    # twitter_task = KubernetesJobOperator(
+    #     task_id="scrape-tweets",
+    #     body_filepath=POD_TEMPALTE,
+    #     command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
+    #     jinja_job_args={
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #         "name": "scrape-tweets",
+    #         "gitsync": True,
+    #         "volumes": [COMMON_VOLUME_CONFIG],
+    #     },
+    #     envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 5000},
+    # )
 
     backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
 
@@ -119,60 +119,60 @@ with DAG(
                     envs={"console": console, "local_path": LOCAL_PATH},
                 )
 
-                t3 = KubernetesJobOperator(
-                    task_id=f"scrape-{console}-user-reviews",
-                    body_filepath=POD_TEMPALTE,
-                    command=["python", f"{BASE}/metacritic/scrape_user_reviews.py"],
-                    jinja_job_args={
-                        "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                        "name": f"get-{console}-user-reviews",
-                        "gitsync": True,
-                        "volumes": [COMMON_VOLUME_CONFIG],
-                    },
-                    envs={"console": console, "local_path": LOCAL_PATH},
-                )
-                t4 = KubernetesJobOperator(
-                    task_id=f"scrape-{console}-critic-reviews",
-                    body_filepath=POD_TEMPALTE,
-                    command=[
-                        "python",
-                        f"{BASE}/metacritic/scrape_metacritic_reviews.py",
-                    ],
-                    jinja_job_args={
-                        "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                        "name": f"get-{console}-critic-reviews",
-                        "gitsync": True,
-                        "volumes": [COMMON_VOLUME_CONFIG],
-                    },
-                    envs={"console": console, "local_path": LOCAL_PATH},
-                )
+                # t3 = KubernetesJobOperator(
+                #     task_id=f"scrape-{console}-user-reviews",
+                #     body_filepath=POD_TEMPALTE,
+                #     command=["python", f"{BASE}/metacritic/scrape_user_reviews.py"],
+                #     jinja_job_args={
+                #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                #         "name": f"get-{console}-user-reviews",
+                #         "gitsync": True,
+                #         "volumes": [COMMON_VOLUME_CONFIG],
+                #     },
+                #     envs={"console": console, "local_path": LOCAL_PATH},
+                # )
+                # t4 = KubernetesJobOperator(
+                #     task_id=f"scrape-{console}-critic-reviews",
+                #     body_filepath=POD_TEMPALTE,
+                #     command=[
+                #         "python",
+                #         f"{BASE}/metacritic/scrape_metacritic_reviews.py",
+                #     ],
+                #     jinja_job_args={
+                #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+                #         "name": f"get-{console}-critic-reviews",
+                #         "gitsync": True,
+                #         "volumes": [COMMON_VOLUME_CONFIG],
+                #     },
+                #     envs={"console": console, "local_path": LOCAL_PATH},
+                # )
             t1 >> tg1
-    with TaskGroup(group_id="process-vgchartz-data") as vgchartz_tg:
-        v1 = KubernetesJobOperator(
-            task_id="scrape-vgchartz-hw-sales",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": "scrape-vg-hw-sales",
-                "gitsync": True,
-                "volumes": [COMMON_VOLUME_CONFIG],
-            },
-            envs={"local_path": LOCAL_PATH},
-        )
+    # with TaskGroup(group_id="process-vgchartz-data") as vgchartz_tg:
+    #     v1 = KubernetesJobOperator(
+    #         task_id="scrape-vgchartz-hw-sales",
+    #         body_filepath=POD_TEMPALTE,
+    #         command=["python", f"{BASE}/vgchartz/scrape_hardware_sales.py"],
+    #         jinja_job_args={
+    #             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #             "name": "scrape-vg-hw-sales",
+    #             "gitsync": True,
+    #             "volumes": [COMMON_VOLUME_CONFIG],
+    #         },
+    #         envs={"local_path": LOCAL_PATH},
+    #     )
 
-        v2 = KubernetesJobOperator(
-            task_id="scrape-vgchartz-game-sales",
-            body_filepath=POD_TEMPALTE,
-            command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
-            jinja_job_args={
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-                "name": "scrape-vg-game-sales",
-                "gitsync": True,
-                "volumes": [COMMON_VOLUME_CONFIG],
-            },
-            envs={"local_path": LOCAL_PATH},
-        )
+    #     v2 = KubernetesJobOperator(
+    #         task_id="scrape-vgchartz-game-sales",
+    #         body_filepath=POD_TEMPALTE,
+    #         command=["python", f"{BASE}/vgchartz/scrape_game_sales.py"],
+    #         jinja_job_args={
+    #             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+    #             "name": "scrape-vg-game-sales",
+    #             "gitsync": True,
+    #             "volumes": [COMMON_VOLUME_CONFIG],
+    #         },
+    #         envs={"local_path": LOCAL_PATH},
+    #     )
     gcp_task = KubernetesJobOperator(
         task_id="load_to_gcp",
         body_filepath=POD_TEMPALTE,
@@ -191,4 +191,5 @@ with DAG(
             "DATA_BUCKET": os.getenv("DATA_BUCKET"),
         },
     )
-    twitter_task >> backfill_first >> [metacritic_tg, vgchartz_tg] >> gcp_task
+    # twitter_task >> backfill_first >> [metacritic_tg, vgchartz_tg] >> gcp_task
+    backfill_first >> metacritic_tg >> gcp_task

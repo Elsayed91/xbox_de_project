@@ -33,6 +33,9 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # sleep 60
 
 # gcloud config set compute/zone $GCP_ZONE >/dev/null
+
+# gcloud compute disks create --size=2GB nfs-disk
+
 # gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" -q >/dev/null
 # gcloud config set builds/use_kaniko True
 # bq --location=${GCP_REGION} mk -d \

@@ -300,7 +300,7 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     game_list = read_txt(console, local_path)
     game_data = []
-    for game_url in game_list[:100]:
+    for game_url in game_list:
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)
