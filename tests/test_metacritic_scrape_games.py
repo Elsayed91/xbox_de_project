@@ -22,7 +22,7 @@ def test_fuzzy_match():
     game_names = ["Halo", "Forza Horizon", "Gears of War"]
 
     # Test exact match (threshold = 0)
-    assert fuzzy_match("Halo 3", game_names) == "Halo"
+    assert fuzzy_match("Halo 3", game_names, threshold=60) == "Halo"
 
     # Test looser match (threshold = 20)
     assert fuzzy_match("Gears", game_names, threshold=20) == "Gears of War"

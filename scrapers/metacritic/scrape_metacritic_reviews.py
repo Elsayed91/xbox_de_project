@@ -116,9 +116,7 @@ def extract_metacritic_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
                 {
                     "Game": game,
                     "Platform": platform,
-                    "Critic": review.find("div", class_="review_critic")
-                    .find("a")
-                    .text.strip(),
+                    "Critic": review.find("div", class_="source").text.strip(),
                     "Review Source": review_source,
                     "Score": review.find("div", class_="metascore_w").text.strip(),
                     "Review": review.find("div", class_="review_body").text.strip(),
