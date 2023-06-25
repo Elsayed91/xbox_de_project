@@ -4,6 +4,7 @@ This module provides functionality for scraping Metacritic reviews for a game.
 import logging
 import os
 import time
+from datetime import datetime
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -100,15 +101,28 @@ def extract_metacritic_reviews(soup: BeautifulSoup) -> list[dict[str, str]]:
             review_source = (
                 review_source_element["href"] if review_source_element else None
             )
+            date_element = review.find("div", class_="date")
+            date = None
+            if date_element:
+                date_string = date_element.text.strip()
+                try:
+                    date = datetime.strptime(date_string, "%b %d, %Y").strftime(
+                        "%Y-%m-%d"
+                    )
+                except ValueError:
+                    pass
 
             reviews.append(
                 {
                     "Game": game,
                     "Platform": platform,
-                    "Critic": review.find("div", class_="review_critic").text.strip(),
+                    "Critic": review.find("div", class_="review_critic")
+                    .find("a")
+                    .text.strip(),
                     "Review Source": review_source,
                     "Score": review.find("div", class_="metascore_w").text.strip(),
                     "Review": review.find("div", class_="review_body").text.strip(),
+                    "Date": date,
                 }
             )
 

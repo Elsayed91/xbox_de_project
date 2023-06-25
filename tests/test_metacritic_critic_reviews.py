@@ -22,11 +22,7 @@ example_html = """
 <div class="review_content">
     <div class="review_section">
         <div class="review_stats">
-            <div class="review_critic">
-                <div class="source">
-                    <a rel="popup:external" class="external" href="http://www.oxm.co.uk/article.php?id=3993" target="_blank">Official Xbox Magazine UK</a>
-                </div>
-            </div>
+  <div class="review_critic"><div class="source"><a rel="popup:external" class="external" href="http://www.oxm.co.uk/article.php?id=3993" target="_blank">Official Xbox Magazine UK</a></div><div class="date">Mar 25, 2022</div></div>
             <div class="review_grade">
                 <div class="metascore_w medium game positive indiv perfect">100</div>
             </div>
@@ -56,6 +52,7 @@ def test_extract_metacritic_reviews():
             "Review Source": "http://www.oxm.co.uk/article.php?id=3993",
             "Score": "100",
             "Review": "It's got a world you believe in, a cast you care about and a script stuffed with brilliant moments... Utterly stunning in every resepct. [May 2008, p.79]",
+            "Date": "2022-03-25",
         }
     ]
 
