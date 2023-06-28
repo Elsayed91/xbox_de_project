@@ -1,6 +1,8 @@
 # pylint: disable=missing-function-docstring, too-many-function-args, missing-module-docstring
 
 
+from datetime import datetime
+
 import pandas as pd
 from pandas.api.types import is_datetime64_any_dtype as is_datetime
 from pandas.api.types import is_string_dtype as is_string

@@ -46,12 +46,12 @@ default_args = {
     "depends_on_past": False,
     "retries": 1,
     "retry_delay": timedelta(seconds=60),
-    "concurrency": 4,
+    "concurrency": 2,
     "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
-    "max_active_tasks_per_dag": 4,
+    "max_active_tasks_per_dag": 2,
 }
 
 
