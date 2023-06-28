@@ -82,6 +82,7 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
     return url
 
 
+import dateparser
 import pandas as pd
 
 
@@ -107,8 +108,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         {"XS": "Xbox Series X", "XOne": "Xbox One", "X360": "Xbox 360", "XB": "Xbox"}
     )
 
-    df["Release Date"] = pd.to_datetime(df["Release Date"], format="%dst %b %y")
-    df["Last Update"] = pd.to_datetime(df["Last Update"], format="%dst %b %y")
+    df["Release Date"] = df["Release Date"].apply(dateparser.parse)
+    df["Last Update"] = df["Last Update"].apply(dateparser.parse)
     df["Release Year"] = df["Release Date"].dt.year
 
     df = df.dropna(subset=["Release Year"])
