@@ -107,11 +107,11 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         {"XS": "Xbox Series X", "XOne": "Xbox One", "X360": "Xbox 360", "XB": "Xbox"}
     )
 
-    df["Release_Date"] = pd.to_datetime(df["Release_Date"], format="%dth %b %y")
-    df["Last_Update"] = pd.to_datetime(df["Last_Update"], format="%dth %b %y")
-    df["Release_Year"] = df["Release_Date"].dt.year
+    df["Release Date"] = pd.to_datetime(df["ReleaseDate"], format="%dth %b %y")
+    df["Last Update"] = pd.to_datetime(df["Last Update"], format="%dth %b %y")
+    df["Release Year"] = df["Release Date"].dt.year
 
-    df = df.dropna(subset=["Release_Year"])
+    df = df.dropna(subset=["Release Year"])
 
     df = df.drop(["Gamex"], axis=1)
     return df
