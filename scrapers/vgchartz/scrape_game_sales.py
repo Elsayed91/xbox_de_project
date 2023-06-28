@@ -115,10 +115,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     df["Release Date"] = df["Release Date"].apply(parse_date)
-    df["Last Updat"] = df["Last Updat"].apply(parse_date)
-    df["Release Year"] = df["Release Date"].fillna(pd.to_datetime("1900-01-01")).dt.year
+    df = df.dropna(subset=["Release Date"])
+    df["Last Update"] = df["Last Update"].apply(parse_date)
 
-    df = df.dropna(subset=["Release Year"])
+    df["Release Year"] = df["Release Date"].dt.year
 
     df = df.drop(["Gamex"], axis=1)
     return df
