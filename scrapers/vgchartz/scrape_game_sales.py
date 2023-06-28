@@ -87,7 +87,7 @@ import pandas as pd
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Clean the scraped data by filtering for total sales > 100,000, converting sales columns to float format,
+    Clean the scraped data by converting sales columns to float format,
     replacing 'Series' in the 'Console' column with 'XS', dropping the 'Gamex' column,
     converting 'Release_Date' and 'Last_Update' columns to date format, and adding a 'Release_Year' column.
     Additionally, update the values in the 'Console' column.
@@ -98,8 +98,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         A pandas DataFrame with cleaned data.
     """
-    # Filter for total sales > 100,000
-    df = df[df["Total_Sales"] > 100000]
 
     for col in df.columns:
         if "Sales" in col or "Units" in col:
