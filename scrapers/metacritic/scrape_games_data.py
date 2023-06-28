@@ -331,8 +331,8 @@ if __name__ == "__main__":
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)
-    df = pd.DataFrame.from_records(game_data)
-    df["Weighted Score"] = df.apply(calculate_weighted_score, axis=1)
-    df = add_gamepass_status(df)
-    df.to_parquet(f"{local_path}{console}-games.parquet")
+    df1 = pd.DataFrame.from_records(game_data)
+    df1["Weighted Score"] = df.apply(calculate_weighted_score, axis=1)
+    df1 = add_gamepass_status(df1)
+    df1.to_parquet(f"{local_path}{console}-games.parquet")
     print("done")
