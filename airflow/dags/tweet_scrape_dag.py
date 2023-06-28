@@ -43,7 +43,7 @@ default_args = {
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
-    # "max_active_tasks_per_dag": 4,
+    "max_active_tasks_per_dag": 4,
 }
 
 

@@ -46,12 +46,12 @@ default_args = {
     "depends_on_past": False,
     "retries": 1,
     "retry_delay": timedelta(seconds=60),
-    "concurrency": 0,
+    "concurrency": 4,
     # "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
-    # "max_active_tasks_per_dag": 4,
+    "max_active_tasks_per_dag": 4,
 }
 
 
@@ -69,7 +69,7 @@ LOCAL_PATH = "/etc/scraped_data/"
 
 with DAG(
     dag_id="scrapers",
-    schedule_interval="0 0 1 * *",
+    schedule_interval="0 1 1 * *",
     default_args=default_args,
     tags=["scraping", "vgchartz", "metacritic"],
 ) as dag:
@@ -169,7 +169,6 @@ with DAG(
         },
         envs={
             "LOCAL_DIR": LOCAL_PATH,
-            "TWITTER_DATASET": os.getenv("TWITTER_DATASET"),
             "VGCHARTZ_DATASET": os.getenv("VGCHARTZ_DATASET"),
             "METACRITIC_DATASET": os.getenv("METACRITIC_DATASET"),
             "DATA_BUCKET": os.getenv("DATA_BUCKET"),
