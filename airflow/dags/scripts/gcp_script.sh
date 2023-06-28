@@ -52,3 +52,16 @@ bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq
   "gs://${DATA_BUCKET}/vgchartz/vgc_hw_sales.parquet" >/dev/null 2>&1
 bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_game_sales \
   "gs://${DATA_BUCKET}/vgchartz/vgc_game_sales.parquet" >/dev/null 2>&1
+
+bq query --nouse_legacy_sql \
+"CREATE OR REPLACE TABLE \`${PROJECT}.${METACRITIC_DATASET}.bq_metacritic_genre_data\` AS
+WITH GenreData AS (
+  SELECT TRIM(genre) AS genre,
+    AVG(meta_score) AS average_meta_score,
+    AVG(user_score) AS average_user_score,
+    COUNT(*) AS game_count
+  FROM \`${PROJECT}.${METACRITIC_DATASET}.bq_metacritic_gamedata\`, UNNEST(SPLIT(genre, ',')) AS genre
+  GROUP BY genre
+)
+SELECT *
+FROM GenreData;"

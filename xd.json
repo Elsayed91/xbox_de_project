@@ -1,0 +1,22 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "console",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "date",
+    "type": "TIMESTAMP"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "region",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "sales",
+    "type": "INTEGER"
+  }
+]

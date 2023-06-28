@@ -99,7 +99,20 @@ E --> F[(Decision Making)]
     -   The analyzed data is used to generate metrics and statistics.
     -   A dashboard is created to present the insights obtained from the gathered data.
     -   The dashboard provides visualizations and key findings to aid decision-making. -->
+    
+<!-- Weighted_Performance = (Critic_Reviews_Count * 0.7 * Meta_Score + User_Rating_Count * 0.3 * User_Score) / (Critic_Reviews_Count + User_Rating_Count)
 
+Here's an explanation of the equation:
+
+Critic_Reviews_Count: This represents the total count of critic reviews for a game.
+Meta_Score: It represents the average score given by the critics.
+User_Rating_Count: This represents the total count of user reviews for a game.
+User_Score: It represents the average score given by the users.
+The equation assigns a weightage of 0.7 to the critic reviews and 0.3 to the user reviews. These weightage values can be adjusted based on the relative importance you want to give to each factor.
+
+The formula calculates the weighted performance by multiplying the respective counts, scores, and weightages, and then dividing the weighted sum by the total count of reviews (critic and user) to obtain the average weighted performance.
+
+This equation provides a way to combine the influence of both critics and users in evaluating the performance of a game, while also considering the review counts. Adjusting the weightage values allows you to emphasize the importance of one factor over the other, according to your preferences and project requirements. -->
 ## Getting Started
 
 
@@ -134,4 +147,7 @@ make setup
 for example take the game at this link https://www.metacritic.com/game/xbox-series-x/potion-craft-alchemist-simulator
 this game is listed as potion-craft in the gamepass mastersheet. Okay, we can implement some sort of fuzzy matching, but this ends up putting us
 at a position where similar titles can be mistaken, leading to more inaccurate data. 
-At the moment there are 506 games in gamepass ultimate, however the table we create has 
+At the moment there are 506 games in gamepass ultimate, however the table we create has  465.
+2. This Project is mainly about Xbox as a console, however it doesn't have to be. Xbox PC could be baked in.
+
+- Prices 

@@ -74,18 +74,18 @@ with DAG(
     catchup=True,
     tags=["scraping", "vgchartz", "twitter", "metacritic"],
 ) as dag:
-    # twitter_task = KubernetesJobOperator(
-    #     task_id="scrape-tweets",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
-    #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
-    #         "name": "scrape-tweets",
-    #         "gitsync": True,
-    #         "volumes": [COMMON_VOLUME_CONFIG],
-    #     },
-    #     envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 5000},
-    # )
+    twitter_task = KubernetesJobOperator(
+        task_id="scrape-tweets",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/twitter/sentiment_analysis.py"],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/scraper:latest",
+            "name": "scrape-tweets",
+            "gitsync": True,
+            "volumes": [COMMON_VOLUME_CONFIG],
+        },
+        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 5000},
+    )
 
     backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
 
@@ -189,6 +189,7 @@ with DAG(
             "VGCHARTZ_DATASET": os.getenv("VGCHARTZ_DATASET"),
             "METACRITIC_DATASET": os.getenv("METACRITIC_DATASET"),
             "DATA_BUCKET": os.getenv("DATA_BUCKET"),
+            "PROJECT": GOOGLE_CLOUD_PROJECT,
         },
     )
     # twitter_task >> backfill_first >> [metacritic_tg, vgchartz_tg] >> gcp_task

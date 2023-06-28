@@ -86,16 +86,30 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # gcloud builds submit
 
-for FILE in ./manifests/*; do
-    [[ -e "$FILE" ]] || continue
-    cat "$FILE" | envsubst | kubectl apply -f -
-done
+# for FILE in ./manifests/*; do
+#     [[ -e "$FILE" ]] || continue
+#     cat "$FILE" | envsubst | kubectl apply -f -
+# done
 
-kubectl wait --for=condition=Ready $(kubectl get pods -o name | grep airflow) --timeout=100s
-airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
-sleep 20
-kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause scrapers
+# kubectl wait --for=condition=Ready $(kubectl get pods -o name | grep airflow) --timeout=100s
+# airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
+# sleep 20
+# kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause scrapers
 # pods=$(kubectl get pods | grep -E "Error|CrashLoopBackOff|Completed|Terminated|ImagePullBackOff" | cut -d' ' -f 1)
 # if [ -n "$pods" ]; then
 #     kubectl delete pod $pods
 # fi
+
+
+bq query --nouse_legacy_sql \
+"CREATE OR REPLACE TABLE \`${PROJECT}.${METACRITIC_DATASET}.bq_metacritic_genre_data\` AS
+WITH GenreData AS (
+  SELECT TRIM(genre) AS genre,
+    AVG(meta_score) AS average_meta_score,
+    AVG(user_score) AS average_user_score,
+    COUNT(*) AS game_count
+  FROM \`${PROJECT}.${METACRITIC_DATASET}.bq_metacritic_gamedata\`, UNNEST(SPLIT(genre, ',')) AS genre
+  GROUP BY genre
+)
+SELECT *
+FROM GenreData;"
