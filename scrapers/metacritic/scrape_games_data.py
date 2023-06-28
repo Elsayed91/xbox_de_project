@@ -298,6 +298,30 @@ def extract_user_rating_count(soup: BeautifulSoup) -> int:
     return 0
 
 
+def calculate_weighted_score(row: pd.Series) -> float:
+    """
+    Calculates the weighted score based on the provided equation.
+
+    Args:
+        row: A pandas Series containing the necessary data for calculation.
+
+    Returns:
+        The calculated weighted score.
+    """
+    critic_reviews_count = row["Critic Reviews Count"] or 0
+    meta_score = row["Meta Score"] or 0
+    user_rating_count = row["User Rating Count"] or 0
+    user_score = row["User Score"] or 0
+    critic_weight = critic_reviews_count * 0.25 * meta_score
+    user_weight = user_rating_count * 0.75 * user_score
+
+    total_reviews_count = critic_reviews_count + user_rating_count
+
+    weighted_score = (critic_weight + user_weight) / total_reviews_count
+
+    return weighted_score
+
+
 if __name__ == "__main__":
     console = os.getenv("console")
     local_path = os.getenv("local_path")
@@ -307,7 +331,8 @@ if __name__ == "__main__":
         data = scrape_game_data(game_url)
         if data is not None:
             game_data.append(data)
-    df1 = pd.DataFrame.from_records(game_data)
-    df1 = add_gamepass_status(df1)
-    df1.to_parquet(f"{local_path}{console}-games.parquet")
+    df = pd.DataFrame.from_records(game_data)
+    df["Weighted Score"] = df.apply(calculate_weighted_score, axis=1)
+    df = add_gamepass_status(df)
+    df.to_parquet(f"{local_path}{console}-games.parquet")
     print("done")
