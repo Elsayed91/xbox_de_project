@@ -189,18 +189,17 @@ def scrape_tweets(
     exclude_keywords: list[str],
     num_tweets: int,
     hashtag_operator: str = "OR",
-    balanced_distribution: bool = False,
 ) -> list[dict]:
     """
-    Use snscrape to scrape tweets and extract relevant data.
+    Use snscrape to scrape tweets and extract relevant data.>
     Args:
         hashtags (list[str]): A list of hashtags to search for.
-        since_date (str): A string representing the date from which to start searching for tweets (YYYY-MM-DD format).
+        since_date (str): A string representing the date from which to start searching for
+        tweets (YYYY-MM-DD format).
         lang (str): The language of the tweets to search for.
         exclude_keywords (list[str]): A list of keywords to exclude from the search results.
         num_tweets (int): The number of tweets to scrape.
-        hashtag_operator(str):  OR or AND in the query. Defaults to OR.
-        balanced_distribution (bool): Whether to evenly distribute the tweets across days. Defaults to False.
+        hastag_oerator(str):  OR or AND in the query. defaults to OR.
     Returns:
         A pandas DataFrame
     """
@@ -210,20 +209,60 @@ def scrape_tweets(
         + f" until:{until_date}"
         + "".join([f" -{kw}" for kw in exclude_keywords])
     )
-
     tweets_list = []
     logger.info(f"processing tweets from {since_date} until {until_date}.")
+    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
+        if i >= num_tweets:
+            break
+        tweet_dict = {
+            "Datetime": tweet.date,
+            "Tweet Id": tweet.id,
+            "Original Text": tweet.rawContent,
+            "Username": tweet.user.username,
+            "Likes": tweet.likeCount,
+            "Views": int(tweet.viewCount) if tweet.viewCount is not None else 0,
+            "Replies": tweet.replyCount,
+            "Retweets": tweet.retweetCount,
+            "Followers": tweet.user.followersCount,
+            "Extra Hashtags": [
+                tag.lower()
+                for tag in re.findall(r"#(\w+)", tweet.rawContent)
+                if tag.lower() not in [h.lower().replace("#", "") for h in hashtags]
+            ],
+        }
+        print(tweet.user.username)
+        tweets_list.append(tweet_dict)
+
+    return pd.DataFrame(tweets_list)
+
+
+def scrape_tweets_distributed(
+    hashtags: list[str],
+    since_date: str,
+    until_date: str,
+    lang: str,
+    exclude_keywords: list[str],
+    num_tweets: int,
+    hashtag_operator: str = "OR",
+) -> pd.DataFrame:
     dates = pd.date_range(start=since_date, end=until_date)
     tweets_per_day = num_tweets // len(dates)
     remaining_tweets = num_tweets % len(dates)
+
+    tweets_list = []
+    logger.info(f"Processing tweets from {since_date} until {until_date}.")
+
     for date in dates:
-        if balanced_distribution and len(tweets_list) >= num_tweets:
-            break
         date_str = date.strftime("%Y-%m-%d")
+        query = (
+            f" {hashtag_operator} ".join(hashtags)
+            + f" lang:{lang}"
+            + "".join([f" -{kw}" for kw in exclude_keywords])
+            + f" since:{date_str} until:{date_str}"
+        )
         tweet_count = 0
-        for tweet in sntwitter.TwitterSearchScraper(
-            query + f" since:{date_str} until:{date_str}"
-        ).get_items():
+
+        for tweet in sntwitter.TwitterSearchScraper(query).get_items():
             if tweet_count >= tweets_per_day + (remaining_tweets > 0):
                 break
             tweet_dict = {
@@ -244,17 +283,42 @@ def scrape_tweets(
             }
             tweets_list.append(tweet_dict)
             tweet_count += 1
-            if balanced_distribution and len(tweets_list) >= num_tweets:
-                break
+            if tweet_count == tweets_per_day:
+                remaining_tweets -= 1
 
-    df = pd.DataFrame(tweets_list)
-    min_datetime = df["Datetime"].min()
-    max_datetime = df["Datetime"].max()
+    return pd.DataFrame(tweets_list)
 
-    print("Minimum Datetime:", min_datetime)
-    print("Maximum Datetime:", max_datetime)
 
-    return df
+def select_scrape_mode(
+    hashtags: list[str],
+    since_date: str,
+    until_date: str,
+    lang: str,
+    exclude_keywords: list[str],
+    num_tweets: int,
+    hashtag_operator: str = "OR",
+    distribute_tweets: bool = False,
+) -> pd.DataFrame:
+    if distribute_tweets:
+        return scrape_tweets_distributed(
+            hashtags,
+            since_date,
+            until_date,
+            lang,
+            exclude_keywords,
+            num_tweets,
+            hashtag_operator,
+        )
+    else:
+        return scrape_tweets(
+            hashtags,
+            since_date,
+            until_date,
+            lang,
+            exclude_keywords,
+            num_tweets,
+            hashtag_operator,
+        )
 
 
 def main(
@@ -264,20 +328,20 @@ def main(
     lang: str,
     exclude_keywords: list[str],
     num_tweets: int,
-    balanced_distribution: bool = False,
+    distribute_tweets: bool = False,
 ) -> pd.DataFrame:
     """
     main function that utilizes scrape_tweets, clean_tweets and get_sentiment_scores
     to get a dataframe of tweets with desired data.
     """
-    tweets_df = scrape_tweets(
+    tweets_df = select_scrape_mode(
         hashtags,
         since_date,
         until_date,
         lang,
         exclude_keywords,
         num_tweets,
-        balanced_distribution=True,
+        distribute_tweets=distribute_tweets,
     )
 
     # Clean text and add column to DataFrame
@@ -344,7 +408,13 @@ if __name__ == "__main__":
     ]
 
     df = main(
-        hashtags, start_date_str, end_date_str, lang, exclude_keywords, num_tweets
+        hashtags,
+        start_date_str,
+        end_date_str,
+        lang,
+        exclude_keywords,
+        num_tweets,
+        distribute_tweets=True,
     )
     data_vol = os.getenv("local_path")
     df.to_parquet(f"{data_vol}tweets-{start_date_str}.parquet")
