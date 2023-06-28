@@ -260,6 +260,7 @@ def scrape_tweets_distributed(
             + "".join([f" -{kw}" for kw in exclude_keywords])
             + f" since:{date_str} until:{date_str}"
         )
+        print(query)
         tweet_count = 0
 
         for tweet in sntwitter.TwitterSearchScraper(query).get_items():
@@ -285,6 +286,7 @@ def scrape_tweets_distributed(
             tweet_count += 1
             if tweet_count == tweets_per_day:
                 remaining_tweets -= 1
+            print(len(tweets_list))
 
     return pd.DataFrame(tweets_list)
 
