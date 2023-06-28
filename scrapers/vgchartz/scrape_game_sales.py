@@ -84,7 +84,12 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
 
 
 def parse_date(date_str):
-    return datetime.strptime(date_str, "%dth %b %y")
+    if isinstance(date_str, str):
+        try:
+            return datetime.strptime(date_str, "%dth %b %y")
+        except ValueError:
+            return None
+    return None
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -111,7 +116,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df["Release Date"] = df["Release Date"].apply(parse_date)
     df["Last Updat"] = df["Last Updat"].apply(parse_date)
-    df["Release Year"] = df["Release Date"].dt.year
+    df["Release Year"] = df["Release Date"].fillna(pd.to_datetime("1900-01-01")).dt.year
 
     df = df.dropna(subset=["Release Year"])
 
