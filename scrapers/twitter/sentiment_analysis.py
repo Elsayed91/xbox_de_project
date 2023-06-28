@@ -394,4 +394,5 @@ if __name__ == "__main__":
 
     data_vol = os.getenv("local_path")
     tweets_df.to_parquet(f"{data_vol}tweets-{start_date_str}.parquet")
+    print(tweets_df.head())
     logger.info(f"Saved data to file tweets-{start_date_str}.parquet")
