@@ -309,6 +309,7 @@ if __name__ == "__main__":
         "#gamepassultimate",
     ]
     start_date = os.getenv("start_date")
+    print(start_date)
     start_date_str, end_date_str = get_date_range(start_date)
     lang = os.getenv("lang", "en")
     exclude_keywords = [
