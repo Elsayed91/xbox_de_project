@@ -151,3 +151,7 @@ At the moment there are 506 games in gamepass ultimate, however the table we cre
 2. This Project is mainly about Xbox as a console, however it doesn't have to be. Xbox PC could be baked in.
 
 - Prices 
+
+
+sentiment analysis per game
+data analysis
