@@ -47,7 +47,7 @@ default_args = {
     "retries": 1,
     "retry_delay": timedelta(seconds=60),
     "concurrency": 4,
-    # "max_active_runs": 1,
+    "max_active_runs": 1,
     "in_cluster": True,
     "random_name_postfix_length": 3,
     "name_prefix": "",
@@ -71,6 +71,7 @@ with DAG(
     dag_id="scrapers",
     schedule_interval="0 1 1 * *",
     default_args=default_args,
+    catchup=False,
     tags=["scraping", "vgchartz", "metacritic"],
 ) as dag:
     with TaskGroup(group_id="process-metacritic-data") as metacritic_tg:
