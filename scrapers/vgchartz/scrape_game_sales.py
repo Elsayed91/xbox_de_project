@@ -8,6 +8,7 @@ input and returns a pandas DataFrame containing the scraped data.
 import os
 import time
 import urllib
+from datetime import datetime
 from typing import Optional
 
 import pandas as pd
@@ -82,8 +83,8 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
     return url
 
 
-import dateparser
-import pandas as pd
+def parse_date(date_str):
+    return datetime.strptime(date_str, "%dth %b %y")
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -108,8 +109,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         {"XS": "Xbox Series X", "XOne": "Xbox One", "X360": "Xbox 360", "XB": "Xbox"}
     )
 
-    df["Release Date"] = df["Release Date"].apply(dateparser.parse)
-    df["Last Update"] = df["Last Update"].apply(dateparser.parse)
+    df["Release Date"] = df["Release Date"].apply(parse_date)
+    df["Last Updat"] = df["Last Updat"].apply(parse_date)
     df["Release Year"] = df["Release Date"].dt.year
 
     df = df.dropna(subset=["Release Year"])
