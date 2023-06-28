@@ -264,7 +264,7 @@ def main(
     lang: str,
     exclude_keywords: list[str],
     num_tweets: int,
-    balanced_distribution: Bool = False,
+    balanced_distribution: bool = False,
 ) -> pd.DataFrame:
     """
     main function that utilizes scrape_tweets, clean_tweets and get_sentiment_scores
