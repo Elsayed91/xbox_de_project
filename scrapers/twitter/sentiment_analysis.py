@@ -260,7 +260,6 @@ def scrape_tweets_distributed(
             + "".join([f" -{kw}" for kw in exclude_keywords])
             + f" since:{date_str} until:{date_str}"
         )
-        print(query)
         tweet_count = 0
 
         for tweet in sntwitter.TwitterSearchScraper(query).get_items():
@@ -283,10 +282,10 @@ def scrape_tweets_distributed(
                 ],
             }
             tweets_list.append(tweet_dict)
+            logger.info(len(tweets_list))
             tweet_count += 1
             if tweet_count == tweets_per_day:
                 remaining_tweets -= 1
-            print(len(tweets_list))
 
     return pd.DataFrame(tweets_list)
 
@@ -323,27 +322,42 @@ def select_scrape_mode(
         )
 
 
-def main(
-    hashtags: list[str],
-    since_date: str,
-    until_date: str,
-    lang: str,
-    exclude_keywords: list[str],
-    num_tweets: int,
-    distribute_tweets: bool = False,
-) -> pd.DataFrame:
-    """
-    main function that utilizes scrape_tweets, clean_tweets and get_sentiment_scores
-    to get a dataframe of tweets with desired data.
-    """
+if __name__ == "__main__":
+    num_tweets = int(os.getenv("num_tweets"))
+    hashtags = [
+        "#xbox",
+        "#xboxseriesx",
+        "#xboxseriess",
+        "#xboxone",
+        "#xboxgames",
+        "#xboxgamepass",
+        "#xboxlive",
+        "#xboxcommunity",
+        "#xboxlivegold",
+        "#xboxgamepassultimate",
+        "#gamepassultimate",
+    ]
+    start_date = os.getenv("start_date")
+    start_date_str, end_date_str = get_date_range(start_date)
+    lang = os.getenv("lang", "en")
+    exclude_keywords = [
+        "sale",
+        "discount",
+        "buy",
+        "shop",
+        "promote",
+        "click",
+        "shopify",
+    ]
+
     tweets_df = select_scrape_mode(
         hashtags,
-        since_date,
-        until_date,
+        start_date_str,
+        end_date_str,
         lang,
         exclude_keywords,
         num_tweets,
-        distribute_tweets=distribute_tweets,
+        distribute_tweets=True,
     )
 
     # Clean text and add column to DataFrame
@@ -378,46 +392,6 @@ def main(
             ]
         ]
 
-    return tweets_df
-
-
-if __name__ == "__main__":
-    num_tweets = int(os.getenv("num_tweets"))
-    hashtags = [
-        "#xbox",
-        "#xboxseriesx",
-        "#xboxseriess",
-        "#xboxone",
-        "#xboxgames",
-        "#xboxgamepass",
-        "#xboxlive",
-        "#xboxcommunity",
-        "#xboxlivegold",
-        "#xboxgamepassultimate",
-        "#gamepassultimate",
-    ]
-    start_date = os.getenv("start_date")
-    start_date_str, end_date_str = get_date_range(start_date)
-    lang = os.getenv("lang", "en")
-    exclude_keywords = [
-        "sale",
-        "discount",
-        "buy",
-        "shop",
-        "promote",
-        "click",
-        "shopify",
-    ]
-
-    df = main(
-        hashtags,
-        start_date_str,
-        end_date_str,
-        lang,
-        exclude_keywords,
-        num_tweets,
-        distribute_tweets=True,
-    )
     data_vol = os.getenv("local_path")
-    df.to_parquet(f"{data_vol}tweets-{start_date_str}.parquet")
-    logger.info(f"saved data to file tweets-{start_date_str}.parquet")
+    tweets_df.to_parquet(f"{data_vol}tweets-{start_date_str}.parquet")
+    logger.info(f"Saved data to file tweets-{start_date_str}.parquet")
