@@ -161,9 +161,29 @@ def main(
     return df
 
 
+def update_console_names(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Update the content of the 'Console' column in the DataFrame.
+
+    Args:
+        df: A pandas DataFrame.
+
+    Returns:
+        A pandas DataFrame with updated 'Console' column values.
+    """
+    console_mapping = {
+        "XS": "Xbox Series X",
+        "XOne": "Xbox One",
+        "X360": "Xbox 360",
+    }
+    df["Console"] = df["Console"].replace(console_mapping)
+    return df
+
+
 if __name__ == "__main__":
     consoles = ["XS", "XOne", "X360"]
     regions = ["USA", "Europe", "Japan", "Global"]
     local_path = os.getenv("local_path")
     df = main(regions, consoles)
+    df = update_console_names(df)
     df.to_parquet(f"{local_path}vgc_hw_sales.parquet")
