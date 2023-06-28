@@ -3,7 +3,7 @@ This DAG utilizes the KubernetesJobOperator to execute scripts as Kubernetes job
 primary purpose of these jobs is to perform scraping tasks.
 
 The DAG follows the sequence: 
-    twitter_task >> backfill_first >> metacritic_tg >> vgchartz_tg >> gcp_task
+    twitter_task >> backfill_first >> gcp_task
 
 Task 'twitter_task': This task involves scraping tweets from Twitter for the previous
 month and performing sentiment analysis on them.
@@ -11,18 +11,11 @@ month and performing sentiment analysis on them.
 Task 'backfill_first': This task ensures that the Twitter data is backfilled before
 scraping other sites that do not require backfilling.
 
-Task group 'metacritic_tg': This task group consists of multiple tasks that scrape data
-from Metacritic. It scrapes the data for each game as well as the user and critic reviews.
-
-Task group 'vgchartz_tg': This task group consists of 2 tasks that scrape data
-from Vgchartz. 
-
 Task 'gcp_task': This final task saves the scraped data to a Google Cloud Storage (GCS)
 bucket and subsequently loads it into a BigQuery table.
 
 The DAG is scheduled to run on a cron schedule, specifically on the first day of each
-month. The Twitter data is appended during each run, while the other data is replaced with
-the latest version.
+month.
 """
 # pylint: disable=pointless-statement
 # pylint: disable=wrong-import-order

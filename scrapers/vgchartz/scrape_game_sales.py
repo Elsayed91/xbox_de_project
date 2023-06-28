@@ -82,11 +82,15 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
     return url
 
 
+import pandas as pd
+
+
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Clean the scraped data by converting sales columns to float format, replacing
-    'Series' in the 'Console' column with 'XS', dropping the 'Gamex' column, and
-    returning the cleaned DataFrame.
+    Clean the scraped data by filtering for total sales > 100,000, converting sales columns to float format,
+    replacing 'Series' in the 'Console' column with 'XS', dropping the 'Gamex' column,
+    converting 'Release_Date' and 'Last_Update' columns to date format, and adding a 'Release_Year' column.
+    Additionally, update the values in the 'Console' column.
 
     Args:
         df: A pandas DataFrame containing scraped video game sales data.
@@ -94,11 +98,23 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         A pandas DataFrame with cleaned data.
     """
+    # Filter for total sales > 100,000
+    df = df[df["Total_Sales"] > 100000]
+
     for col in df.columns:
         if "Sales" in col or "Units" in col:
             df[col] = df[col].str.replace("m", "").astype(float)
 
-    df["Console"] = df["Console"].str.replace("Series", "XS")
+    df["Console"] = df["Console"].replace(
+        {"XS": "Xbox Series X", "XOne": "Xbox One", "X360": "Xbox 360", "XB": "Xbox"}
+    )
+
+    df["Release_Date"] = pd.to_datetime(df["Release_Date"], format="%dth %b %y")
+    df["Last_Update"] = pd.to_datetime(df["Last_Update"], format="%dth %b %y")
+    df["Release_Year"] = df["Release_Date"].dt.year
+
+    df = df.dropna(subset=["Release_Year"])
+
     df = df.drop(["Gamex"], axis=1)
     return df
 

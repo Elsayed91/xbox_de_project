@@ -230,7 +230,6 @@ def scrape_tweets(
                 if tag.lower() not in [h.lower().replace("#", "") for h in hashtags]
             ],
         }
-        print(tweet.user.username)
         tweets_list.append(tweet_dict)
 
     return pd.DataFrame(tweets_list)
