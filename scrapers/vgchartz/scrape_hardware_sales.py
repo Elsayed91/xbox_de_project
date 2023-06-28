@@ -176,7 +176,7 @@ def update_console_names(df: pd.DataFrame) -> pd.DataFrame:
         "XOne": "Xbox One",
         "X360": "Xbox 360",
     }
-    df["Console"] = df["Console"].replace(console_mapping)
+    df["console"] = df["console"].replace(console_mapping)
     return df
 
 
