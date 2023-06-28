@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 from pandas.api.types import is_datetime64_any_dtype as is_datetime
 from pandas.api.types import is_string_dtype as is_string
-
 from scrapers.twitter.sentiment_analysis import *
 
 
@@ -175,7 +174,7 @@ def test_get_date_range():
 #     expected_columns = [
 #         'Datetime', 'Tweet Id', 'Original Text', 'Cleaned Text', 'Polarity',
 #         'Subjectivity', 'Sentiment', 'Negative Score', 'Neutral Score', 'Positive Score',
-#         'Compound Score', 'Likes', 'Views', 'Replies', 'Retweets', 'Followers', 'Extra Hashtags'
+#         'Compound Score', 'Username', 'Likes', 'Views', 'Replies', 'Retweets', 'Followers', 'Extra Hashtags'
 #     ]
 #     assert not df.empty
 #     assert list(df.columns) == expected_columns

@@ -209,6 +209,7 @@ def scrape_tweets(
         + f" until:{until_date}"
         + "".join([f" -{kw}" for kw in exclude_keywords])
     )
+
     tweets_list = []
     logger.info(f"processing tweets from {since_date} until {until_date}.")
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
@@ -231,8 +232,14 @@ def scrape_tweets(
             ],
         }
         tweets_list.append(tweet_dict)
+    df = pd.DataFrame(tweets_list)
+    min_datetime = df["Datetime"].min()
+    max_datetime = df["Datetime"].max()
 
-    return pd.DataFrame(tweets_list)
+    print("Minimum Datetime:", min_datetime)
+    print("Maximum Datetime:", max_datetime)
+
+    return df
 
 
 def main(
@@ -273,6 +280,7 @@ def main(
                 "Neutral Score",
                 "Positive Score",
                 "Compound Score",
+                "Username",
                 "Likes",
                 "Views",
                 "Replies",
