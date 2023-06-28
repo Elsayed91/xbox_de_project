@@ -317,7 +317,9 @@ def calculate_weighted_score(row: pd.Series) -> float:
 
     total_reviews_count = critic_reviews_count + user_rating_count
 
-    weighted_score = (critic_weight + user_weight) / total_reviews_count
+    weighted_score = 0.0  # Default value in case of division by zero
+    if total_reviews_count != 0:
+        weighted_score = (critic_weight + user_weight) / total_reviews_count
 
     return weighted_score
 
