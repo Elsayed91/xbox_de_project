@@ -116,11 +116,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df["Release Date"] = df["Release Date"].apply(parse_date)
     df = df.dropna(subset=["Release Date"])
-    df["Last Update"] = df["Last Update"].apply(parse_date)
 
     df["Release Year"] = df["Release Date"].dt.year
+    df = df.drop(["Last Update", "Release Date", "Gamex", "__index_level_0__"], axis=1)
 
-    df = df.drop(["Gamex"], axis=1)
     return df
 
 

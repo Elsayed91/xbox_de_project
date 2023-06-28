@@ -312,6 +312,10 @@ if __name__ == "__main__":
         "promote",
         "click",
         "shopify",
+        "playstation",
+        "ps5",
+        "nintendo",
+        "nintendoswitch",
     ]
 
     df = main(
