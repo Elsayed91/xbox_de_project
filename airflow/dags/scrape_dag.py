@@ -193,4 +193,4 @@ with DAG(
     #     },
     # )
     # twitter_task >> backfill_first >> [metacritic_tg, vgchartz_tg] >> gcp_task
-    backfill_first >> metacritic_tg >> gcp_task
+    # backfill_first >> metacritic_tg >> gcp_task
