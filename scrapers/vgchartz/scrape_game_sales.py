@@ -228,4 +228,5 @@ if __name__ == "__main__":
     local_path = os.getenv("local_path")
     df = scrape_vgchartz(console_list=["XS", "XOne", "X360", "XB"])
     df = clean_data(df)
+    df = df.reset_index(drop=True)
     df.to_parquet(f"{local_path}vgc_game_sales.parquet")
