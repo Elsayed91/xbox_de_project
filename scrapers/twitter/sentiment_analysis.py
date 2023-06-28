@@ -209,6 +209,7 @@ def scrape_tweets(
         + f" until:{until_date}"
         + "".join([f" -{kw}" for kw in exclude_keywords])
     )
+    print(query)
 
     tweets_list = []
     logger.info(f"processing tweets from {since_date} until {until_date}.")
