@@ -155,3 +155,4 @@ At the moment there are 506 games in gamepass ultimate, however the table we cre
 
 sentiment analysis per game
 data analysis
+nlp

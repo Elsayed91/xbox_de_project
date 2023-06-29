@@ -211,7 +211,9 @@ def scrape_tweets(
     )
     tweets_list = []
     logger.info(f"processing tweets from {since_date} until {until_date}.")
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
+    for i, tweet in enumerate(
+        sntwitter.TwitterSearchScraper(query, maxEmptyPages=100).get_items()
+    ):
         if i >= num_tweets:
             break
         tweet_dict = {
@@ -314,6 +316,7 @@ if __name__ == "__main__":
         "shopify",
         "playstation",
         "ps5",
+        "ps4",
         "nintendo",
         "nintendoswitch",
     ]

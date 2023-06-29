@@ -28,3 +28,6 @@ style:
 
 git: 
 	@git add . && git commit -m "$$(openssl rand -hex 5)" && git push -u origin main
+
+xd: 
+	@cat manifests/airflow.yaml | envsubst | kubectl apply -f -

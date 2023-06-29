@@ -76,7 +76,7 @@ with DAG(
             "gitsync": True,
             "volumes": [COMMON_VOLUME_CONFIG],
         },
-        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 10000},
+        envs={"start_date": "{{ ds }}", "local_path": LOCAL_PATH, "num_tweets": 20000},
     )
 
     backfill_first = LatestOnlyOperator(task_id="ensure_backfill_complete")
