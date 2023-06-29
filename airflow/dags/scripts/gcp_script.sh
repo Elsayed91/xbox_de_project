@@ -28,5 +28,4 @@ bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq
 bq load --replace=true --autodetect --source_format=PARQUET $VGCHARTZ_DATASET.bq_vgchartz_game_sales \
   "gs://${DATA_BUCKET}/vgchartz/vgc_game_sales.parquet" >/dev/null 2>&1
 
-bq query --nouse_legacy_sql \
 
