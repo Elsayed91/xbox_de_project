@@ -13,6 +13,22 @@
     A data-driven project that uses Python, Airflow, GCP and K8s to gather & provide insights into Xbox data.
 </div>
 
+<div align="center" style="display: flex;">
+    <a href="images/dashboard-1.png" style="flex: 1; margin-right: 5px;">
+        <img src="images/dashboard-1.png" alt="Dashboard Screenshot 1" width="300" height="200">
+    </a>
+    <a href="images/dashboard-2.png" style="flex: 1; margin-left: 5px;">
+        <img src="images/dashboard-2.png" alt="Dashboard Screenshot 2" width="300" height="200">
+    </a>
+</div>
+<br>
+<div align="center">
+  <a href="https://lookerstudio.google.com/u/3/reporting/3b68c870-507f-4618-8454-fbae208bbc14/page/1M">
+    View Dashboard Here
+  </a>
+
+
+</div>
 
 <br>
 
@@ -39,22 +55,7 @@
 
 ## About The Project
 
-<div style="display: flex;">
-    <a href="images/dashboard-1.png" style="flex: 1; margin-right: 5px;">
-        <img src="images/dashboard-1.png" alt="Dashboard Screenshot 1" width="300" height="200">
-    </a>
-    <a href="images/dashboard-2.png" style="flex: 1; margin-left: 5px;">
-        <img src="images/dashboard-2.png" alt="Dashboard Screenshot 2" width="300" height="200">
-    </a>
-</div>
-<br>
-<div align="center">
-  <a href="https://lookerstudio.google.com/u/3/reporting/3b68c870-507f-4618-8454-fbae208bbc14/page/1M">
-    View Dashboard Here
-  </a>
 
-
-</div>
 
 <br>
 The project aims to gather and analyze Xbox-specific data from multiple sources, including Metacritic, VGChartz, and Twitter. 
