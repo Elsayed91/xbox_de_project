@@ -21,6 +21,7 @@ gcsfs = "*"
 snscrape = {git = "https://github.com/JustAnotherArchivist/snscrape.git"}
 pytest-mock = "*"
 pyarrow = "*"
+pillow = "*"
 
 [dev-packages]
 airflow-kubernetes-job-operator = "*"

@@ -48,48 +48,48 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # gcloud container clusters create ${GKE_CLUSTER_NAME}  \
 #     --zone=${GCP_ZONE} \
 #     --workload-pool=${PROJECT}.svc.id.goog \
-#     --machine-type=e2-standard-2  \
+#     --machine-type=e2-standard-4  \
 #     --enable-autoscaling \
 #     --min-nodes=0 \
 #     --max-nodes=20 \
 #     --workload-metadata=GKE_METADATA \
 #     --spot \
-#     --disk-size=10 \
+#     --disk-size=40 \
 #     --num-nodes=1
 
 # gcloud iam service-accounts create gke-sa \
 #     --project=${PROJECT}
 
-# gcloud projects add-iam-policy-binding ${PROJECT} \
-#     --member "serviceAccount:gke-sa@${PROJECT}.iam.gserviceaccount.com" \
-#     --role "roles/owner"
+gcloud projects add-iam-policy-binding ${PROJECT} \
+    --member "serviceAccount:gke-sa@${PROJECT}.iam.gserviceaccount.com" \
+    --role "roles/owner"
 
-# gcloud iam service-accounts add-iam-policy-binding gke-sa@${PROJECT}.iam.gserviceaccount.com \
-#     --role roles/iam.workloadIdentityUser \
-#     --member "serviceAccount:${PROJECT}.svc.id.goog[default/default]"
+gcloud iam service-accounts add-iam-policy-binding gke-sa@${PROJECT}.iam.gserviceaccount.com \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:${PROJECT}.svc.id.goog[default/default]"
 
-# gcloud container clusters get-credentials $GKE_CLUSTER_NAME \
-#     --project=$PROJECT --region=$GCP_ZONE
+gcloud container clusters get-credentials $GKE_CLUSTER_NAME \
+    --project=$PROJECT --region=$GCP_ZONE
 
-# kubectl annotate serviceaccount default --overwrite \
-#     iam.gke.io/gcp-service-account=gke-sa@${PROJECT}.iam.gserviceaccount.com
+kubectl annotate serviceaccount default --overwrite \
+    iam.gke.io/gcp-service-account=gke-sa@${PROJECT}.iam.gserviceaccount.com
 
-# kubectl create secret docker-registry gcr-json-key \
-#     --docker-server="${DOCKER_SERVER}" --docker-username="${DOCKER_USERNAME}" \
-#     --docker-password="$(gcloud auth print-access-token)" --docker-email=any@valid.email
+kubectl create secret docker-registry gcr-json-key \
+    --docker-server="${DOCKER_SERVER}" --docker-username="${DOCKER_USERNAME}" \
+    --docker-password="$(gcloud auth print-access-token)" --docker-email=any@valid.email
 
-# kubectl patch serviceaccount default \
-#     -p '{"imagePullSecrets": [{"name": "gcr-json-key"}]}'
-# kubectl create clusterrolebinding admin-role \
-#     --clusterrole=cluster-admin --serviceaccount=default:default
+kubectl patch serviceaccount default \
+    -p '{"imagePullSecrets": [{"name": "gcr-json-key"}]}'
+kubectl create clusterrolebinding admin-role \
+    --clusterrole=cluster-admin --serviceaccount=default:default
 
-
+kubectl port-forward pod/airflow-67c48b75d9-8m972  8080:8080
 # gcloud builds submit
 
-# for FILE in ./manifests/*; do
-#     [[ -e "$FILE" ]] || continue
-#     cat "$FILE" | envsubst | kubectl apply -f -
-# done
+for FILE in ./manifests/*; do
+    [[ -e "$FILE" ]] || continue
+    cat "$FILE" | envsubst | kubectl apply -f -
+done
 
 # kubectl wait --for=condition=Ready $(kubectl get pods -o name | grep airflow) --timeout=100s
 # airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)

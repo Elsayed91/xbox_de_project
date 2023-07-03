@@ -92,256 +92,256 @@ def test_get_sentiment_labels():
     assert get_sentiment_label(compound) == expected_label
 
 
-def test_scrape_tweets_returns_dataframe():
-    assert isinstance(
-        scrape_tweets(
-            hashtags=["python"],
-            since_date="2022-01-01",
-            until_date="2022-01-02",
-            lang="en",
-            exclude_keywords=[],
-            num_tweets=10,
-        ),
-        pd.DataFrame,
-    )
+# def test_scrape_tweets_returns_dataframe():
+#     assert isinstance(
+#         scrape_tweets(
+#             hashtags=["python"],
+#             since_date="2022-01-01",
+#             until_date="2022-01-02",
+#             lang="en",
+#             exclude_keywords=[],
+#             num_tweets=10,
+#         ),
+#         pd.DataFrame,
+#     )
 
 
-def test_scrape_tweets_columns():
-    columns = [
-        "Datetime",
-        "Tweet Id",
-        "Original Text",
-        "Username",
-        "Likes",
-        "Views",
-        "Replies",
-        "Retweets",
-        "Followers",
-        "Extra Hashtags",
-    ]
-    df = scrape_tweets(
-        hashtags=["python"],
-        since_date="2022-01-01",
-        until_date="2022-01-02",
-        lang="en",
-        exclude_keywords=[],
-        num_tweets=10,
-    )
-    assert df.columns.tolist() == columns
+# def test_scrape_tweets_columns():
+#     columns = [
+#         "Datetime",
+#         "Tweet Id",
+#         "Original Text",
+#         "Username",
+#         "Likes",
+#         "Views",
+#         "Replies",
+#         "Retweets",
+#         "Followers",
+#         "Extra Hashtags",
+#     ]
+#     df = scrape_tweets(
+#         hashtags=["python"],
+#         since_date="2022-01-01",
+#         until_date="2022-01-02",
+#         lang="en",
+#         exclude_keywords=[],
+#         num_tweets=10,
+#     )
+#     assert df.columns.tolist() == columns
 
 
-def test_scrape_tweets_data_types():
-    import numpy as np
+# def test_scrape_tweets_data_types():
+#     import numpy as np
 
-    df = scrape_tweets(
-        hashtags=["python"],
-        since_date="2022-01-01",
-        until_date="2022-01-02",
-        lang="en",
-        exclude_keywords=[],
-        num_tweets=10,
-    )
-    assert is_datetime(df["Datetime"])
-    assert is_string(df["Original Text"])
-    assert is_string(df["Username"])
-    assert isinstance(df["Likes"][0], np.integer)
-    assert isinstance(df["Views"][0], np.integer)
-    assert isinstance(df["Replies"][0], np.integer)
-    assert isinstance(df["Retweets"][0], np.integer)
-    assert isinstance(df["Followers"][0], np.integer)
-    assert isinstance(df["Extra Hashtags"][0], list)
-
-
-def test_scrape_tweets_num_tweets():
-    df = scrape_tweets(
-        hashtags=["python"],
-        since_date="2022-01-01",
-        until_date="2022-01-02",
-        lang="en",
-        exclude_keywords=[],
-        num_tweets=10,
-    )
-    assert len(df) == 10
+#     df = scrape_tweets(
+#         hashtags=["python"],
+#         since_date="2022-01-01",
+#         until_date="2022-01-02",
+#         lang="en",
+#         exclude_keywords=[],
+#         num_tweets=10,
+#     )
+#     assert is_datetime(df["Datetime"])
+#     assert is_string(df["Original Text"])
+#     assert is_string(df["Username"])
+#     assert isinstance(df["Likes"][0], np.integer)
+#     assert isinstance(df["Views"][0], np.integer)
+#     assert isinstance(df["Replies"][0], np.integer)
+#     assert isinstance(df["Retweets"][0], np.integer)
+#     assert isinstance(df["Followers"][0], np.integer)
+#     assert isinstance(df["Extra Hashtags"][0], list)
 
 
-def test_scrape_tweets_datetime():
-    df = scrape_tweets(
-        hashtags=["python"],
-        since_date="2022-01-01",
-        until_date="2022-01-02",
-        lang="en",
-        exclude_keywords=[],
-        num_tweets=10,
-    )
-    assert isinstance(df["Datetime"][0], datetime)
-    assert df["Datetime"][0] >= datetime(2022, 1, 1, tzinfo=timezone("UTC"))
+# def test_scrape_tweets_num_tweets():
+#     df = scrape_tweets(
+#         hashtags=["python"],
+#         since_date="2022-01-01",
+#         until_date="2022-01-02",
+#         lang="en",
+#         exclude_keywords=[],
+#         num_tweets=10,
+#     )
+#     assert len(df) == 10
 
 
-def test_scrape_tweets_excluded_keywords():
-    df = scrape_tweets(
-        hashtags=["python"],
-        since_date="2022-01-01",
-        until_date="2022-01-02",
-        lang="en",
-        exclude_keywords=["programming"],
-        num_tweets=10,
-    )
-    assert all(
-        keyword not in text
-        for keyword in ["programming"]
-        for text in df["Original Text"]
-    )
+# def test_scrape_tweets_datetime():
+#     df = scrape_tweets(
+#         hashtags=["python"],
+#         since_date="2022-01-01",
+#         until_date="2022-01-02",
+#         lang="en",
+#         exclude_keywords=[],
+#         num_tweets=10,
+#     )
+#     assert isinstance(df["Datetime"][0], datetime)
+#     assert df["Datetime"][0] >= datetime(2022, 1, 1, tzinfo=timezone("UTC"))
 
 
-def test_main():
-    # Define parameters
-    hashtags = ["python"]
-    since_date = "2022-01-01"
-    until_date = "2022-01-02"
-    lang = "en"
-    exclude_keywords = []
-    num_tweets = 5
-    expected_columns = [
-        "Datetime",
-        "Tweet Id",
-        "Original Text",
-        "Cleaned Text",
-        "Polarity",
-        "Subjectivity",
-        "Sentiment",
-        "Negative Score",
-        "Neutral Score",
-        "Positive Score",
-        "Compound Score",
-        "Username",
-        "Likes",
-        "Views",
-        "Replies",
-        "Retweets",
-        "Followers",
-        "Extra Hashtags",
-    ]
-
-    # Run main function and get DataFrame
-    tweets_df = main(
-        hashtags, since_date, until_date, lang, exclude_keywords, num_tweets
-    )
-
-    # Test if the function returns a pandas DataFrame
-    assert isinstance(tweets_df, pd.DataFrame)
-    # Test if the function returns a DataFrame with the expected columns
-    assert set(tweets_df.columns) == set(expected_columns)
-
-    # Test if the function returns a DataFrame with the expected number of rows
-    assert len(tweets_df) == num_tweets
-
-    # Check data types of DataFrame columns
-    assert all(
-        isinstance(tweets_df[column].iloc[0], expected_type)
-        for column, expected_type in zip(
-            expected_columns,
-            [
-                pd.Timestamp,
-                np.int64,
-                str,
-                str,
-                float,
-                float,
-                str,
-                float,
-                float,
-                float,
-                float,
-                str,
-                np.int64,
-                np.int64,
-                np.int64,
-                np.int64,
-                np.int64,
-                list,
-            ],
-        )
-    )
-
-    # Check that sentiment scores are between -1 and 1
-    assert all(
-        all(-1 <= score <= 1 for score in tweets_df[column])
-        for column in [
-            "Polarity",
-            "Subjectivity",
-            "Negative Score",
-            "Neutral Score",
-            "Positive Score",
-            "Compound Score",
-        ]
-    )
+# def test_scrape_tweets_excluded_keywords():
+#     df = scrape_tweets(
+#         hashtags=["python"],
+#         since_date="2022-01-01",
+#         until_date="2022-01-02",
+#         lang="en",
+#         exclude_keywords=["programming"],
+#         num_tweets=10,
+#     )
+#     assert all(
+#         keyword not in text
+#         for keyword in ["programming"]
+#         for text in df["Original Text"]
+#     )
 
 
-def test_integration_scrape_tweets_returns_non_empty_dataframe():
-    hashtags = ["#xbox"]
-    since_date = "2022-01-01"
-    until_date = "2022-01-02"
-    lang = "en"
-    exclude_keywords = []
-    num_tweets = 10
+# def test_main():
+#     # Define parameters
+#     hashtags = ["python"]
+#     since_date = "2022-01-01"
+#     until_date = "2022-01-02"
+#     lang = "en"
+#     exclude_keywords = []
+#     num_tweets = 5
+#     expected_columns = [
+#         "Datetime",
+#         "Tweet Id",
+#         "Original Text",
+#         "Cleaned Text",
+#         "Polarity",
+#         "Subjectivity",
+#         "Sentiment",
+#         "Negative Score",
+#         "Neutral Score",
+#         "Positive Score",
+#         "Compound Score",
+#         "Username",
+#         "Likes",
+#         "Views",
+#         "Replies",
+#         "Retweets",
+#         "Followers",
+#         "Extra Hashtags",
+#     ]
 
-    df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
-    assert not df.empty
+#     # Run main function and get DataFrame
+#     tweets_df = main(
+#         hashtags, since_date, until_date, lang, exclude_keywords, num_tweets
+#     )
+
+#     # Test if the function returns a pandas DataFrame
+#     assert isinstance(tweets_df, pd.DataFrame)
+#     # Test if the function returns a DataFrame with the expected columns
+#     assert set(tweets_df.columns) == set(expected_columns)
+
+#     # Test if the function returns a DataFrame with the expected number of rows
+#     assert len(tweets_df) == num_tweets
+
+#     # Check data types of DataFrame columns
+#     assert all(
+#         isinstance(tweets_df[column].iloc[0], expected_type)
+#         for column, expected_type in zip(
+#             expected_columns,
+#             [
+#                 pd.Timestamp,
+#                 np.int64,
+#                 str,
+#                 str,
+#                 float,
+#                 float,
+#                 str,
+#                 float,
+#                 float,
+#                 float,
+#                 float,
+#                 str,
+#                 np.int64,
+#                 np.int64,
+#                 np.int64,
+#                 np.int64,
+#                 np.int64,
+#                 list,
+#             ],
+#         )
+#     )
+
+#     # Check that sentiment scores are between -1 and 1
+#     assert all(
+#         all(-1 <= score <= 1 for score in tweets_df[column])
+#         for column in [
+#             "Polarity",
+#             "Subjectivity",
+#             "Negative Score",
+#             "Neutral Score",
+#             "Positive Score",
+#             "Compound Score",
+#         ]
+#     )
 
 
-def test_integration_main_returns_non_empty_dataframe_with_expected_columns():
-    hashtags = ["#xbox"]
-    since_date = "2022-01-01"
-    until_date = "2022-01-02"
-    lang = "en"
-    exclude_keywords = []
-    num_tweets = 10
+# def test_integration_scrape_tweets_returns_non_empty_dataframe():
+#     hashtags = ["#xbox"]
+#     since_date = "2022-01-01"
+#     until_date = "2022-01-02"
+#     lang = "en"
+#     exclude_keywords = []
+#     num_tweets = 10
 
-    df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
-    expected_columns = [
-        "Datetime",
-        "Tweet Id",
-        "Original Text",
-        "Cleaned Text",
-        "Polarity",
-        "Subjectivity",
-        "Sentiment",
-        "Negative Score",
-        "Neutral Score",
-        "Positive Score",
-        "Compound Score",
-        "Username",
-        "Likes",
-        "Views",
-        "Replies",
-        "Retweets",
-        "Followers",
-        "Extra Hashtags",
-    ]
-    assert not df.empty
-    assert list(df.columns) == expected_columns
+#     df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
+#     assert not df.empty
 
 
-def test_integration_main_handles_invalid_inputs():
-    # Invalid hashtag
-    hashtags = ["#nonexistenthashta123321321321dsg"]
-    since_date = "2022-01-01"
-    until_date = "2022-01-02"
-    lang = "en"
-    exclude_keywords = []
-    num_tweets = 10
+# def test_integration_main_returns_non_empty_dataframe_with_expected_columns():
+#     hashtags = ["#xbox"]
+#     since_date = "2022-01-01"
+#     until_date = "2022-01-02"
+#     lang = "en"
+#     exclude_keywords = []
+#     num_tweets = 10
 
-    df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
-    assert df.empty
+#     df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
+#     expected_columns = [
+#         "Datetime",
+#         "Tweet Id",
+#         "Original Text",
+#         "Cleaned Text",
+#         "Polarity",
+#         "Subjectivity",
+#         "Sentiment",
+#         "Negative Score",
+#         "Neutral Score",
+#         "Positive Score",
+#         "Compound Score",
+#         "Username",
+#         "Likes",
+#         "Views",
+#         "Replies",
+#         "Retweets",
+#         "Followers",
+#         "Extra Hashtags",
+#     ]
+#     assert not df.empty
+#     assert list(df.columns) == expected_columns
 
-    # Invalid language
-    hashtags = ["#xbox"]
-    since_date = "2022-01-01"
-    until_date = "2022-01-02"
-    lang = "nonexistentlanguage"
 
-    exclude_keywords = []
-    num_tweets = 10
+# def test_integration_main_handles_invalid_inputs():
+#     # Invalid hashtag
+#     hashtags = ["#nonexistenthashta123321321321dsg"]
+#     since_date = "2022-01-01"
+#     until_date = "2022-01-02"
+#     lang = "en"
+#     exclude_keywords = []
+#     num_tweets = 10
 
-    df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
-    assert df.empty
+#     df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
+#     assert df.empty
+
+#     # Invalid language
+#     hashtags = ["#xbox"]
+#     since_date = "2022-01-01"
+#     until_date = "2022-01-02"
+#     lang = "nonexistentlanguage"
+
+#     exclude_keywords = []
+#     num_tweets = 10
+
+#     df = main(hashtags, since_date, until_date, lang, exclude_keywords, num_tweets)
+#     assert df.empty

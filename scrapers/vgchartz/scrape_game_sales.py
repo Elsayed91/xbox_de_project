@@ -83,13 +83,31 @@ def build_url(genre: str, console_type: str, page_num: int) -> str:
     return url
 
 
-def parse_date(date_str):
-    if isinstance(date_str, str):
-        try:
-            return datetime.strptime(date_str, "%dth %b %y")
-        except ValueError:
-            return None
-    return None
+def parse_date(date_str: str) -> datetime or None:
+    """
+    Parse a date string in the format "ddth Mon yy" into a datetime object.
+
+    Args:
+        date_str (str): A string representing the date in the format "ddth Mon yy".
+
+    Returns:
+        datetime or None: The parsed datetime object.
+
+    Example:
+        parse_date("4th Jul 20")  # Returns: datetime.datetime(2020, 7, 4, 0, 0)
+        parse_date("30st Dec 21")  # Returns: datetime.datetime(2021, 12, 31, 0, 0)
+    """
+    from dateutil.parser import parse
+
+    try:
+        parsed_date = parse(date_str)
+        if (
+            parsed_date.year < 2000
+        ):  # For two-digit years, dateutil.parser defaults to the 1900s, so we adjust it
+            parsed_date = parsed_date.replace(year=parsed_date.year + 100)
+        return parsed_date
+    except ValueError:
+        return None
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -113,9 +131,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df["Console"] = df["Console"].replace(
         {"XS": "Xbox Series X", "XOne": "Xbox One", "X360": "Xbox 360", "XB": "Xbox"}
     )
-
-    df["Release Date"] = df["Release Date"].apply(parse_date)
     df = df.dropna(subset=["Release Date"])
+    df["Release Date"] = df["Release Date"].apply(parse_date)
 
     df["Release Year"] = df["Release Date"].dt.year
     df = df.drop(["Last Update", "Release Date", "Gamex"], axis=1)
@@ -138,17 +155,15 @@ def scrape_game_info(
         empty, and the DataFrame of the scraped game information.
     """
     soup_div = soup.find("div", {"id": "generalBody"})
+
     if soup_div is None:
         return False, None
-
     console_list = []
     all_trs = soup_div.find("table").find_all("tr")
     for tr in all_trs[3:]:
         console_list.append(tr.find_all("td")[3].find("img").attrs["alt"])
-
     # Scrape the game info into DataFrame
     game_info_df = pd.read_html(str(soup_div))[0]
-
     if game_info_df.empty:
         return False, None
 
