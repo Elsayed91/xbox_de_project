@@ -35,12 +35,8 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-    </li>
-    <li>
-      <a href="#architecture">Architecture</a>
-    </li>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#architecture">Architecture</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -48,19 +44,17 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
+    <li><a href="#things-to-consider">Things to Consider</a></li>
+    <li><a href="#how-to-improve">How to Improve</a></li>
   </ol>
 </details>
 
 
 
+
 ## About The Project
 
-
-
-<br>
-The project aims to gather and analyze Xbox-specific data from multiple sources, including Metacritic, VGChartz, and Twitter. 
-The collected data includes console and game sales, game ratings, user reviews, sentiment analysis for Xbox-related tweets, and more. 
-The project utilizes scraping scripts written in Python. The pipline is orchestrated by Airflow, and the whole pipeline runs on Kubernetes (GKE) for efficient and scalable data processing.
+This project aims to collect and analyze Xbox-specific data from various sources, including console and game sales, game ratings, user reviews, sentiment analysis for Xbox-related tweets, and more. The data collection process involves Python-based scraping scripts, while the pipeline is orchestrated by Airflow, running efficiently and at scale on Kubernetes (GKE) for data processing.
 
 ## Architecture
 
@@ -72,9 +66,7 @@ The project utilizes scraping scripts written in Python. The pipline is orchestr
 </div>
 
 
-The architecture of the project is designed to collect, process, and analyze data related to Xbox in a periodic fashion.
-
-A simplified overview of the project's architecture can be summarized in the flow chart below.
+The project's architecture is designed to periodically gather, process, and analyze data related to Xbox. The flowchart below provides a simplified overview:
 
 ```mermaid
 flowchart LR
@@ -86,50 +78,8 @@ D --> E[Insights & Metrics]
 E --> F[(Decision Making)]
 ```
 
-<!-- -   Data Sources:
     
-    -   Metacritic: Provides game ratings and reviews.
-    -   VGChartz: Offers Xbox console and game sales data.
-    -   Twitter: Gathers Xbox-related tweets for sentiment analysis.
--   Scraping Scripts:
-    
-    -   Python scripts are developed to scrape data from Metacritic, VGChartz, and Twitter.
-    -   Each script handles the specific scraping logic for its respective data source.
--   Data Extraction:
-    
-    -   The scraping scripts extract the relevant data from each source.
-    -   Extracted data includes game ratings, reviews, sales figures, and tweets.
--   Data Storage:
-    
-    -   Extracted data is uploaded to Google Cloud Storage (GCS).
-    -   GCS serves as a centralized storage location for the collected data.
--   Data Ingestion:
-    
-    -   The data from GCS is ingested into Google BigQuery.
-    -   BigQuery is a scalable and fully-managed data warehouse that allows efficient querying and analysis of large datasets.
--   Data Analysis:
-    
-    -   The ingested data in BigQuery is analyzed using various techniques and algorithms.
-    -   Sentiment analysis is performed on Twitter data to gauge user sentiment towards Xbox.
--   Dashboard and Insights:
-    
-    -   The analyzed data is used to generate metrics and statistics.
-    -   A dashboard is created to present the insights obtained from the gathered data.
-    -   The dashboard provides visualizations and key findings to aid decision-making. -->
-    
-<!-- Weighted_Performance = (Critic_Reviews_Count * 0.7 * Meta_Score + User_Rating_Count * 0.3 * User_Score) / (Critic_Reviews_Count + User_Rating_Count)
 
-Here's an explanation of the equation:
-
-Critic_Reviews_Count: This represents the total count of critic reviews for a game.
-Meta_Score: It represents the average score given by the critics.
-User_Rating_Count: This represents the total count of user reviews for a game.
-User_Score: It represents the average score given by the users.
-The equation assigns a weightage of 0.7 to the critic reviews and 0.3 to the user reviews. These weightage values can be adjusted based on the relative importance you want to give to each factor.
-
-The formula calculates the weighted performance by multiplying the respective counts, scores, and weightages, and then dividing the weighted sum by the total count of reviews (critic and user) to obtain the average weighted performance.
-
-This equation provides a way to combine the influence of both critics and users in evaluating the performance of a game, while also considering the review counts. Adjusting the weightage values allows you to emphasize the importance of one factor over the other, according to your preferences and project requirements. -->
 ## Getting Started
 
 
@@ -151,26 +101,26 @@ git clone https://github.com/Elsayed91/xbox_de_project.git
 ```sh
 pip install pipenv
 ```
-3. rename template.env to .env and fill out the values
-4. run project setup script:
+3. Rename template.env to .env and fill out the values.
+4. Run the project setup script:
 ```sh
 make setup
 ```
 
+### Things to consider:
+
+-   **Weighted Performance Metric:** The dashboard employs a weighted performance metric to handle uncertainties in game ratings effectively. This approach ensures that games with only a few highly-rated reviews do not receive higher scores than games with many slightly lower ratings. The weighted metric is derived from Wilson's interval, a statistical method that takes into account the uncertainty tied to the true rating of a game.
+    
+-   **Game Pass Status Matching:** The function responsible for adding Game Pass Status to the data is functional; however, it may occasionally yield inaccurate results due to title mismatches between Metacritic.com and the Xbox Game Pass Master Sheet. While the dashboard addresses this issue, some individual gamepass status lookups might still be affected by these mismatches.
+
+
+
+
 
 ## How to improve
 
-1. For starters, the game pass look up function is working properly for most part, but sometimes it just doesn't work.
-for example take the game at this link https://www.metacritic.com/game/xbox-series-x/potion-craft-alchemist-simulator
-this game is listed as potion-craft in the gamepass mastersheet. Okay, we can implement some sort of fuzzy matching, but this ends up putting us
-at a position where similar titles can be mistaken, leading to more inaccurate data. 
-At the moment there are 506 games in gamepass ultimate, however the table we create has  465.
-2. This Project is mainly about Xbox as a console, however it doesn't have to be. Xbox PC could be baked in.
-
-- Prices 
-
-
-sentiment analysis per game
-data analysis
-nlp
-
+-   **Game Pass Status:** Monitor the project and create a list to fix troublesome titles, or consider using a different source, such as Xbox.com, to improve accuracy.
+-   **Project Scope:** Expand the project to include Xbox PC.
+-   **Data Modeling:** Data Modeling techniques could be implemented.
+-   **Leverage Unitilized Metacritic Data:** Explore the number of players data from Metacritic to analyze trends.
+-   **NLP and Sentiment Analysis:** Use NLP to extract key words associated with good and bad reviews and perform sentiment analysis on game reviews.
