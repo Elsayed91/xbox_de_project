@@ -65,6 +65,7 @@ This project aims to collect and analyze Xbox-specific data from various sources
 
 </div>
 
+<br>
 
 The project's architecture is designed to periodically gather, process, and analyze data related to Xbox. The flowchart below provides a simplified overview:
 
