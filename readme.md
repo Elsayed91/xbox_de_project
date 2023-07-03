@@ -39,8 +39,24 @@
 
 ## About The Project
 
-[![Dashboard Screenshot][product-screenshot]](https://example.com)
+<div style="display: flex;">
+    <a href="images/dashboard-1.png" style="flex: 1; margin-right: 5px;">
+        <img src="images/dashboard-1.png" alt="Dashboard Screenshot 1" width="300">
+    </a>
+    <a href="images/dashboard-2.png" style="flex: 1; margin-left: 5px;">
+        <img src="images/dashboard-2.png" alt="Dashboard Screenshot 2" width="300">
+    </a>
+</div>
+<br>
+<div align="center">
+  <a href="https://lookerstudio.google.com/u/3/reporting/3b68c870-507f-4618-8454-fbae208bbc14/page/1M">
+    View Dashboard Here
+  </a>
 
+
+</div>
+
+<br>
 The project aims to gather and analyze Xbox-specific data from multiple sources, including Metacritic, VGChartz, and Twitter. 
 The collected data includes console and game sales, game ratings, user reviews, sentiment analysis for Xbox-related tweets, and more. 
 The project utilizes scraping scripts written in Python. The pipline is orchestrated by Airflow, and the whole pipeline runs on Kubernetes (GKE) for efficient and scalable data processing.
@@ -156,3 +172,4 @@ At the moment there are 506 games in gamepass ultimate, however the table we cre
 sentiment analysis per game
 data analysis
 nlp
+
