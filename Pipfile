@@ -19,9 +19,7 @@ fake-useragent = {extras = ["metacritic"], version = "*"}
 google-cloud-storage = "*"
 gcsfs = "*"
 snscrape = {git = "https://github.com/JustAnotherArchivist/snscrape.git"}
-pytest-mock = "*"
 pyarrow = "*"
-pillow = "*"
 
 [dev-packages]
 airflow-kubernetes-job-operator = "*"
@@ -32,6 +30,7 @@ ipykernel = "*"
 black = "*"
 isort = "*"
 pylint = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.10"
