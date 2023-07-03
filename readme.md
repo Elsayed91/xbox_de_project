@@ -36,9 +36,9 @@
   <summary>Table of Contents</summary>
   <ol>
     <li><a href="#architecture">Architecture</a></li>
-      <ul>
+      <!-- <ul>
         <li><a href="#highlevel-overview">Highlevel Overview</a></li>
-      </ul>
+      </ul> -->
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -58,7 +58,7 @@
 
 ## Architecture
 
-The project aims to collect and analyze Xbox-specific data from various sources, including console and game sales, game ratings, user reviews, sentiment analysis for Xbox-related tweets, and more. It involves Python-based scraping scripts and is orchestrated by Airflow, running efficiently and at scale on Kubernetes (GKE) for data processing. The architecture is designed to periodically gather, process, and analyze Xbox data,
+The project aims to periodically collect and analyze Xbox-specific data from various sources. It involves Python-based scraping scripts and is orchestrated by Airflow, running on Kubernetes (GKE).
 
 <div align="center">
   <a>
@@ -68,7 +68,7 @@ The project aims to collect and analyze Xbox-specific data from various sources,
 </div>
 
 
-### Highlevel Overview:
+<!-- ### Highlevel Overview:
 
 ```mermaid
 flowchart LR
@@ -80,7 +80,7 @@ D --> E[Insights & Metrics]
 E --> F[(Decision Making)]
 ```
 
-    
+     -->
 
 ## Getting Started
 
