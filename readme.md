@@ -41,10 +41,10 @@
 
 <div style="display: flex;">
     <a href="images/dashboard-1.png" style="flex: 1; margin-right: 5px;">
-        <img src="images/dashboard-1.png" alt="Dashboard Screenshot 1" width="300">
+        <img src="images/dashboard-1.png" alt="Dashboard Screenshot 1" width="300" height="200">
     </a>
     <a href="images/dashboard-2.png" style="flex: 1; margin-left: 5px;">
-        <img src="images/dashboard-2.png" alt="Dashboard Screenshot 2" width="300">
+        <img src="images/dashboard-2.png" alt="Dashboard Screenshot 2" width="300" height="200">
     </a>
 </div>
 <br>
