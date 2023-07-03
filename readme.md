@@ -54,7 +54,7 @@
 
 ## About The Project
 
-This project aims to collect and analyze Xbox-specific data from various sources, including console and game sales, game ratings, user reviews, sentiment analysis for Xbox-related tweets, and more. The data collection process involves Python-based scraping scripts, while the pipeline is orchestrated by Airflow, running efficiently and at scale on Kubernetes (GKE) for data processing.
+This project aims to collect and analyze Xbox-specific data from various sources. This data include console and game sales, game ratings, user reviews, sentiment analysis for Xbox-related tweets, and more. The data collection process involves Python-based scraping scripts, while the pipeline is orchestrated by Airflow, running efficiently and at scale on Kubernetes (GKE) for data processing.
 
 ## Architecture
 
