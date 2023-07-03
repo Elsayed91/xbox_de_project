@@ -100,6 +100,9 @@ make setup
     
 -   **Game Pass Status Matching:** The function responsible for adding Game Pass Status to the data is functional; however, it may occasionally yield inaccurate results due to title mismatches between Metacritic.com and the [Xbox Game Pass Master List](https://docs.google.com/spreadsheets/d/1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg/edit#gid=0). While the dashboard addresses this issue, some individual game lookups might still be affected by these mismatches.
 
+- **Twitter Code:** Kindly note that as of the 1st of July twitter has been made to require authentication for viewing. This has rendered Snscrape useless. 
+According to this [tweet](https://twitter.com/AqueelMiq/status/1674843555486134272) this is temporary. If this is not reverted soon, then a [fork of Snscrape](https://github.com/vladkens/twscrape) that includes authentication could be used instead. 
+
 
 
 
