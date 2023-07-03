@@ -74,7 +74,7 @@ The project aims to collect and analyze Xbox-specific data from various sources,
 flowchart LR
 
 A[Data Scraping] --> B[Data Storage]
-A --> C[Data Ingestion]
+B --> C[Data Ingestion]
 C --> D[Data Analysis]
 D --> E[Insights & Metrics]
 E --> F[(Decision Making)]
