@@ -36,9 +36,6 @@
   <summary>Table of Contents</summary>
   <ol>
     <li><a href="#architecture">Architecture</a></li>
-      <!-- <ul>
-        <li><a href="#highlevel-overview">Highlevel Overview</a></li>
-      </ul> -->
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -68,19 +65,7 @@ The project aims to periodically collect and analyze Xbox-specific data from var
 </div>
 
 
-<!-- ### Highlevel Overview:
 
-```mermaid
-flowchart LR
-
-A[Data Scraping] --> B[Data Storage]
-B --> C[Data Ingestion]
-C --> D[Data Analysis]
-D --> E[Insights & Metrics]
-E --> F[(Decision Making)]
-```
-
-     -->
 
 ## Getting Started
 
