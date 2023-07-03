@@ -98,7 +98,7 @@ make setup
 
 -   **Weighted Performance Metric:** The dashboard employs a weighted performance metric to handle uncertainties in game ratings effectively. This approach ensures that games with only a few highly-rated reviews do not receive higher scores than games with many slightly lower ratings. The weighted metric is derived from Wilson's interval, a statistical method that takes into account the uncertainty tied to the true rating of a game.
     
--   **Game Pass Status Matching:** The function responsible for adding Game Pass Status to the data is functional; however, it may occasionally yield inaccurate results due to title mismatches between Metacritic.com and the [Xbox Game Pass Master List](https://docs.google.com/spreadsheets/d/1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg/edit#gid=0). While the dashboard addresses this issue, some individual gamepass status lookups might still be affected by these mismatches.
+-   **Game Pass Status Matching:** The function responsible for adding Game Pass Status to the data is functional; however, it may occasionally yield inaccurate results due to title mismatches between Metacritic.com and the [Xbox Game Pass Master List](https://docs.google.com/spreadsheets/d/1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg/edit#gid=0). While the dashboard addresses this issue, some individual game lookups might still be affected by these mismatches.
 
 
 

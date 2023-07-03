@@ -12,7 +12,7 @@ $(foreach v,$(VARS),$(eval $(shell echo export $(v)="$($(v))")))
 
 
 # Setup target to run the setup script
-setup: #install_dependencies
+setup: install_dependencies
 	@bash setup.sh
 
 install_dependencies:
