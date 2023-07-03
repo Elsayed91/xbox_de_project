@@ -72,7 +72,7 @@ The project's architecture is designed to periodically gather, process, and anal
 flowchart LR
 
 A[Data Scraping] --> B[Data Storage]
-A --> C[Data Ingestion]
+B --> C[Data Ingestion]
 C --> D[Data Analysis]
 D --> E[Insights & Metrics]
 E --> F[(Decision Making)]
